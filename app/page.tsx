@@ -10,28 +10,6 @@ import { getCharacterById, getRepeatThreadById, getScenarioById, getScenarioReco
 import { Badge } from "@/components/ui/badge";
 
 
-const current = [
-    {
-        type: "scenario",
-        id: "",
-        orgId: "",
-    }
-]
-
-const records = [
-    {
-        type: "scenario",
-        _id: "",
-        userId: "",
-        time: "",
-        orgId: "",
-    },
-    {
-        type: "repeat",
-        id: "",
-    }
-]
-
 export default async function Home() {
     const { userId, orgId } = auth();
     const current = await kv.hgetall('current@' + 'demo')
