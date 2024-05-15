@@ -1,4 +1,4 @@
-
+// @ts-ignore
 import { PromptTemplate } from "@langchain/core/prompts";
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from '@ai-sdk/openai';
