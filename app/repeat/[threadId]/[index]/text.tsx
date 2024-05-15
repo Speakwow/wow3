@@ -1,7 +1,7 @@
 'use client'
 import { Button } from "@/components/ui/button"
 import { Card, CardFooter } from "@/components/ui/card";
-import { IconPause, IconPlay, IconRefLeft, IconRefRight, IconRight, IconRightArrow, IconRollback } from "@/components/ui/icons"
+import { IconRightArrow} from "@/components/ui/icons"
 import { sttFromMic, sttFromMicWithAssess } from "@/lib/speech/asr";
 import { EvalResult, evalSpeechFromFile } from "@/lib/speech/eval";
 import { synthesizeSpeech } from "@/lib/speech/tts";

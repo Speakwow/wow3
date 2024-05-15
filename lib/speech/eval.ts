@@ -3,9 +3,11 @@ import { ResultReason } from 'microsoft-cognitiveservices-speech-sdk';
 import _ from "lodash"
 
 export interface EvalResult {
+  text:string;
   pronunciation: number;
   accuracy: number;
   fluency: number;
+  completeness:number;
   prosody: number;
   length:number;
   sum:number;
@@ -34,12 +36,14 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
         console.log(`RECOGNIZED: Text=${result.text}`);
         var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
         var evalResult = {
-          pronunciation: pronunciation_result.accuracyScore,
-          accuracy: pronunciation_result.pronunciationScore,
-          fluency: pronunciation_result.completenessScore,
+          text:result.text,
+          pronunciation: pronunciation_result.pronunciationScore,
+          accuracy: pronunciation_result.accuracyScore,
+          fluency: pronunciation_result.fluencyScore,
+          completeness: pronunciation_result.completenessScore,
           prosody: pronunciation_result.prosodyScore,
-          length: pronunciation_result.detailResult.Words.length,
-        }
+          length: pronunciation_result.detailResult.Words,
+        }     
         console.log(evalResult)
         // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',
         //   "pronunciation score: ", pronunciation_result.pronunciationScore, '\n',
@@ -86,13 +90,14 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
         var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
         var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
         var evalResult = {
+          text:result.text,
           pronunciation: pronunciation_result.pronunciationScore,
           accuracy: pronunciation_result.accuracyScore,
           fluency: pronunciation_result.fluencyScore,
+          completeness: pronunciation_result.completenessScore,
           prosody: pronunciation_result.prosodyScore,
-          length: pronunciation_result.detailResult.Words.length,
-          sum:(pronunciation_result.accuracyScore + pronunciation_result.fluencyScore)/2
-        }        
+          length: pronunciation_result.detailResult.Words,
+        }             
         resolve(evalResult);
         reco.close();
         // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',

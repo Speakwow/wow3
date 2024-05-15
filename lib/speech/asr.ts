@@ -45,3 +45,31 @@ export async function sttFromMic() {
   })
 }
 
+
+export async function sttFromMicWithAssess(referenceText: string) {
+  const speechConfig = sdk.SpeechConfig.fromSubscription("48f483a59dea4064893000232ef9612b", "eastus");
+  speechConfig.speechRecognitionLanguage = 'en-US';
+  const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
+  const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+
+  const pronunciationAssessmentConfig = new sdk.PronunciationAssessmentConfig(
+    referenceText,
+    sdk.PronunciationAssessmentGradingSystem.HundredMark,
+    sdk.PronunciationAssessmentGranularity.Phoneme,
+    false
+  );
+  pronunciationAssessmentConfig.enableProsodyAssessment = true;
+  pronunciationAssessmentConfig.applyTo(recognizer);
+
+  return new Promise((resolve, reject) => {
+    recognizer.recognizeOnceAsync(result => {
+      if (result.reason === ResultReason.RecognizedSpeech) {
+        var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
+        resolve({ text: result.text, ...pronunciation_result });
+      } else {
+        reject(new Error(result.errorDetails || 'Recognition failed'));
+      }
+    });
+  })
+}
+

@@ -3,7 +3,6 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { kv } from '@vercel/kv';
 import { NextRequest,NextResponse } from "next/server";
 
-export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
     const data = await req.json()

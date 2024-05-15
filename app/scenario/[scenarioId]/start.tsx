@@ -1,6 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
-import Chat from "./chat";
+import Chat from "@/components/chat";
 import React, { useState, useEffect, useRef } from 'react';
 
 export default function Initial({chatid,scenarioId,characterId,scenario,character}: { chatid: string, scenarioId: string,characterId:string, scenario:any, character: any }) {

@@ -32,6 +32,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "howler": "^2.2.4",
+    "langchain": "^0.1.37",
     "lodash": "^4.17.21",
     "lucide-react": "^0.367.0",
     "microsoft-cognitiveservices-speech-sdk": "^1.36.0",
