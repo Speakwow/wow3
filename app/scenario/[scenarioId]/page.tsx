@@ -19,7 +19,6 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
   } 
 
   const characterDoc = await getCharacterById(characterId)
-
   const scenario = JSON.parse(JSON.stringify(scenarioDoc));
   const character = JSON.parse(JSON.stringify(characterDoc));
 
@@ -57,7 +56,7 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
           <code className="relative rounded bg-muted px-[0.3rem] py-[0.10rem] font-mono text-sm font-semibold">📚上课中：{scenario.name}</code>
         </div>
         {scenario.welcomeMessage ?
-          <Chat chatid={chatid} scenarioId={params.scenarioId} characterId={characterId} scenario={scenario} character={character} />
+          <Initial chatid={chatid} scenarioId={params.scenarioId} characterId={characterId} scenario={scenario} character={character} />
           :
           <div>
             No Scenario
