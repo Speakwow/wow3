@@ -1,0 +1,47 @@
+import * as sdk from "microsoft-cognitiveservices-speech-sdk"
+import { ResultReason } from 'microsoft-cognitiveservices-speech-sdk';
+import { evalSpeechFromFile } from "./eval";
+import { webm2Wav } from "./wav";
+
+export async function sttFromMic() {
+  const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+  speechConfig.speechRecognitionLanguage = 'en-US';
+  const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
+  const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+
+  // // 使用 MediaRecorder API 进行录音
+  // const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  // const mediaRecorder = new MediaRecorder(stream);
+  // let audioChunks: Blob[] = [];
+  // mediaRecorder.start();
+  // mediaRecorder.ondataavailable = event => {
+  //   audioChunks.push(event.data);
+  // };
+
+  return new Promise((resolve, reject) => {
+    recognizer.recognizeOnceAsync(result => {
+      if (result.reason === ResultReason.RecognizedSpeech) {
+        resolve(result.text);
+        // mediaRecorder.stop();
+        // mediaRecorder.onstop = async () => {
+        //   // 创建 Blob 保存音频文件
+        //   const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        //   const wavBlob = await webm2Wav(audioBlob)
+        //   const audioUrl = URL.createObjectURL(wavBlob);
+        //   // downloadWavFile(wavBlob, 'output.wav');
+        //   evalSpeechFromFile(result.text,wavBlob).then(evalResult =>{
+        //     resolve(evalResult)
+        //   })
+        //   URL.revokeObjectURL(audioUrl);
+        //   audioChunks = []; // 清空数组以释放内存
+        // };
+        recognizer.close()
+        
+      } else {
+        reject(new Error(result.errorDetails || 'Recognition failed'));
+        recognizer.close()
+      }
+    });
+  })
+}
+
