@@ -1,4 +1,6 @@
+// @ts-ignore
 import { ChatOpenAI } from "@langchain/openai";
+// @ts-ignore
 import { PromptTemplate } from "@langchain/core/prompts";
 import { kv } from '@vercel/kv';
 import { NextRequest,NextResponse } from "next/server";
