@@ -1,5 +1,5 @@
 import { ChatOpenAI } from "@langchain/openai";
-//@ts-config
+// @ts-ignore
 import { PromptTemplate } from "@langchain/core/prompts";
 import { kv } from '@vercel/kv';
 import { NextRequest,NextResponse } from "next/server";
