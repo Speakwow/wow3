@@ -13,13 +13,14 @@ import { Howl, Howler } from 'howler';
 import TextWithHighlights from "./correct";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { Bravo } from "./bravo";
+import { Bravo } from "../../../../../components/bravo";
+import { updateWordRecord } from "@/lib/action/mongoIO";
 
 // function HighlightWords({ story }: { story: any }) {
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
 // }
-
-export default function RepeatText({ text, index }: { text: any, index: number }) {
+let pronscore = 0;
+export default function RepeatText({ text, index ,info,recordId}: { text: any, index: number,info:any,recordId:string }) {
 
     const [audioFile, setAudioFile] = useState('')
 
@@ -79,7 +80,6 @@ export default function RepeatText({ text, index }: { text: any, index: number }
 
     //handle Play
     const handleReplay = async () => {
-        setCorrect('')
         setDisplayText('Replaying...');
         setRecognitionText('')
         var sound = new Howl({
@@ -100,25 +100,16 @@ export default function RepeatText({ text, index }: { text: any, index: number }
         sound.play();
     }
 
-    //Handle Correct
-    const [correct, setCorrect] = useState('')
-    async function handleCorrect(reference: string, result: string) {
-        const res = await fetch('/api/correct',
-            {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ reference: reference, result: result })
-            })
-        const data = await res.json()
-        setCorrect(data.message)
-    }
 
 
     //Handle Asr with Eval
     const handleSpeechToText = async () => {
-        setCorrect('')
+        var sound = new Howl({
+            src: ['/sound/asr-on.wav'],
+            format: ['wav'],
+            autoplay: true,
+          });
+          sound.play();
         setDisplayText('Repeat After Me...');
         setLoading(true)
         setRecognitionText('');
@@ -134,11 +125,16 @@ export default function RepeatText({ text, index }: { text: any, index: number }
             };
 
             const asrText = await sttFromMic() as string;
-            handleCorrect(text, asrText)
             setDisplayText('Reviewing...');
-            setRecognitionText(asrText);
+            // setRecognitionText(asrText);
             mediaRecorder.stop();
             mediaRecorder.onstop = async () => {
+                var sound = new Howl({
+                    src: ['/sound/asr-off.wav'],
+                    format: ['wav'],
+                    autoplay: true,
+                  });
+                  sound.play();
                 // 创建 Blob 保存音频文件
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 stream.getTracks().forEach(track => track.stop());
@@ -146,6 +142,8 @@ export default function RepeatText({ text, index }: { text: any, index: number }
                 // const audioUrl = URL.createObjectURL(wavBlob);
                 // downloadWavFile(wavBlob, 'output.wav');
                 const evalResult = await evalSpeechFromFile(text, wavBlob) as EvalResult;
+                setRecognitionText(evalResult.text);
+                pronscore = evalResult.accuracy
                 setPronResult({
                     accuray: evalResult.accuracy,
                     fluency: evalResult.fluency,
@@ -169,19 +167,20 @@ export default function RepeatText({ text, index }: { text: any, index: number }
     };
 
     const nextPage = () => {
+        updateWordRecord(recordId,index,pronscore,text)
         router.push('./' + (index + 1))
     }
 
     return (
-        <div className="flex flex-col items-center justify-between h-full">
+        <div className="flex flex-col items-center justify-center h-full">
             <div className="w-full relative text-3xl  mx-6 flex">
                 <audio ref={audioRef} className="sr-only">
                 </audio>
 
-                <Card className="z-50 p-8 rounded-[36px] w-full sticky font-semibold text-center ">
+                <Card className="z-50 p-4 rounded-[36px] w-full sticky font-semibold text-center bg-white/75">
                     <div className="flex justify-center pb-4">
-                        {recognitionText.length > 0 && correct && !isRecognizing ?
-                            <Bravo score={90} mistakeCount={mistakeCount} />
+                        {recognitionText.length > 0  && !isRecognizing ?
+                            <Bravo score={pronscore} mistakeCount={mistakeCount} />
                             :
                             <div>
                                 <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying}>
@@ -195,13 +194,11 @@ export default function RepeatText({ text, index }: { text: any, index: number }
                     {!recognitionText ?
                         <div>{text}</div>
                         :
-                        !correct ? <div>{recognitionText}</div> :
-                            <div className="text-[#19B700]">
-                                <TextWithHighlights text={correct} setMistakeCount={setMistakeCount} />
-                            </div>
+                        pronscore > 90 ? <div className="text-[#42C83C]">{recognitionText}</div> :
+                        <div>{recognitionText}</div>
                     }
                     <div className='flex justify-center text-xl text-black/50 mt-8'>
-                        {index} / 6
+                         
                     </div>
 
                 </Card>
@@ -225,7 +222,7 @@ export default function RepeatText({ text, index }: { text: any, index: number }
 
                     </Button>
                     {recognitionText.length > 0 && !isRecognizing ?
-                        <Button size="icon" className='rounded-full p-3 w-fit h-fit bg-[#00D422] border-4 border-white ' onClick={() => nextPage()}>
+                        <Button size="icon" className='rounded-full p-3 w-fit h-fit bg-[#42C83C] border-4 border-white ' onClick={() => nextPage()}>
                             <IconRightArrow className="w-6 h-6" />
                         </Button>
                         :

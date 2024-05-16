@@ -52,9 +52,132 @@ export async function getRepeatThreadById(threadId:string) {
 export async function getRepeatPageByIndex(threadId:string,index:number) {
   const mongo = await connect()
   const repeatPage = await mongo.db(DB).collection(C_REPEAT_PAGES).findOne({ threadId: threadId, index:index})
-  console.log(repeatPage)
   return repeatPage
 }
+
+
+export async function createRepeatRecord(threadId:string,userId:string){
+  const now = Date.now(); // 获取当前时间的时间戳
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+  .collection('repeat_records')
+  .insertOne({
+      threadId:threadId,
+      userId:userId,
+      isFinished:false,
+      createAt:now,
+      score:0,
+      record:[]
+    });
+  return res.insertedId.toString()
+}
+
+export async function finishRepeatRecord(recordId:string){
+const now = Date.now(); // 获取当前时间的时间戳
+const mongo = await connect()
+const current = await mongo.db(DB)
+.collection('repeat_records')
+.findOne({_id:new ObjectId(recordId)})
+const final_score = (current?.record.reduce((sum:number, record:any) => sum + parseFloat(record.score), 0))/current?.record.length;
+const duration = (now - current?.createAt)/60000
+const res = await mongo.db(DB)
+.collection('repeat_records')
+.updateOne(
+  {_id:new ObjectId(recordId)},
+  {$set:{
+    isFinished:true,
+    finishAt:now,
+    score:final_score,
+  }});
+return {final_score,current,duration}
+}
+
+
+export async function updateRepeatRecord(recordId:string,index:number,score:number,text:string){
+  const newRecord ={
+      text:text,
+      score:score,
+      index:index
+  }
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+  .collection('repeat_records')
+  .updateOne(
+      {_id: new ObjectId(recordId)},
+      //@ts-ignore
+      {$push:{record:newRecord}
+  })
+  return res
+}
+
+
+export async function getWordThreadById(threadId:string) {
+    const mongo = await connect()
+    const repeatThread = await mongo.db(DB).collection("word_threads").findOne({ _id: new ObjectId(threadId as string)})
+    return repeatThread
+  }
+  
+  
+export async function getWordPageByIndex(threadId:string,index:number) {
+const mongo = await connect()
+const repeatPage = await mongo.db(DB).collection("word_pages").findOne({ threadId: threadId, index:index})
+return repeatPage
+}
+
+export async function createWordRecord(threadId:string,userId:string){
+    const now = Date.now(); // 获取当前时间的时间戳
+    const mongo = await connect()
+    const res = await mongo.db(DB)
+    .collection('word_records')
+    .insertOne({
+        threadId:threadId,
+        userId:userId,
+        isFinished:false,
+        createAt:now,
+        score:0,
+        record:[]
+      });
+    return res.insertedId.toString()
+}
+
+export async function finishWordRecord(recordId:string){
+  const now = Date.now(); // 获取当前时间的时间戳
+  const mongo = await connect()
+  const current = await mongo.db(DB)
+  .collection('word_records')
+  .findOne({_id:new ObjectId(recordId)})
+  const final_score = (current?.record.reduce((sum:number, record:any) => sum + parseFloat(record.score), 0))/current?.record.length;
+  const duration = (now - current?.createAt)/60000
+  const res = await mongo.db(DB)
+  .collection('word_records')
+  .updateOne(
+    {_id:new ObjectId(recordId)},
+    {$set:{
+      isFinished:true,
+      finishAt:now,
+      score:final_score,
+    }});
+  return {final_score,current,duration}
+}
+
+
+export async function updateWordRecord(recordId:string,index:number,score:number,text:string){
+    const newRecord ={
+        text:text,
+        score:score,
+        index:index
+    }
+    const mongo = await connect()
+    const res = await mongo.db(DB)
+    .collection('word_records')
+    .updateOne(
+        {_id: new ObjectId(recordId)},
+        //@ts-ignore
+        {$push:{record:newRecord}
+    })
+    return res
+}
+
 
 
 export async function getAllLessons() {
@@ -107,3 +230,4 @@ export async function getScenarioRecordByUserId(userId:string){
     .toArray();
     return res[0]
 }
+

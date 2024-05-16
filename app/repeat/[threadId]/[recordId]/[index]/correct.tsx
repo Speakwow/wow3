@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 
 export const TextWithHighlights = ({ text ,setMistakeCount }:{text:string,setMistakeCount:React.Dispatch<React.SetStateAction<number>>}) => {

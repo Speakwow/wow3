@@ -22,7 +22,7 @@ export function synthesizeSpeech(text: string,onComplete:AudioDataCallback) {
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(
-        createSSML(text, "en-US-TonyNeural", "excited", "0.7"),
+        createSSML(text, "en-GB-RyanNeural", "cheerful", "0.7"),
         result => {
             if (result) {
                 speechSynthesizer.close();
@@ -43,7 +43,7 @@ export function synthesizeSpeechWithVoice(text: string,voice:string,onComplete:A
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(
-        createSSML(text,voice, "excited", "0.7"),
+        createSSML(text,voice, "cheerful", "0.7"),
         result => {
             if (result) {
                 speechSynthesizer.close();
