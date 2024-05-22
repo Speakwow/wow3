@@ -15,7 +15,7 @@ import CurrentLessonCard from "./current-lesson";
 
 export default async function Home() {
     const { userId, orgId } = auth();
-    const current = await kv.hgetall('current@' + 'hailing')
+    // const current = await kv.hgetall('current@' + 'hailing')
 
     // // const recordList = await kv.smembers('record@' + userId)
     // let currentLesson;
