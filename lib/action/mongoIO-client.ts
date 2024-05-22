@@ -33,20 +33,20 @@ export async function getScenarioByName(name:string) {
 export async function getScenarioById(id:string) {
   const mongo = await connect()
   const scenario = await mongo.db(DB).collection(C_SCENARIOS).findOne({ _id: new ObjectId(id as string)})
-  return scenario
+  return JSON.parse(JSON.stringify(scenario))
 }
 
 
 export async function getCharacterById(id:string) {
   const mongo = await connect()
   const character= await mongo.db(DB).collection(C_CHARACTERS).findOne({ _id: new ObjectId(id as string)})
-  return character
+  return JSON.parse(JSON.stringify(character))
 }
 
 export async function getRepeatThreadById(threadId:string) {
   const mongo = await connect()
   const repeatThread = await mongo.db(DB).collection(C_REPEAT_THREADS).findOne({ _id: new ObjectId(threadId as string)})
-  return repeatThread
+  return JSON.parse(JSON.stringify(repeatThread))
 }
 
 
@@ -119,14 +119,14 @@ export async function getRepeatRecordByUserId(userId:string){
   .sort({ score: -1 }) // 按 createAt 字段降序排序
   .limit(1) // 只获取一条记录
   .toArray();
-  return res[0]
+  return JSON.parse(JSON.stringify(res[0]))
 }
 
 //Talk about
 export async function getTalkaboutById(threadId:string) {
   const mongo = await connect()
   const repeatThread = await mongo.db(DB).collection("talkabouts").findOne({ _id: new ObjectId(threadId as string)})
-  return repeatThread
+  return JSON.parse(JSON.stringify(repeatThread))
 }
 
 export async function createTalkaboutRecord(threadId:string,userId:string){
@@ -172,7 +172,7 @@ export async function getTalkaboutRecordByUserId(userId:string){
   .sort({ score: -1 }) // 按 createAt 字段降序排序
   .limit(1) // 只获取一条记录
   .toArray();
-  return res[0]
+  return JSON.parse(JSON.stringify(res[0]))
 }
 
 
@@ -180,7 +180,7 @@ export async function getTalkaboutRecordByUserId(userId:string){
 export async function getWordThreadById(threadId:string) {
     const mongo = await connect()
     const repeatThread = await mongo.db(DB).collection("word_threads").findOne({ _id: new ObjectId(threadId as string)})
-    return repeatThread
+    return JSON.parse(JSON.stringify(repeatThread))
   }
   
   
@@ -252,7 +252,7 @@ export async function getWordRecordByUserId(userId:string){
   .sort({ score: -1 }) // 按 createAt 字段降序排序
   .limit(1) // 只获取一条记录
   .toArray();
-  return res[0]
+  return JSON.parse(JSON.stringify(res[0]))
 }
 
 
@@ -269,7 +269,7 @@ export async function getLessonListById(lessonId:string) {
   noStore()
   const mongo = await connect()
   const lesson = mongo.db(DB).collection('lessons').find({_id: new ObjectId(lessonId as string)})
-  return lesson
+  return JSON.parse(JSON.stringify(lesson))
 }
 
 
@@ -308,6 +308,6 @@ export async function getScenarioRecordByUserId(userId:string){
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
-    return res[0]
+    return JSON.parse(JSON.stringify(res[0]))
 }
 

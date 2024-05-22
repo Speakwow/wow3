@@ -43,6 +43,7 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
           completeness: pronunciation_result.completenessScore,
           prosody: pronunciation_result.prosodyScore,
           length: pronunciation_result.detailResult.Words,
+          topic:pronunciation_result.contentAssessmentResult,
         }     
         console.log(evalResult)
         // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',
@@ -98,6 +99,61 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
           prosody: pronunciation_result.prosodyScore,
           length: pronunciation_result.detailResult.Words,
         }             
+        resolve(evalResult);
+        reco.close();
+        // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',
+        //   "pronunciation score: ", pronunciation_result.pronunciationScore, '\n',
+        //   "completeness score : ", pronunciation_result.completenessScore, '\n',
+        //   "fluency score: ", pronunciation_result.fluencyScore, '\n',
+        //   "prosody score: ", pronunciation_result.prosodyScore
+        // );
+        // console.log("Word-level details:");
+        // _.forEach(pronunciation_result.detailResult.Words, (word, idx) => {
+        //   console.log("    ", idx + 1, ": word: ", word.Word, "\taccuracy score: ", word.PronunciationAssessment?.AccuracyScore, "\terror type: ", word.PronunciationAssessment?.ErrorType, ";");
+        // });
+        reco.close();
+      }, err => {
+      
+          reject(err);  // Reject the promise if there's an error
+          reco.close();
+    });
+    })
+  }
+
+
+
+
+  export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob) {
+    return new Promise(async (resolve, reject) => {
+    const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
+    speechConfig.speechRecognitionLanguage = 'en-GB';
+    const audioFile = new File([audioBlob], "input.wav", { type: "audio/wav" });
+    var audioConfig = sdk.AudioConfig.fromWavFileInput(audioFile)
+    const reco = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+    const pronunciationAssessmentConfig = new sdk.PronunciationAssessmentConfig(
+      "",
+      sdk.PronunciationAssessmentGradingSystem.HundredMark,
+      sdk.PronunciationAssessmentGranularity.Phoneme,
+      false
+    );
+    pronunciationAssessmentConfig.enableProsodyAssessment = true;
+    pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
+    pronunciationAssessmentConfig.applyTo(reco);
+    console.log(`Topic: `+topic)
+    reco.recognizeOnceAsync(result => {
+        console.log(`RECOGNIZED: Text=${result.text}`);
+        var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
+    
+        var evalResult = {
+          text:result.text,
+          pronunciation: pronunciation_result.pronunciationScore,
+          accuracy: pronunciation_result.accuracyScore,
+          fluency: pronunciation_result.fluencyScore,
+          completeness: pronunciation_result.completenessScore,
+          prosody: pronunciation_result.prosodyScore,
+          length: pronunciation_result.detailResult.Words,
+        }             
+        console.log(pronunciation_result)
         resolve(evalResult);
         reco.close();
         // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',
