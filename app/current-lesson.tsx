@@ -88,7 +88,10 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
                                 <div className="flex flex-col justify-center text-center gap-2">
                                     <CardTitle className="gap-2">
                                         <Badge className="text-md rounded-full px-8 py-2 bg-[#42C83C]">
-                                            {current?.type == 'repeat' ? <p>跟读练习</p> : 'scenario' ? <p>情景对话</p> :'word' ? <p>词汇练习</p>:'talkabout' ? <p>看图说话</p>: <div></div>}
+                                        {current?.type == 'repeat' && <p>跟读练习</p>}
+                                            {current?.type == 'scenario' && <p>情景对话</p>}
+                                            {current?.type == 'talkabout' && <p>看图说话</p>}
+                                            {current?.type == 'word' && <p> 词汇练习</p>}
                                         </Badge>
                                         <div className="text-3xl p-4">
                                             {currentLesson?.name}
@@ -123,7 +126,10 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
                                 <div className="flex flex-col justify-center text-center gap-2">
                                     <CardTitle className="gap-2">
                                         <Badge className="text-md rounded-full px-8 py-2 bg-[#42C83C]">
-                                            {current?.type == 'repeat' ? <p>跟读练习</p> : 'scenario' ? <p>情景对话</p> :'word' ? <p>词汇练习</p>: 'talkabout' ? <p>看图说话</p> : <p></p>}
+                                            {current?.type == 'repeat' && <p>跟读练习</p>}
+                                            {current?.type == 'scenario' && <p>情景对话</p>}
+                                            {current?.type == 'talkabout' && <p>看图说话</p>}
+                                            {current?.type == 'word' && <p> 词汇练习</p>}
                                         </Badge>
                                         <div className="text-3xl p-4">
                                             {currentLesson?.name}
