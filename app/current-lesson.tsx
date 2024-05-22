@@ -26,7 +26,11 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
         const res = await fetch('/api/getCurrent')
         const data = await res.json()
         console.log(data)
+        if(data.id&&data.type){
         setCurrent({id:data.id,type:data.type})
+        }else{
+            setCurrent(null)
+        }
 
     }
 
