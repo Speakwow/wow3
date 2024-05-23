@@ -42,10 +42,9 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
           fluency: pronunciation_result.fluencyScore,
           completeness: pronunciation_result.completenessScore,
           prosody: pronunciation_result.prosodyScore,
-          length: pronunciation_result.detailResult.Words,
+          length: pronunciation_result.detailResult.Words.length,
           topic:pronunciation_result.contentAssessmentResult,
         }     
-        console.log(evalResult)
         // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',
         //   "pronunciation score: ", pronunciation_result.pronunciationScore, '\n',
         //   "completeness score : ", pronunciation_result.completenessScore, '\n',
@@ -89,7 +88,7 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
     reco.recognizeOnceAsync(result => {
         console.log(`RECOGNIZED: Text=${result.text}`);
         var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
-        var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
+        console.log(pronunciation_result)
         var evalResult = {
           text:result.text,
           pronunciation: pronunciation_result.pronunciationScore,
@@ -97,7 +96,7 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
           fluency: pronunciation_result.fluencyScore,
           completeness: pronunciation_result.completenessScore,
           prosody: pronunciation_result.prosodyScore,
-          length: pronunciation_result.detailResult.Words,
+          length: pronunciation_result.detailResult.Words.length,
         }             
         resolve(evalResult);
         reco.close();
@@ -111,7 +110,6 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
         // _.forEach(pronunciation_result.detailResult.Words, (word, idx) => {
         //   console.log("    ", idx + 1, ": word: ", word.Word, "\taccuracy score: ", word.PronunciationAssessment?.AccuracyScore, "\terror type: ", word.PronunciationAssessment?.ErrorType, ";");
         // });
-        reco.close();
       }, err => {
       
           reject(err);  // Reject the promise if there's an error
@@ -151,7 +149,7 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
           fluency: pronunciation_result.fluencyScore,
           completeness: pronunciation_result.completenessScore,
           prosody: pronunciation_result.prosodyScore,
-          length: pronunciation_result.detailResult.Words,
+          length: pronunciation_result.detailResult.Words.length,
         }             
         console.log(pronunciation_result)
         resolve(evalResult);

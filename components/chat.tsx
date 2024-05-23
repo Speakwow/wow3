@@ -171,7 +171,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         const wavBlob = await webm2Wav(audioBlob)
         // const audioUrl = URL.createObjectURL(wavBlob);
         // downloadWavFile(wavBlob, 'output.wav');
-        const evalResult = await evalSpeechFromFile(text, wavBlob) as EvalResult;
+        const evalResult = await evalSpeechFromFile(text, wavBlob) as any;
         dialogLength = dialogLength + evalResult.length;
         totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
         totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
@@ -230,18 +230,21 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   const reportTriggerRef = useRef<HTMLButtonElement>(null);
   //handle Report
   function handleReport() {
-    stayTime = Date.now() - startTime
-    const reportResult = {
-      accuracy:totalAccuracyScore / dialogLength,
-      fluency:totalFluencyScore / dialogLength,
-      
-      duration:Math.round((stayTime / 1000)),
-      round:messages.length,
-    }
-    updateScenarioRecord(params.chatid,reportResult)
+
     const lowerCaseMessage = currentMessage.toLowerCase()
+    console.log(totalAccuracyScore / dialogLength)
     if (lowerCaseMessage.includes('goodbye' || 'bye' || 'see you' || 'bye-bye')) {
       if (reportTriggerRef.current) {
+        stayTime = Date.now() - startTime
+        const reportResult = {
+          score:Math.round(totalPronScore / dialogLength),
+          accuracy:Math.round(totalAccuracyScore / dialogLength),
+          fluency:Math.round(totalFluencyScore / dialogLength),
+          duration:Math.round((stayTime / 1000)),
+          round:messages.length,
+        }
+        console.log(reportResult)
+        updateScenarioRecord(params.chatid,reportResult)
         reportTriggerRef.current.click();
 
       }
@@ -378,7 +381,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
               </div>
               <div className='flex flex-col'>
                 <div className='text-center text-[#42C83C] text-5xl'>
-                  {(100 * (Math.pow(totalPronScore / dialogLength / 100, 1)) - (25 - messages.length) - ((8 - dialogLength * 2 / messages.length) * 2)).toFixed(1)}
+                  {(100 * (Math.pow(totalPronScore / dialogLength / 100, 1))).toFixed(1)}
                 </div>
               </div>
               <div className='grid grid-cols-2 text-center gap-4 py-6'>

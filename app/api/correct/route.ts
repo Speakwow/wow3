@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     console.log('Ref : '+data.reference)
     console.log('Res : '+data.result)
     // const template = await kv.get('prompt@correct') as string
-    const model = new ChatOpenAI({model: 'gpt-4'});
+    const model = new ChatOpenAI({model: 'gpt-4o'});
     const promptTemplate = PromptTemplate.fromTemplate(template);
     const chain = promptTemplate.pipe(model);
     const result = await chain.invoke({ 

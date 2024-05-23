@@ -279,7 +279,7 @@ export async function updateScenarioRecord(chatId:string,report:any) {
     const date = new Date(now); // 将时间戳转换为 Date 对象
     const lesson = mongo.db(DB).collection('scenario_records')
     .updateOne({_id: new ObjectId(chatId as string)},{$set:{
-        report,
+        ...report,
         isFinished:true,
         finishAt:date.toLocaleString()
     }})

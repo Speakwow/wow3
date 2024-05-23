@@ -13,7 +13,7 @@ import { Howl, Howler } from 'howler';
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Bravo } from "@/components/bravo";
-import { finishTalkaboutRecord, updateRepeatRecord } from "@/lib/action/mongoIO";
+import { finishTalkaboutRecord, updateRepeatRecord } from "@/lib/action/mongoIO-client";
 import { StopIcon } from "@radix-ui/react-icons";
 import Image from 'next/image'
 
@@ -61,18 +61,29 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
 
 
     //Handle Correct
-    const [correct, setCorrect] = useState('')
-    async function handleCorrect(reference: string, result: string) {
+    const [feedback, setFeedback] = useState('')
+    const [themeScore, setThemeScore] = useState(0)
+    const [vocabScore, setVocabScore] = useState(0)
+    const [grammarScore, setGrammarScore] = useState(0)
+    const [contentScore, setContentScore] = useState(0)
+    async function handleFeedback(image_url: string, answer:string) {
         const res = await fetch('/api/talkabout/feedback',
             {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ reference: reference, result: result })
+                body: JSON.stringify({ image_url: image_url, answer: answer })
             })
         const data = await res.json()
-        setCorrect(data.message)
+        const feedbackJson = JSON.parse(data.message)
+        console.log(feedbackJson)
+        // console.log(data.message)
+        setThemeScore(feedbackJson.Theme_Relevance_Score)
+        setVocabScore(feedbackJson.Vocabulary_Score)
+        setGrammarScore(feedbackJson.Grammarza_Syntax_Score)
+        setFeedback(feedbackJson.feedback)
+        setContentScore(feedbackJson.Overall_score)
     }
 
 
@@ -91,6 +102,8 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                         webm2Wav(audioBlob).then(wavBlob => {
                             evalSpeechWithTopicFromFile(topic, wavBlob).then(evalResult => {
                                 setPronResult(evalResult as any)
+                                //@ts-ignore
+                                handleFeedback(image_url,evalResult.text)
                                 console.log(evalResult)
                             })
                         }
@@ -131,16 +144,17 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
     }
 
     const finishLesson = async ()=>{
-        const finalScore = (pronResult.accuray+pronResult.fluency)/2
-        finishTalkaboutRecord(recordId,finalScore,'')
+        const finalScore = (contentScore*4+pronResult.accuracy+pronResult.fluency)/6
+        console.log(finalScore.toFixed(0))
+        await finishTalkaboutRecord(recordId,+finalScore.toFixed(0),feedback)
         router.push('/')
     }
 
 
 
     return (
-        <div className="flex flex-col items-center justify-center h-full gap-6">
-            <Card className={`p-4 text-center rounded-[36px] w-[250px] whitespace-pre-line ${step =="end"&&'text-white bg-[#42C83C]'} ${step =="practice"&&'border-2 border-[#42C83C]'}`}>
+        <div className="flex flex-col items-center justify-center h-full gap-4">
+            <Card className={`p-2 text-center rounded-[36px] w-[250px] whitespace-pre-line ${step =="end"&&'text-white bg-[#42C83C]'} ${step =="practice"&&'border-2 border-[#42C83C]'}`}>
                 {step =="prepare"&&<p>准备时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
                 {step =="practice"&&<p>作答时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
                 {step =="end"&&<p className="text-xl">🎉 练习已完成</p>}
@@ -159,7 +173,7 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                             objectFit: 'cover', // cover, contain, none
                         }}
 
-                        className="rounded-[36px] border-4 border-white h-[400px]"
+                        className={`rounded-[36px] border-4 border-white ${step=='end'?"h-[200px]":"h-[400px]"}`}
                     />
                 </div>
             </div>
@@ -239,7 +253,12 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                             练习结果
                         </CardTitle> */}
                     </CardHeader>
-                    <CardContent className="text-center grid grid-cols-3 px-10">
+                    {!feedback?
+                    <CardContent className="text-center grid grid-cols-3 gap-4 text-black/50">
+                        Frank 正在写评语...
+                    </CardContent>
+                    :
+                    <CardContent className="text-center grid grid-cols-4 gap-4">
                         {/* <div className="border-r">
                             主题相关性：<span className="text-[#42C83C] text-3xl">{pronResult?.topic as any}</span>
                         </div>
@@ -249,18 +268,30 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                         <div>
                             语法丰富度：<span className="text-[#42C83C] text-3xl">{pronResult?.grammar}</span>
                         </div> */}
-                        <div className="border-r">
-                            准确度：<span className="text-[#42C83C] text-3xl">{pronResult?.accuracy}</span>
+                        <div className="col-span-4">
+                            <Badge className="rounded-full px-6" variant="outline">
+                            总分：<span className="text-[#42C83C] text-3xl">{pronResult?.fluency}</span>
+                            </Badge>
+                        </div>
+                        <div className="col-span-4 px-6 text-xl text-[#42C83C] mb-4">
+                            {feedback}
                         </div>
                         <div>
-                            流利度：<span className="text-[#42C83C] text-3xl">{pronResult?.fluency}</span>
+                            词汇丰富度：<span className="text-[#42C83C] text-3xl">{vocabScore}</span>
                         </div>
                         <div>
-                            韵律自然度：<span className="text-[#42C83C] text-3xl">{pronResult?.prosody}</span>
+                            语法丰富度：<span className="text-[#42C83C] text-3xl">{grammarScore}</span>
+                        </div>
+                        <div>
+                            发音准确度：<span className="text-[#42C83C] text-3xl">{pronResult?.accuracy}</span>
+                        </div>
+                        <div>
+                            表达流利度：<span className="text-[#42C83C] text-3xl">{pronResult?.fluency}</span>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex justify-center text-xs items-center">
-                        <Button className="text-xl rounded-full px-8 py-6 bg-[#42C83C] text-white" onClick={finishLesson}>
+                    }
+                    <CardFooter className="flex justify-center text-xs items-center border-t p-6">
+                        <Button className="text-xl rounded-full w-1/2 py-6 bg-[#42C83C] text-white" onClick={finishLesson}>
                             完成练习
                         </Button>
                     </CardFooter>

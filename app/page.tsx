@@ -39,7 +39,7 @@ export default async function Home() {
     return (
         <div className="h-screen flex flex-col gap-12 lg:p-24 md:p-16 p-6 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%">
             <div className="text-center text-white w-full text-5xl">
-                开口蛙 EnglishWOW
+                开口蛙 SpeakWOW
             </div>
             <CurrentLessonCard userId={userId as string}/>
 

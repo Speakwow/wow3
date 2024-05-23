@@ -29,7 +29,7 @@ export async function POST(req: Request,{ params }:{ params: { scenario:string }
 
   // Ask OpenAI for a streaming chat completion given the prompt
   const response = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model: 'gpt-4o',
     stream: true,
     messages,
   });

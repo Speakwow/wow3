@@ -58,7 +58,7 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
         } else if (current.type == 'scenario') {
             getScenarioById(current.id as string).then(lesson=>{
                 setCurrentLesson(lesson)
-                getRepeatRecordByUserId(userId).then(result=>{
+                getScenarioRecordByUserId(userId).then(result=>{
                     setCurrentRecord(result)
                 })
             })
@@ -86,7 +86,7 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
             {!current ?
                 <div>当前无进行中课程</div> :
                 currentRecord && currentRecord.isFinished ?
-                    <Card className="border-[#42C83C] border-2 rounded-[40px] w-[150px]">
+                    <Card className="border-[#42C83C] border-2 rounded-[40px] max-w-96">
                         <CardHeader>
                             <div className="flex  gap-2">
                                 <div className="flex flex-col justify-center text-center gap-2">
@@ -112,12 +112,12 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardFooter className="flex p-6 flex-col border-t justify-center">
+                        <CardFooter className="flex p-6 flex-col border-t justify-center  gap-4">
                             {/* <Link href={`/${current.type}/${current.id}`}> */}
-                            <Badge className="rounded-full text-3xl">
+                            <Badge className="rounded-full text-3xl bg-[#42C83C] px-8">
                                 {currentRecord.score}
                             </Badge>
-                            <div>
+                            <div className="text-sm text-[#42C83C]">
                                 练习成绩
                             </div>
                             {/* </Link> */}
@@ -161,6 +161,10 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
 
 
             }
+            {current && currentRecord &&currentRecord.isFinished && 
+            <div className="text-white/50">
+            课程已完成，等待下一节课吧～
+            </div>}
             <Button size="icon" variant="secondary" onClick={fetchData}>
                 <RefreshCcwIcon />
             </Button>
