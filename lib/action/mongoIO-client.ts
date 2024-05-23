@@ -108,9 +108,7 @@ export async function updateRepeatRecord(recordId: string, index: number, score:
     .updateOne(
       { _id: new ObjectId(recordId) },
       //@ts-ignore
-      {
-        $push: { record: newRecord }
-      })
+      {$push: { record: newRecord }})
   return res
 }
 
@@ -246,9 +244,7 @@ export async function updateWordRecord(recordId: string, index: number, score: n
     .updateOne(
       { _id: new ObjectId(recordId) },
       //@ts-ignore
-      {
-        $push: { record: newRecord }
-      })
+      {$push: { record: newRecord }})
   return res
 }
 export async function getWordRecordByUserId(userId: string) {
