@@ -284,7 +284,7 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                             词汇丰富度：<span className="text-[#42C83C] text-3xl">{vocabScore}</span>
                         </div>
                         <div>
-                            语法丰富度：<span className="text-[#42C83C] text-3xl">{grammarScore}</span>
+                        句式丰富度：<span className="text-[#42C83C] text-3xl">{grammarScore}</span>
                         </div>
                         <div>
                             发音准确度：<span className="text-[#42C83C] text-3xl">{pronResult?.accuracy}</span>
