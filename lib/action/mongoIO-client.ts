@@ -145,7 +145,7 @@ export async function createTalkaboutRecord(threadId: string, userId: string) {
   return res.insertedId.toString()
 }
 
-export async function finishTalkaboutRecord(recordId: string, score: number, feedback: string) {
+export async function finishTalkaboutRecord(recordId: string, score: number, result:any) {
   const now = Date.now(); // 获取当前时间的时间戳
   const mongo = await connect()
   const current = await mongo.db(DB)
@@ -161,7 +161,7 @@ export async function finishTalkaboutRecord(recordId: string, score: number, fee
           isFinished: true,
           finishAt: now,
           score: score,
-          feedback: feedback,
+          ...result
         }
       });
 }

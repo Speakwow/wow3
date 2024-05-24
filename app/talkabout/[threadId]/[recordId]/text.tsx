@@ -2,19 +2,14 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconRightArrow } from "@/components/ui/icons"
-import { sttFromMic, sttFromMicWithAssess } from "@/lib/speech/asr";
-import { EvalResult, evalSpeechWithTopicFromFile } from "@/lib/speech/eval";
-import { synthesizeSpeech } from "@/lib/speech/tts";
+import { evalSpeechWithTopicFromFile } from "@/lib/speech/eval";
 import { webm2Wav } from "@/lib/speech/wav";
-import { AudioWaveformIcon, Mic, Recycle, Redo, Redo2, Redo2Icon, RedoDotIcon, RedoIcon, RefreshCcw, RefreshCwIcon, RefreshCwOffIcon, ReplyAllIcon, Volume1Icon } from "lucide-react";
+import {  Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from 'react';
-import { Howl, Howler } from 'howler';
+import { Howl} from 'howler';
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { Bravo } from "@/components/bravo";
-import { finishTalkaboutRecord, updateRepeatRecord } from "@/lib/action/mongoIO-client";
-import { StopIcon } from "@radix-ui/react-icons";
+import { finishTalkaboutRecord} from "@/lib/action/mongoIO-client";
 import Image from 'next/image'
 
 // function HighlightWords({ story }: { story: any }) {
@@ -25,12 +20,10 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
 
     const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
-    const [completed, setIsCompleted] = useState(false);
     const [isRecognizing, setIsRecognizing] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
-    const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
     const router = useRouter()
     const [isRecording, setIsRecording] = useState(false);
     const [step, setStep] = useState('prepare');
@@ -143,10 +136,21 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
         mediaRecorderRef.current?.stop();
     }
 
+    const [isSaving,setIsSaving] = useState(false)
     const finishLesson = async ()=>{
         const finalScore = (contentScore*4+pronResult.accuracy+pronResult.fluency)/6
         console.log(finalScore.toFixed(0))
-        await finishTalkaboutRecord(recordId,+finalScore.toFixed(0),feedback)
+        setIsSaving(true)
+        await finishTalkaboutRecord(recordId,+finalScore.toFixed(0),{
+            themeScore:themeScore,
+            vocabScore:vocabScore,
+            grammarScore:grammarScore,
+            feedback:feedback,
+            overallContentScore:contentScore,
+            overallPronScore:(pronResult.accuracy+pronResult.fluency)/2,
+            accuracy:pronResult.accuracy,
+            fluency:pronResult.fluency
+        })
         router.push('/')
     }
 
@@ -254,7 +258,7 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                         </CardTitle> */}
                     </CardHeader>
                     {!feedback?
-                    <CardContent className="text-center grid grid-cols-3 gap-4 text-black/50">
+                    <CardContent className="animated-pulse text-center grid grid-cols-3 gap-4 text-black/50">
                         Frank 正在写评语...
                     </CardContent>
                     :
@@ -291,7 +295,7 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                     </CardContent>
                     }
                     <CardFooter className="flex justify-center text-xs items-center border-t p-6">
-                        <Button className="text-xl rounded-full w-1/2 py-6 bg-[#42C83C] text-white" onClick={finishLesson}>
+                        <Button className="text-xl rounded-full w-1/2 py-6 bg-[#42C83C] text-white" onClick={finishLesson} disabled={isSaving}>
                             完成练习
                         </Button>
                     </CardFooter>
