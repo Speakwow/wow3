@@ -18,11 +18,11 @@ export function createSSML(text: string, name: string, style: string, degree: st
 type AudioDataCallback = (audioData: ArrayBuffer|null) => void;
 
 export function synthesizeSpeech(text: string,onComplete:AudioDataCallback) {
-    const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+    const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(
-        createSSML(text, "en-GB-RyanNeural", "cheerful", "0.7"),
+        createSSML(text, "en-US-TonyNeural", "cheerful", "0.7"),
         result => {
             if (result) {
                 speechSynthesizer.close();
@@ -39,7 +39,7 @@ export function synthesizeSpeech(text: string,onComplete:AudioDataCallback) {
 }
 
 export function synthesizeSpeechWithVoice(text: string,voice:string,onComplete:AudioDataCallback) {
-    const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+    const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(

@@ -16,7 +16,7 @@ export interface EvalResult {
 export async function evalSpeech(referenceText: string, audioBlob: Blob) {
   return new Promise(async (resolve, reject) => {
     const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
-    speechConfig.speechRecognitionLanguage = 'en-GB';
+    speechConfig.speechRecognitionLanguage = 'en-US';
     let pushStream = sdk.AudioInputStream.createPushStream();
     const arrayBuffer = await audioBlob.arrayBuffer();
     pushStream.write(arrayBuffer);
@@ -72,7 +72,7 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
   export async function evalSpeechFromFile(referenceText: string, audioBlob: Blob) {
     return new Promise(async (resolve, reject) => {
     const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
-    speechConfig.speechRecognitionLanguage = 'en-GB';
+    speechConfig.speechRecognitionLanguage = 'en-US';
     const audioFile = new File([audioBlob], "input.wav", { type: "audio/wav" });
     var audioConfig = sdk.AudioConfig.fromWavFileInput(audioFile)
     const reco = new sdk.SpeechRecognizer(speechConfig, audioConfig);
@@ -124,7 +124,7 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
   export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob) {
     return new Promise(async (resolve, reject) => {
     const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
-    speechConfig.speechRecognitionLanguage = 'en-GB';
+    speechConfig.speechRecognitionLanguage = 'en-US';
     const audioFile = new File([audioBlob], "input.wav", { type: "audio/wav" });
     var audioConfig = sdk.AudioConfig.fromWavFileInput(audioFile)
     const reco = new sdk.SpeechRecognizer(speechConfig, audioConfig);

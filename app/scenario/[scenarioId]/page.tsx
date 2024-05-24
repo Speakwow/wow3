@@ -13,7 +13,7 @@ import { auth } from "@clerk/nextjs/server"
 export default async function ChatPage({ params }: { params: { scenarioId: string } }) {
   const { userId, orgId } = auth();
   const scenarioDoc = await getScenarioById(params.scenarioId) as any
-  let characterId = "66435c61fd8764b993a473f4"
+  let characterId = "6650346b4b838ac30d19694c"
   if (scenarioDoc.character) {
     characterId = scenarioDoc.character
   } 

@@ -289,8 +289,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           </div>
 
         </div>
-        <div className='relative flex justify-center top-10'>
-          <Avatar className={`w-[300px] h-[300px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
+        <div className='relative flex justify-center top-10 p-4'>
+          <Avatar className={`w-[250px] h-[250px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
             <AvatarImage src={params.character.avatar} alt={params.character.name} />
           </Avatar>
         </div>

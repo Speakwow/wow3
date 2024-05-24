@@ -4,7 +4,7 @@ import { evalSpeechFromFile } from "./eval";
 import { webm2Wav } from "./wav";
 
 export async function sttFromMic() {
-  const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+  const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
   speechConfig.speechRecognitionLanguage = 'en-US';
   const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
@@ -47,7 +47,7 @@ export async function sttFromMic() {
 
 
 export async function sttFromMicWithAssess(referenceText: string) {
-  const speechConfig = sdk.SpeechConfig.fromSubscription("48f483a59dea4064893000232ef9612b", "eastus");
+  const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
   speechConfig.speechRecognitionLanguage = 'en-US';
   const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);

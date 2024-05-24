@@ -37,7 +37,7 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
 
     useEffect(() => {
         // const recordList = await kv.smembers('record@' + userId)
-        getCharacterById("66435c61fd8764b993a473f4").then(result => {
+        getCharacterById("6650346b4b838ac30d19694c").then(result => {
             setCharacter(result)
         })
         fetchData()
