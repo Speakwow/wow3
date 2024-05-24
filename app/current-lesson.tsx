@@ -40,8 +40,14 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
         getCharacterById("6650346b4b838ac30d19694c").then(result => {
             setCharacter(result)
         })
-        fetchData()
     }, [])
+
+    useEffect(()=>{
+        fetchData()
+        const intervalId = setInterval(fetchData, 10000); // 每10秒调用一次fetchData
+        // 清除定时器
+        return () => clearInterval(intervalId);
+    },[])
 
     useEffect(() => {
 
