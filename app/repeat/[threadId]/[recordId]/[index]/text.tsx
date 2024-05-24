@@ -171,7 +171,7 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
     };
 
     const nextPage = () => {
-        updateRepeatRecord(recordId,index,pronscore,text)
+        updateRepeatRecord(recordId,index,+pronscore.toFixed(0),text)
         router.push('./' + (index + 1))
     }
 
