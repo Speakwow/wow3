@@ -8,13 +8,14 @@ import { kv } from "@vercel/kv";
 import { ArrowLeftIcon, RefreshCcwIcon } from "lucide-react";
 import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { getTalkaboutById,getTalkaboutRecordByUserId,getCharacterById, getWordThreadById, getRepeatThreadById, getScenarioById, getScenarioRecordByUserId, getRepeatRecordByUserId, getWordRecordByUserId } from "@/lib/action/mongoIO-client";
+import { getTalkaboutById, getTalkaboutRecordByUserId, getCharacterById, getAnyRecord, getWordThreadById, getRepeatThreadById, getScenarioById, getScenarioRecordByUserId, getRepeatRecordByUserId, getWordRecordByUserId, getAnyLesson } from "@/lib/action/mongoIO-client";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { getCurrentLesson } from "@/lib/action/learn";
+import { threadId } from "worker_threads";
 
 
-export default function CurrentLessonCard({userId}:{userId:string}) {
+export default function CurrentLessonCard({ userId }: { userId: string }) {
 
     const router = useRouter()
 
@@ -26,14 +27,19 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
         const res = await fetch('/api/getCurrent')
         const data = await res.json()
         console.log(data)
-        if(data.id&&data.type){
-        setCurrent({id:data.id,type:data.type})
-        }else{
+        if (data.id && data.type) {
+            if(data.id!=current.id){
+            setCurrent({ id: data.id, type: data.type })
+            getAnyLesson(userId, data.id, data.type).then(result => setCurrentLesson(result))
+            getAnyRecord(userId, data.id, data.type).then(result => setCurrentRecord(result))
+            }
+        }
+        else {
+            setCurrentLesson(null)
+            setCurrentRecord(null)
             setCurrent(null)
         }
-
     }
-
 
     useEffect(() => {
         // const recordList = await kv.smembers('record@' + userId)
@@ -42,49 +48,12 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
         })
     }, [])
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchData()
         const intervalId = setInterval(fetchData, 10000); // 每10秒调用一次fetchData
         // 清除定时器
         return () => clearInterval(intervalId);
-    },[])
-
-    useEffect(() => {
-
-        if (!current || !current.id) {
-            setCurrentLesson == null
-            setCurrentRecord == null
-        } else if (current.type == 'repeat') {
-            getRepeatThreadById(current.id as string).then(lesson =>{
-                setCurrentLesson(lesson)
-                getRepeatRecordByUserId(userId as string).then(result=>{
-                    setCurrentRecord(result)
-                })
-            })
-        } else if (current.type == 'scenario') {
-            getScenarioById(current.id as string).then(lesson=>{
-                setCurrentLesson(lesson)
-                getScenarioRecordByUserId(userId).then(result=>{
-                    setCurrentRecord(result)
-                })
-            })
-        } else if (current.type == 'word') {
-            getWordThreadById(current.id as string).then(lesson=>{
-                setCurrentLesson(lesson)
-                getWordRecordByUserId(userId as string).then(result=>{
-                    setCurrentRecord(result)
-                })
-            })
-        }
-        else if (current.type == 'talkabout') {
-            getTalkaboutById(current.id as string).then(lesson=>{
-                setCurrentLesson(lesson)
-                getTalkaboutRecordByUserId(userId as string).then(result=>{
-                    setCurrentRecord(result)
-                })
-            })
-        }
-    }, [current])
+    }, [])
 
 
     return (
@@ -98,7 +67,7 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
                                 <div className="flex flex-col justify-center text-center gap-2">
                                     <CardTitle className="gap-2">
                                         <Badge className="text-md rounded-full px-8 py-2 bg-[#42C83C]">
-                                        {current?.type == 'repeat' && <p>跟读练习</p>}
+                                            {current?.type == 'repeat' && <p>跟读练习</p>}
                                             {current?.type == 'scenario' && <p>情景对话</p>}
                                             {current?.type == 'talkabout' && <p>看图说话</p>}
                                             {current?.type == 'word' && <p> 词汇练习</p>}
@@ -157,25 +126,21 @@ export default function CurrentLessonCard({userId}:{userId:string}) {
                             </div>
                         </CardHeader>
                         <CardFooter className="flex p-6  border-t justify-center">
-                            <Link href={`/${current.type}/${current.id}`}>
-                                <Button size="lg" className="rounded-full">
-                                    开始学习
-                                </Button>
-                            </Link>
+                            <Button size="lg" className="rounded-full" onClick={() => router.push(`/${current.type}/${current.id}`)}>
+                                开始学习
+                            </Button>
                         </CardFooter>
                     </Card>
-
-
             }
-            {current && currentRecord &&currentRecord.isFinished && 
-            <div className="text-white/50">
-            课程已完成，等待下一节课吧～
-            </div>}
+            {current && currentRecord && currentRecord.isFinished &&
+                <div className="text-white/50">
+                    课程已完成，等待下一节课吧～
+                </div>
+            }
             <Button size="icon" variant="secondary" onClick={fetchData}>
                 <RefreshCcwIcon />
             </Button>
         </div>
-
     )
 
 }

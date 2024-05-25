@@ -16,6 +16,7 @@ import { webm2Wav } from '@/lib/speech/wav';
 import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
 import Link from 'next/link';
 import { updateScenarioRecord } from '@/lib/action/mongoIO';
+import { useRouter } from 'next/navigation';
 
 
 let totalFluencyScore = 0
@@ -84,7 +85,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-
+  const router = useRouter()
   const [startTime, setStartTime] = useState(Date.now());
   //Welcome Message TTS
   useEffect(() => {
@@ -421,10 +422,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-
-            <Link href='/'>
-              <AlertDialogAction>Finish</AlertDialogAction>
-            </Link>
+              <AlertDialogAction onClick={()=>router.push('/')}>Finish</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

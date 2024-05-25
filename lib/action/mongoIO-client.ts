@@ -166,12 +166,12 @@ export async function finishTalkaboutRecord(recordId: string, score: number, res
       });
 }
 
-export async function getTalkaboutRecordByUserId(userId: string) {
+export async function getTalkaboutRecordByUserId(userId: string,threadId:string) {
   noStore()
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('talkabout_records')
-    .find({ userId: userId })
+    .find({ userId: userId ,threadId:threadId})
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
@@ -247,12 +247,12 @@ export async function updateWordRecord(recordId: string, index: number, score: n
       {$push: { record: newRecord }})
   return res
 }
-export async function getWordRecordByUserId(userId: string) {
+export async function getWordRecordByUserId(userId: string,threadId:string) {
   noStore()
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('word_records')
-    .find({ userId: userId })
+    .find({ userId: userId,threadId:threadId })
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
@@ -305,13 +305,13 @@ export async function createScenarioRecord(userId: string) {
 }
 
 
-export async function getScenarioRecordByUserId(userId: string) {
+export async function getScenarioRecordByUserId(userId: string,threadId:string) {
   noStore()
   console.log(userId)
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('scenario_records')
-    .find({ userId: userId })
+    .find({ userId: userId,threadId:threadId })
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
@@ -319,4 +319,51 @@ export async function getScenarioRecordByUserId(userId: string) {
   console.log(res[0])
   return JSON.parse(JSON.stringify(res[0]))
 }
+
+
+export async function getAnyRecord(userId: string,threadId:string,type:string) {
+  noStore()
+  console.log(userId)
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection(findCollectinByType(type))
+    .find({ userId: userId,threadId:threadId })
+    .sort({ score: -1 }) // 按 createAt 字段降序排序
+    .limit(1) // 只获取一条记录
+    .toArray();
+    console.log('Find result:')
+  console.log(res[0])
+  return JSON.parse(JSON.stringify(res[0]))
+}
+
+export async function getAnyLesson(userId: string,threadId:string,type:string) {
+  noStore()
+  const collectionName = findCollectinByType(type)
+  console.log(userId)
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection(collectionName)
+    .find({ userId: userId,threadId:threadId })
+    .sort({ score: -1 }) // 按 createAt 字段降序排序
+    .limit(1) // 只获取一条记录
+    .toArray();
+    console.log('Find result:')
+  console.log(res[0])
+  return JSON.parse(JSON.stringify(res[0]))
+}
+
+export function findCollectinByType(type:string){
+  let collection = ''
+  type == "talkabout"?collection = "talkabouts"
+  :
+  type == "word"?collection = "word_threads"
+  :
+  type == "scenario"?collection = "scenarios"
+  :
+  type=="repeat"?collection='repeat_threads'
+  :
+  collection= type+'_threads'
+  return collection
+}
+
 

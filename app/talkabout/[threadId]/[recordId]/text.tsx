@@ -274,7 +274,7 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                         </div> */}
                         <div className="col-span-4">
                             <Badge className="rounded-full px-6" variant="outline">
-                            总分：<span className="text-[#42C83C] text-3xl">{pronResult?.fluency}</span>
+                            总分：<span className="text-[#42C83C] text-3xl">{(contentScore*4+pronResult.accuracy+pronResult.fluency)/6}</span>
                             </Badge>
                         </div>
                         <div className="col-span-4 px-6 text-xl text-[#42C83C] mb-4">
