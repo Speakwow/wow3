@@ -52,7 +52,6 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
     }, [countdown, isRecording]);
 
 
-
     //Handle Correct
     const [feedback, setFeedback] = useState('')
     const [themeScore, setThemeScore] = useState(0)
@@ -85,7 +84,6 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
                     mediaRecorderRef.current = new MediaRecorder(stream);
-
                     mediaRecorderRef.current.ondataavailable = (event: BlobEvent) => {
                         audioChunksRef.current.push(event.data);
                     };
