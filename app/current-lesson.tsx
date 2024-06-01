@@ -8,7 +8,7 @@ import { kv } from "@vercel/kv";
 import { ArrowLeftIcon, RefreshCcwIcon } from "lucide-react";
 import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { getTalkaboutById, getTalkaboutRecordByUserId, getCharacterById, getAnyRecord, getWordThreadById, getRepeatThreadById, getScenarioById, getScenarioRecordByUserId, getRepeatRecordByUserId, getWordRecordByUserId, getAnyLesson } from "@/lib/action/mongoIO-client";
+import { getCharacterById, getAnyRecord, getAnyLesson } from "@/lib/action/mongoIO-client";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { getCurrentLesson } from "@/lib/action/learn";
@@ -27,12 +27,13 @@ export default function CurrentLessonCard({ userId }: { userId: string }) {
         const res = await fetch('/api/getCurrent')
         const data = await res.json()
         console.log(data)
-        if (data.id && data.type) {
-            if(data.id!=current.id){
+        if (data.id && data.type) { 
             setCurrent({ id: data.id, type: data.type })
-            getAnyLesson(userId, data.id, data.type).then(result => setCurrentLesson(result))
+            getAnyLesson(data.id, data.type).then(result => {
+                console.log(result)
+                setCurrentLesson(result)
+            })
             getAnyRecord(userId, data.id, data.type).then(result => setCurrentRecord(result))
-            }
         }
         else {
             setCurrentLesson(null)

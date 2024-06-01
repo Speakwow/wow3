@@ -15,7 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { webm2Wav } from '@/lib/speech/wav';
 import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
 import Link from 'next/link';
-import { updateScenarioRecord } from '@/lib/action/mongoIO';
+import { updateScenarioRecord } from '@/lib/action/mongoIO-client';
 import { useRouter } from 'next/navigation';
 
 
@@ -229,23 +229,23 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
 
   const reportTriggerRef = useRef<HTMLButtonElement>(null);
+  const [recordSaved, setRecordSaved] = useState(false)
   //handle Report
   function handleReport() {
-
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
-    if (lowerCaseMessage.includes('goodbye' || 'bye' || 'see you' || 'bye-bye')) {
+    if (lowerCaseMessage.includes('goodbye' || 'bye' || 'see you' || 'bye-bye')||messages.length>40) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
-          score:Math.round(totalPronScore / dialogLength),
-          accuracy:Math.round(totalAccuracyScore / dialogLength),
-          fluency:Math.round(totalFluencyScore / dialogLength),
-          duration:Math.round((stayTime / 1000)),
-          round:messages.length,
+          score: Math.round(totalPronScore / dialogLength),
+          accuracy: Math.round(totalAccuracyScore / dialogLength),
+          fluency: Math.round(totalFluencyScore / dialogLength),
+          duration: Math.round((stayTime / 1000)),
+          round: messages.length,
         }
         console.log(reportResult)
-        updateScenarioRecord(params.chatid,reportResult)
+        updateScenarioRecord(params.chatid, reportResult).then(() => setRecordSaved(true))
         reportTriggerRef.current.click();
 
       }
@@ -369,7 +369,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         </div>
       </CardHeader>
       <AlertDialog>
-        <AlertDialogTrigger ref={reportTriggerRef}>.</AlertDialogTrigger>
+        <AlertDialogTrigger ref={reportTriggerRef} className='sr-only'>.</AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className='text-center text-2xl'>PERFECT!</AlertDialogTitle>
@@ -421,8 +421,20 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-              <AlertDialogAction onClick={()=>router.push('/')}>Finish</AlertDialogAction>
+          <AlertDialogFooter className='items-center'>
+            {
+              recordSaved == false ?
+                <Button
+                  className='animated-pulse w-full  p-6'
+                  disabled={true}
+                >
+                  正在保存...
+                </Button>
+                :
+                <AlertDialogAction className='w-full bg-[#42C83C] p-6' onClick={() => router.push('/')}>
+                  完成练习
+                </AlertDialogAction>
+            }
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

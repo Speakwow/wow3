@@ -281,7 +281,7 @@ export async function updateScenarioRecord(chatId: string, report: any) {
   const mongo = await connect()
   const now = Date.now(); // 获取当前时间的时间戳
   const date = new Date(now); // 将时间戳转换为 Date 对象
-  const lesson = mongo.db(DB).collection('scenario_records')
+  const lesson = await mongo.db(DB).collection('scenario_records')
     .updateOne({ _id: new ObjectId(chatId as string) }, {
       $set: {
         report,
@@ -324,7 +324,7 @@ export async function getScenarioRecordByUserId(userId: string, threadId: string
 export async function getAnyRecord(userId: string, threadId: string, type: string) {
   noStore()
   console.log(userId)
-  const collectionName = await findCollectinByType(type)
+  const collectionName =findCollectinByType(type)
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection(collectionName)
@@ -334,26 +334,33 @@ export async function getAnyRecord(userId: string, threadId: string, type: strin
     .toArray();
   console.log('Find result:')
   console.log(res[0])
+  if(res[0]){
   return JSON.parse(JSON.stringify(res[0]))
+  }else{
+    return null
+  }
 }
 
-export async function getAnyLesson(userId: string, threadId: string, type: string) {
+export async function getAnyLesson(threadId: string, type: string) {
   noStore()
-  const collectionName = await findCollectinByType(type)
-  console.log(userId)
+  const collectionName =findCollectinByType(type)
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection(collectionName)
-    .find({ userId: userId, threadId: threadId })
+    .find({ _id: new ObjectId(threadId) })
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
   console.log('Find result:')
   console.log(res[0])
-  return JSON.parse(JSON.stringify(res[0]))
+  if(res[0]){
+    return JSON.parse(JSON.stringify(res[0]))
+    }else{
+      return null
+    }
 }
 
-export async function findCollectinByType(type: string) {
+function findCollectinByType(type: string) {
   let collection = ''
   type == "talkabout" ? collection = "talkabouts"
     :
@@ -364,6 +371,7 @@ export async function findCollectinByType(type: string) {
         type == "repeat" ? collection = 'repeat_threads'
           :
           collection = type + '_threads'
+  console.log('find collection:',collection)
   return collection
 }
 
