@@ -3,9 +3,15 @@ import { Inter, Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { zhCN } from "@clerk/localizations";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
+import { AI } from '@/lib/action/ai';
 
 const inter = Inter({ subsets: ["latin"] });
-const baloo2 = Baloo_2({ subsets: ["latin"], weight: ["600"] })
+const baloo2 = Baloo_2({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "开口蛙 🐸 | Speakwow 梦想无限，开口实现",
@@ -14,8 +20,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  sidebar
 }: Readonly<{
   children: React.ReactNode;
+  sidebar:React.ReactNode
 }>) {
   return (
     <ClerkProvider localization={zhCN}>
@@ -30,7 +38,15 @@ export default function RootLayout({
             </SignedIn>
           </header>
           <main>
-            {children}
+          <ResizablePanelGroup direction="horizontal">
+              <ResizablePanel defaultSize={20} className="border-r min-w-[150px]" collapsible={true}>
+                {sidebar}
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={80}  >
+              <AI>{children}</AI>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </main>
         </body>
       </html>

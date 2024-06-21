@@ -21,7 +21,7 @@ export async function createCharacter(character: Character) {
     return characterId
 }
 
-export async function createScenario(scenario: Scenario) {
+export async function createScenario(scenario: any) {
     const { userId } = auth();
     const scenarioId = nanoid(16)
     await kv.hset('scenario@' + scenarioId, { creator: userId, ...scenario }) //metadata 存储

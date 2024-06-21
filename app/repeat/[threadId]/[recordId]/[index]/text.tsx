@@ -181,7 +181,7 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
                 <audio ref={audioRef} className="sr-only">
                 </audio>
 
-                <Card className="z-50 p-4 rounded-[36px] w-full sticky font-semibold text-center bg-white/75">
+                <Card className="z-50 p-4 rounded-[36px] w-full sticky font-semibold text-center bg-white/75 backdrop-blur">
                     <div className="flex justify-center pb-4">
                         {recognitionText.length > 0 && correct && !isRecognizing ?
                             <Bravo score={pronscore} mistakeCount={mistakeCount} />

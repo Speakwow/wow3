@@ -16,7 +16,7 @@ export async function RepeatReport({score,length,duration}:{score:number,length:
       </CardHeader>
       <CardContent>
       <div className='flex flex-col'>
-      <div className='text-center text-[#42C83C] text-6xl'>
+      <div className='text-center text-[#42C83C] text-6xl font-bold'>
       {score}
       </div>
       </div>
@@ -25,7 +25,7 @@ export async function RepeatReport({score,length,duration}:{score:number,length:
           <div>
             练习数
           </div>
-          <div className=' text-[#FF8B01] text-5xl'>
+          <div className=' text-[#FF8B01] text-5xl font-bold'>
             {length}
           </div>
         </div>
@@ -33,8 +33,8 @@ export async function RepeatReport({score,length,duration}:{score:number,length:
           <div>
              练习时长
           </div>
-          <div className='text-[#019FFF] text-5xl'> 
-            {duration} <span className="text-xl">分钟</span>
+          <div className='text-[#019FFF] text-5xl font-bold'> 
+            {duration.toFixed(1)} <span className="text-xl">分钟</span>
           </div>
         </div>
         {/* <div className='flex flex-col'>
@@ -55,9 +55,9 @@ export async function RepeatReport({score,length,duration}:{score:number,length:
         </div> */}
       </div>
       </CardContent>
-      <CardFooter className="flex justify-center border-t py-8">
+      <CardFooter className="flex justify-center border-t py-4">
         <Link href="/">
-          <Button size="lg" className="py-4 px-8 bg-[#42C83C] text-xl rounded-full">
+          <Button size="lg" className="py-6 px-16 bg-[#42C83C] text-xl rounded-full">
             完成练习
           </Button>
           </Link>

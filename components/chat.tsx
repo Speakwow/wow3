@@ -259,8 +259,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   return (
 
     <div className='relative h-full bg-transparent rounded-10 min-w-full'>
-      <CardHeader className='h-[24rem] w-full relative'>
-        <div className=' h-full flex justify-center'>
+      <CardHeader className='h-screen w-full relative'>
+        <div className='flex justify-center'>
           <div>
             <div className='relative md:top-4 top-2 flex justify-center'>
               <div className='h-fit cursor-default rounded-full bg-[#42C83C] text-white  px-8 w-fit font-bold text-xl border-4 border-white'>
@@ -290,12 +290,12 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           </div>
 
         </div>
-        <div className='relative flex justify-center top-10 p-4'>
-          <Avatar className={`w-[250px] h-[250px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
+        <div className='relative flex justify-center mb-10  p-4'>
+          <Avatar className={`w-[200px] h-[200px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
             <AvatarImage src={params.character.avatar} alt={params.character.name} />
           </Avatar>
         </div>
-        <div className='fixed inset-x-0 bottom-24 w-full flex flex-col gap-4 items-center max-lg:landscape:bottom-8 z-10'>
+        <div className='absolute inset-x-0 py-12 w-full flex flex-col gap-4 items-center bottom-16 landscape:bottom-16 z-10'>
           {isVoiceInput ?
             <form onSubmit={handleSubmit}>
               <div className='w-full flex flex-col-reverse gap-4'>
@@ -315,7 +315,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                       onClick={handleSpeechToText}
                       disabled={loading}
                     >
-                      <Mic width="80" height="80" />
+                      <Mic width="60" height="60" />
                     </Button>
                     <Button type='button' className='rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
                       <Keyboard width={30} height={30} />
@@ -324,7 +324,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                 </div>
                 {hint.length > 0 ?
                   <div className='flex flex-col gap-4'>
-                    <div className='text-xl w-full text-center animate-custom-bounce rounded-full bg-[#42C83C] text-white py-2 px-4 w-fit font-bold text-xl'>
+                    <div className='text-xl w-full text-center animate-custom-bounce rounded-full bg-[#42C83C] text-white py-1 px-4 w-fit font-bold '>
                       <div className='flex flex-row items-center'>
                         <Button variant='ghost' size='icon' onClick={playHint}><PlayIcon className='w-1/2' /></Button>
                         <div className='px-2'>{hint}</div>

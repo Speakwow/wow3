@@ -2,9 +2,10 @@
 import { Button } from "@/components/ui/button";
 import Chat from "@/components/chat";
 import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Initial({chatid,scenarioId,characterId,scenario,character}: { chatid: string, scenarioId: string,characterId:string, scenario:any, character: any }) {
-    const [isReady, setIsReady] = useState(false)
+    const [isReady, setIsReady] = useState(true)
 
     function handleInitial() {
         setIsReady(true)
@@ -21,9 +22,26 @@ export default function Initial({chatid,scenarioId,characterId,scenario,characte
     }
     else {
         return (
-            <Button onClick={handleInitial}>
-                Start
+            <Card className="">
+                
+                    <CardHeader>
+                    <CardTitle>
+                        {scenario.name}
+                    </CardTitle>
+                    <CardDescription>
+                        {scenario.topic}
+                    </CardDescription>
+
+                    </CardHeader>
+                    <CardContent>
+                    <Button size="lg" onClick={handleInitial}>
+                开始课程
             </Button>
+
+                    </CardContent>
+                    
+
+            </Card>
         )
     }
 }

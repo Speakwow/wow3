@@ -3,17 +3,17 @@ import React from 'react';
 import { Howl, Howler } from 'howler';
 
 const Perfect = {
-    icon: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/772b9adf-cda8-4c29-7779-bae3cc394700/sm',
+    icon: '/ui/emoji-perfect.webp',
     text: 'Perfect'
 }
 
 const Good = {
-    icon: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/077cd9c7-a652-4255-998e-e7c258a2a500/sm',
+    icon: '/ui/emoji-good.webp',
     text: 'Good'
 }
 
 const Bad = {
-    icon: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/932bb2d8-5f93-4485-159b-a448f10b7100/sm',
+    icon: '/ui/emoji-bad.webp',
     text: 'Bad ~'
 }
 

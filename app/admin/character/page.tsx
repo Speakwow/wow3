@@ -6,10 +6,12 @@ import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { kv } from "@vercel/kv";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeftIcon } from "lucide-react";
+import { getAllCharacters, getCharacterById } from "@/lib/action/mongoIO";
 
-async function CharacterCard({ id }: { id: string }) {
+async function CharacterCard({ character }: { character:any }) {
 
-    const character = await kv.hgetall('character@' + id) as any
+    // const character = await kv.hgetall('character@' + id) as any
+    // const character = await getCharacterById(id) as any
     let userName = ''
     try{
     const user = await clerkClient.users.getUser(character.creator);
@@ -20,7 +22,7 @@ async function CharacterCard({ id }: { id: string }) {
     }
   
     return (
-        <Link href={'./character/' + id}>
+        <Link href={'./character/' + character._id}>
             <Card className="min-w-32 border-primary border-2 border-[#42C83C]" >
                 <CardHeader>
                     <div className="flex flex-row gap-2">
@@ -47,7 +49,9 @@ async function CharacterCard({ id }: { id: string }) {
 
 export default async function Page() {
     const { userId } = auth();
-    const myCharacterList = await kv.smembers('characterList@all')
+    const characters = await getAllCharacters()
+    console.log(characters)
+    // const myCharacterList = await kv.smembers('characterList@all')
 
     return (
         <div className="flex flex-col gap-10 lg:p-24 md:p-16 p-6">
@@ -81,8 +85,8 @@ export default async function Page() {
                         </CardHeader>
                     </Card>
                 </Link>
-                {myCharacterList.map((Id) => (
-                    <CharacterCard key={Id} id={Id} />
+                {characters.map((item:any) => (
+                    <CharacterCard character={item} key={item._id}/>
                 ))}
             </div>
 

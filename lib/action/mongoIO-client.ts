@@ -342,19 +342,13 @@ export async function getAnyRecord(userId: string, threadId: string, type: strin
 }
 
 export async function getAnyLesson(threadId: string, type: string) {
-  noStore()
   const collectionName =findCollectinByType(type)
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection(collectionName)
-    .find({ _id: new ObjectId(threadId) })
-    .sort({ score: -1 }) // 按 createAt 字段降序排序
-    .limit(1) // 只获取一条记录
-    .toArray();
-  console.log('Find result:')
-  console.log(res[0])
-  if(res[0]){
-    return JSON.parse(JSON.stringify(res[0]))
+    .findOne({ _id: new ObjectId(threadId) })
+  if(res){
+    return JSON.parse(JSON.stringify({type:type,...res}))
     }else{
       return null
     }
@@ -371,8 +365,19 @@ function findCollectinByType(type: string) {
         type == "repeat" ? collection = 'repeat_threads'
           :
           collection = type + '_threads'
-  console.log('find collection:',collection)
   return collection
+}
+
+export async function getAllLessonsByLessonId(lessonId: string) {
+  const mongo = await connect()
+  const lessonList =  await mongo.db(DB).collection('lessons').findOne({ _id: new ObjectId(lessonId as string) })
+  if(!lessonList){
+    return null
+  }
+  //@ts-ignore
+  const promises = lessonList.chapters.map(items => getAnyLesson(items.id,items.type));
+  const results = await Promise.all(promises);
+  return JSON.parse(JSON.stringify(results));
 }
 
 

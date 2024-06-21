@@ -2,9 +2,9 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from '@ai-sdk/openai';
-import { StreamingTextResponse, streamText } from 'ai';
-
-
+import { StreamingTextResponse, streamText,tool } from 'ai';
+import { z } from 'zod';
+import OpenAI from "openai";
 
 const class_template = `
 ###Overall_Rules_to_follow
@@ -17,7 +17,8 @@ const class_template = `
 5. Regularly provide short, positive feedback to encourage the student.
 6. Begin the lesson with interactive questions to engage the student's attention.
 7. You must use the marterials from <Setup> to process the lesson.
-8. Remember to maintain the lesoon process by the dialogue <Flow>.
+8. The conversation should be related to the topic: {topic}.
+9. Remember to maintain the lesoon process by the dialogue <Flow>.
     8a. Ensure to complete {length} rounds of dialouge; do not end the conversation early.
     8b. Conversations that are not related to the teaching target do not count in the <Flow>.
 
@@ -34,12 +35,14 @@ For instance, instead of asking "Do you know what a guitar is?" ask "What kind o
 ###Input_Conditions
 
 - Flow: {flow}
+- Topic: {topic}
 - Setup: {setup}
 - Target vocabulary: {target_words}
 - Target sentence structures: {target_sentences}
 - Keypoints:{keypoints}
 - Additional target: {additional_target}
 - AI role: {ai_role}
+- AI Persona: {persona}
 
 ###Output_format
 
@@ -60,23 +63,23 @@ const profile = `
 
 export async function POST(req: NextRequest) {
   let { messages, scenario, character } = await req.json();
-
+  console.log(messages)
   scenario = await JSON.parse(scenario)
   character = await JSON.parse(character)
   const promptTemplate = PromptTemplate.fromTemplate(class_template);
   const systemPrompt = await promptTemplate.invoke(
     {
       profile: profile,
-      character_persona: character.brief,
-      ai_role: scenario.ai_role,
-      kid_role: scenario.kid_role,
+      persona: character.brief,
+      topic:scenario.topic??'',
+      ai_role: scenario.ai_role??'',
       setup: scenario.setup??'',
       target_words: scenario.target_words??'',
       target_sentences: scenario.target_sentences??'',
       additional_target:scenario.additional_target ??'',
       keypoints: scenario.keypoints??'',
       length: scenario.length as string,
-      level: scenario.level,
+      level: scenario.level??'CEFR A1',
       flow: scenario.flow as string,
     }
   )
@@ -87,8 +90,29 @@ export async function POST(req: NextRequest) {
   }
    
   messages.unshift(welcomeMessage);
+
+  const client = new OpenAI();
   const result = await streamText({
-    model: openai('gpt-4-turbo'),
+    model: openai('gpt-4o'),
+    tools: {
+      weather: tool({
+        description: 'Draw the image if the conversation need an image to assist',
+        parameters: z.object({
+          imageDescription: z.string().describe('The description of the image'),
+        }),
+        execute: async ({ imageDescription }) => {
+          console.log(imageDescription)
+          const response = await client.images.generate({
+            model: "dall-e-3",
+            prompt: imageDescription,
+            n: 1,
+            size: "1024x1024",
+          });
+          const image_url = response.data[0].url; 
+          console.log(image_url)
+        return image_url},
+      }),
+    },
     system:systemPrompt.toString(),
     messages,
   });

@@ -36,7 +36,7 @@ export default async function Repeat({ params }: { params: { threadId: string, i
     return (
         <div className='flex w-full h-screen relative p-20 gap-12 bg-[#FFD44C]'
         style={{ backgroundImage: `url('${section.image_url}')`,backgroundSize: 'cover'}}>
-            <div className="fixed top-2 left-2">
+            <div className="absolute top-2 left-2">
                 <Button asChild size="icon" variant="outline">
                     <Link href="/">
                         <ChevronLeft />

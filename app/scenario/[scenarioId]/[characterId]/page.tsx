@@ -21,10 +21,10 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
 
   const bgImage = 
     {
-      // 设置背景图片
-      backgroundImage: `url(${character.background})`,
-      // 设置背景图片放缩方式为cover，使其自动放缩填充div
-      backgroundSize: 'cover'
+      // // 设置背景图片
+      // backgroundImage: `url(${character.background})`,
+      // // 设置背景图片放缩方式为cover，使其自动放缩填充div
+      // backgroundSize: 'cover'
     }
 
   const chatid = await createScenarioRecord(userId as string)

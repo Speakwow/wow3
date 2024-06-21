@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from '@/components/ui/input';
-import { createCharacter } from '@/lib/action/create';
+import { createCharacter } from '@/lib/action/mongoIO';
 import { redirect } from 'next/navigation';
 
 const formSchema = z.object({

@@ -2,13 +2,14 @@
 import { Button } from "@/components/ui/button"
 // import Chat from "./chat"
 import Link from "next/link"
-import { ChevronLeft, Edit2Icon } from "lucide-react"
+import { ChevronLeft, Edit2Icon, MoreVerticalIcon, OptionIcon } from "lucide-react"
 import { kv } from "@vercel/kv"
 import { nanoid } from "ai"
 import Initial from "./start"
 import { createScenarioRecord, getCharacterById, getScenarioById, getScenarioByName } from "@/lib/action/mongoIO"
 import Chat from "@/components/chat"
 import { auth } from "@clerk/nextjs/server"
+import { Card } from "@/components/ui/card"
 
 export default async function ChatPage({ params }: { params: { scenarioId: string } }) {
   const { userId, orgId } = auth();
@@ -36,8 +37,9 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
   const chatid = await createScenarioRecord(userId as string)
 
   return (
-    <div style={bgImage} className="h-screen bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%" >
-      <div className="mx-auto h-screen m p-8 flex flex-col items-center justify-center">
+    <div className="h-screen bg-muted p-4">
+    <Card style={bgImage} className="relative w-full h-full rounded-[20px]" >
+      <div className="mx-auto h-full w-full m p-8 flex flex-col items-center justify-center">
         <div className="absolute top-2 left-2">
           <Button asChild size="icon" variant="outline">
             <Link href="/">
@@ -46,10 +48,9 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
           </Button>
         </div>
         <div className="absolute top-2 right-2">
-          <Button asChild size="icon" variant="default">
-            <Link href={"/admin/scenario/" + params.scenarioId}>
-              <Edit2Icon />
-            </Link>
+          <Button size="icon" variant="secondary">
+            
+              <MoreVerticalIcon />
           </Button>
         </div>
         <div className="items-center justify-center p-2">
@@ -63,6 +64,7 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
           </div>
         }
       </div>
+    </Card>
     </div>
   )
 }
