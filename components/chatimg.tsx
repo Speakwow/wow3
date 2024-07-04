@@ -17,6 +17,7 @@ import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
 import Link from 'next/link';
 import { updateScenarioRecord } from '@/lib/action/mongoIO-client';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 
 let totalFluencyScore = 0
@@ -25,7 +26,7 @@ let totalPronScore = 0
 let dialogLength = 0
 let stayTime = 0;
 
-export default function Chat(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
+export default function ChatImg(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
 
   //Handle Playing Audio
   function handleAudioPlay(audioData: ArrayBuffer) {
@@ -58,7 +59,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   // Streaming Chat I/O
   // api: '/api/learn/' + params.scenarioId +'/'+params.characterId,
   const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: '/api/learn/' + params.scenarioId + '/' + params.characterId,
+    api: '/api/imgtalk/' + params.scenarioId + '/' + params.characterId,
     headers: { 'X-ChatId': params.chatid },
     body: {
       character: JSON.stringify(params.character),
@@ -234,8 +235,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   function handleReport() {
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
-    const keywords = ['goodbye', 'bye', 'see you', 'bye-bye'];
-    if (keywords.some(keyword => lowerCaseMessage.includes(keyword))||messages.length>45) {
+    if (lowerCaseMessage.includes('goodbye' || 'bye' || 'see you' || 'bye-bye')||messages.length>40) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
@@ -291,7 +291,10 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           </div>
 
         </div>
-        <div className='relative flex justify-center mb-10  p-4'>
+        <div className='relative flex justify-center mb-10  p-4 gap-10 items-center'>
+          <div className="relative w-[250px] h-[250px] border-2 border-muted rounded-[20px] overflow-hidden py-20">
+            <Image className="" fill={true} objectFit="cover" alt='Image' src={params.scenario.referenceImage} />
+          </div>
           <Avatar className={`w-[200px] h-[200px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
             <AvatarImage src={params.character.avatar} alt={params.character.name} />
           </Avatar>

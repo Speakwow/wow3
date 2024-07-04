@@ -36,7 +36,7 @@ export default async function ScenarioCreator() {
                         <CardHeader className="flex flex-row justify-between">
                             <div>
                                 <CardTitle className="text-2xl">
-                                    创建 - 看图说话
+                                    创建 - 词句练习
                                 </CardTitle>
                             </div>
                         </CardHeader>

@@ -14,7 +14,7 @@ export async function setupAudioWorklet(audioContext: AudioContext) {
 }
 
 export async function sttFromMic() {
-  const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
+  const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
   speechConfig.speechRecognitionLanguage = 'en-US';
   const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);

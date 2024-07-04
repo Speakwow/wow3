@@ -4,29 +4,26 @@
 import { Message, useChat } from 'ai/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader } from '@/components/ui/card';
+import { CardHeader } from '@/components/ui/card';
 import React, { useState, useEffect, useRef } from 'react';
 import { Keyboard, Mic, PlayIcon, SendIcon } from 'lucide-react';
 import { Avatar, AvatarImage, } from "@/components/ui/avatar"
-import { synthesizeSpeech, synthesizeSpeechWithVoice } from '@/lib/speech/tts';
+import { synthesizeSpeech } from '@/lib/speech/tts';
 import { sttFromMic } from '@/lib/speech/asr';
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { webm2Wav } from '@/lib/speech/wav';
 import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
 import Link from 'next/link';
-import { updateScenarioRecord } from '@/lib/action/mongoIO-client';
-import { useRouter } from 'next/navigation';
 
 
+//Report Params
 let totalFluencyScore = 0
 let totalAccuracyScore = 0
-let totalPronScore = 0
 let dialogLength = 0
 let stayTime = 0;
 
-export default function Chat(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
-
+export default function Chat(params: { chatid: string }) {
   //Handle Playing Audio
   function handleAudioPlay(audioData: ArrayBuffer) {
     const audioBlob = new Blob([audioData], { type: 'audio/wav' });
@@ -43,7 +40,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         setIsPlaying(false)
         console.log('Playback finished');
         const continueSession = handleReport()
-        if (isVoiceInput && continueSession) {
+        if (isVoiceInput&&continueSession) {
           handleSpeechToText()
         } else {
           setLoading(false)
@@ -52,22 +49,13 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     });
     sound.play();
   }
-  // Cache Current Message
   let currentMessage = ''
-
-  // Streaming Chat I/O
-  // api: '/api/learn/' + params.scenarioId +'/'+params.characterId,
   const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: '/api/learn/' + params.scenarioId + '/' + params.characterId,
     headers: { 'X-ChatId': params.chatid },
-    body: {
-      character: JSON.stringify(params.character),
-      scenario: JSON.stringify(params.scenario)
-    },
     onFinish(messages) {
       setHint('')
-      currentMessage = messages.content
-      synthesizeSpeechWithVoice(messages.content, params.character.voice_id, audioData => {
+      currentMessage=messages.content
+      synthesizeSpeech(messages.content, audioData => {
         if (audioData) {
           handleAudioPlay(audioData)
         } else {
@@ -85,21 +73,19 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const router = useRouter()
+
   const [startTime, setStartTime] = useState(Date.now());
-  //Welcome Message TTS
+  //Welcome Messgae TTS
   useEffect(() => {
-    setStartTime(Date.now());
-    synthesizeSpeechWithVoice(params.scenario.welcomeMessage, params.character.voice_id, audioData => {
+    synthesizeSpeech('Hi, I am Marina the Mermaid, how are you doing?', audioData => {
       if (audioData) {
         handleAudioPlay(audioData)
       } else {
         console.error('Speech synthesis failed or returned no audio');
-      }
-    })
+      }})
   }, []);
 
-  //ASR to text Input
+  //ASR text Input
   useEffect(() => {
     const mockEvent = {
       target: { value: recognitionText }
@@ -107,7 +93,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     handleInputChange(mockEvent);
   }, [recognitionText]);
 
-  //Auto-Submit while ASR success
+  //Submit while Input Change
   useEffect(() => {
     if (input && input.length > 0 && submitButtonRef.current) {
       console.log('input:', input)
@@ -128,8 +114,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   //   } catch (error) {
   //     console.error('Speech recognition error:', error);
   //     setDisplayText('Not Hearing...');
-  //     if (currentMessage && currentMessage.length > 0) {
-  //       handleHint()
+  //     if(currentMessage&&currentMessage.length>0){
+  //     handleHint()
   //     }
   //     setLoading(false)
   //   }
@@ -137,12 +123,6 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
   //Handle Asr with Eval
   const handleSpeechToText = async () => {
-    var sound = new Howl({
-      src: ['/sound/asr-on.wav'],
-      format: ['wav'],
-      autoplay: true,
-    });
-    sound.play();
     setDisplayText('Listening...');
     setLoading(true)
     setRecognitionText('');
@@ -161,25 +141,23 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       setRecognitionText(text);
       mediaRecorder.stop();
       mediaRecorder.onstop = async () => {
-        var sound = new Howl({
-          src: ['/sound/asr-off.wav'],
-          format: ['wav'],
-          autoplay: true,
-        });
-        sound.play();
         // 创建 Blob 保存音频文件
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        stream.getTracks().forEach(track => track.stop());
         const wavBlob = await webm2Wav(audioBlob)
         // const audioUrl = URL.createObjectURL(wavBlob);
         // downloadWavFile(wavBlob, 'output.wav');
-        const evalResult = await evalSpeechFromFile(text, wavBlob) as any;
+        const evalResult = await evalSpeechFromFile(text, wavBlob) as EvalResult;
+        
         dialogLength = dialogLength + evalResult.length;
         totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
         totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
-        totalPronScore = totalPronScore + evalResult.pronunciation * evalResult.length;
+
         console.log('words num:', dialogLength)
         console.log('Accuracy:', totalAccuracyScore / dialogLength)
         console.log('Fluency:', totalFluencyScore / dialogLength)
+
+
         // URL.revokeObjectURL(audioUrl);
         audioChunks = []; // 清空数组以释放内存」
       }
@@ -192,6 +170,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       setLoading(false)
     }
   };
+
 
 
   //Handle Hint
@@ -209,9 +188,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     setHint(data.message)
     setDisplayText('You May Say:')
   }
-
   const playHint = async () => {
-    synthesizeSpeechWithVoice(hint, params.character.voice, audioData => {
+    synthesizeSpeech(hint, audioData => {
       if (audioData) {
         const audioBlob = new Blob([audioData], { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -229,30 +207,20 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
 
   const reportTriggerRef = useRef<HTMLButtonElement>(null);
-  const [recordSaved, setRecordSaved] = useState(false)
   //handle Report
+  const exitKeywords = ['goodbye','bye','see you','bye-bye']
   function handleReport() {
+    stayTime = Date.now() - startTime
     const lowerCaseMessage = currentMessage.toLowerCase()
-    console.log(totalAccuracyScore / dialogLength)
-    const keywords = ['goodbye', 'bye', 'see you', 'bye-bye'];
-    if (keywords.some(keyword => lowerCaseMessage.includes(keyword))||messages.length>45) {
+    if (exitKeywords.some(exitKeyword =>
+      lowerCaseMessage.includes(exitKeyword))) {
       if (reportTriggerRef.current) {
-        stayTime = Date.now() - startTime
-        const reportResult = {
-          score: Math.round(totalPronScore / dialogLength),
-          accuracy: Math.round(totalAccuracyScore / dialogLength),
-          fluency: Math.round(totalFluencyScore / dialogLength),
-          duration: Math.round((stayTime / 1000)),
-          round: messages.length,
-        }
-        console.log(reportResult)
-        updateScenarioRecord(params.chatid, reportResult).then(() => setRecordSaved(true))
         reportTriggerRef.current.click();
-
+       
       }
       return false
     }
-    else {
+    else{
       return true
     }
   }
@@ -260,21 +228,20 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   return (
 
     <div className='relative h-full bg-transparent rounded-10 min-w-full'>
-      <CardHeader className='h-screen w-full relative'>
-        <div className='flex justify-center'>
+      <CardHeader className='h-[16rem] w-full relative'>
+        <div className=' h-full flex justify-center'>
           <div>
-            <div className='relative md:top-4 top-2 flex justify-center'>
-              <div className='h-fit cursor-default rounded-full bg-[#42C83C] text-white  px-8 w-fit font-bold text-xl border-4 border-white'>
-                {params.character.name}
+            <div className='relative top-6 flex justify-center'>
+              <div className='h-fit cursor-default rounded-full bg-[#2196F3] text-white py-2 px-8 w-fit font-bold text-xl shadow-[0.25rem_0.25rem_0_#1E6AA7]'>
+                Marina
               </div>
-
             </div>
-            <Card className="flex justify-center max-w-2xl p-4 w-full rounded-3xl">
+            <div className="flex justify-center max-w-2xl p-4 w-full bg-[#F5E0A7] min-h-32 rounded-3xl shadow-[0.5rem_0.5rem_0_#C2A042] sm:shadow-none sm:w-[40rem] sm:h-[8.5rem] md:w-[46rem] md:h-[9.5rem] sm:p-6 md:px-10 md:py-8  sm:rounded-none sm:bg-center sm:bg-contain sm:bg-no-repeat sm:bg-[url('/ui/message-background.png')] sm:bg-transparent ">
               <audio ref={audioRef}>
               </audio>
               {messages.length == 0 ?
                 <div className="w-full p-2 text-2xl">
-                  {params.scenario.welcomeMessage}
+                  Hi😄, I am Marina the Mermaid🧜‍♀️, how are you doing?
                 </div>
                 :
                 <div className="w-full text-2xl">
@@ -282,24 +249,27 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     messages[messages.length - 1].content
                     :
                     <p className='text-center inline text-muted-foreground'>
-                      {params.character.name} is speaking...
+                      Marina is speaking...
                     </p>
                   }
                 </div>
               }
-            </Card>
+            </div>
           </div>
 
         </div>
-        <div className='relative flex justify-center mb-10  p-4'>
-          <Avatar className={`w-[200px] h-[200px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
-            <AvatarImage src={params.character.avatar} alt={params.character.name} />
+        <div className='relative flex justify-center'>
+          <Avatar className={`w-[300px] h-[300px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
+            <AvatarImage src="Mermaid Marina.png" alt="Marina" />
+
           </Avatar>
         </div>
-        <div className='absolute inset-x-0 py-12 w-full flex flex-col gap-4 items-center bottom-16 landscape:bottom-16 z-10'>
+        <div className='fixed inset-x-0 bottom-10 w-full flex flex-col gap-4 items-center max-lg:landscape:bottom-8 z-10'>
           {isVoiceInput ?
+
             <form onSubmit={handleSubmit}>
               <div className='w-full flex flex-col-reverse gap-4'>
+
                 <input className='sr-only' value={recognitionText} type="hidden" />
                 <div className='relative w-full flex flex-row justify-center items-end gap-6'>
                   <div className='px-4'>
@@ -312,7 +282,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     <Button
                       type='button'
                       size={'icon'}
-                      className={`h-fit p-4 bg-[#42C83C] w-fit rounded-full border-4 ${loading == true ? 'animate-pulse' : ''}`}
+                      className={`h-fit p-4 bg-[#2196F3] w-fit rounded-full shadow-[0.25rem_0.25rem_0_#1E6AA7] ${loading == true ? 'animate-pulse' : ''}`}
                       onClick={handleSpeechToText}
                       disabled={loading}
                     >
@@ -322,15 +292,17 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                       <Keyboard width={30} height={30} />
                     </Button>
                   </div>
+
+
                 </div>
                 {hint.length > 0 ?
-                  <div className='flex flex-col gap-4'>
-                    <div className='text-xl w-full text-center animate-custom-bounce rounded-full bg-[#42C83C] text-white py-1 px-4 w-fit font-bold '>
-                      <div className='flex flex-row items-center'>
+                <div className='flex flex-col gap-4'>
+                  <div className='text-xl animate-custom-bounce rounded-full bg-[#2196F3] text-white py-2 px-8 w-fit font-bold text-xl shadow-[0.25rem_0.25rem_0_#1E6AA7]e'>
+                  <div className='flex flex-row items-center'>
                         <Button variant='ghost' size='icon' onClick={playHint}><PlayIcon className='w-1/2' /></Button>
                         <div className='px-2'>{hint}</div>
                       </div>
-                    </div>
+                  </div>
                   </div>
                   :
                   null
@@ -373,18 +345,13 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         <AlertDialogTrigger ref={reportTriggerRef} className='sr-only'>.</AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className='text-center text-2xl'>PERFECT!</AlertDialogTitle>
+            <AlertDialogTitle className='text-center text-3xl flex justify-center'><div className='w-fit bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full px-8 py-2 text-white'>PERFECT!</div></AlertDialogTitle>
             <AlertDialogDescription>
-              <div className='flex justify-center'>
+              <div className='flex justify-center py-2'>
                 <img src='/report-bravo.gif' className='w-1/5'></img>
               </div>
               <div className='text-center text-xl'>
-                You did it! Final Score:
-              </div>
-              <div className='flex flex-col'>
-                <div className='text-center text-[#42C83C] text-5xl'>
-                  {(100 * (Math.pow(totalPronScore / dialogLength / 100, 1))).toFixed(1)}
-                </div>
+                You did it!
               </div>
               <div className='grid grid-cols-2 text-center gap-4 py-6'>
                 <div className='flex flex-col'>
@@ -399,7 +366,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                   <div>
                     Accuracy
                   </div>
-                  <div className='text-[#019FFF] text-5xl'>
+                  <div className='text-[#019FFF] text-5xl'> 
                     {(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1))).toFixed(1)}
                   </div>
                 </div>
@@ -416,26 +383,17 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     Time
                   </div>
                   <div className='text-[#FF3C21] text-5xl'>
-                    <p className='inline'>&nbsp;&nbsp;</p>{Math.round((stayTime / 60000))}<p className='inline text-sm'>min</p>
+                    <p className='inline'>&nbsp;&nbsp;</p>{Math.round((stayTime/60000))}<p className='inline text-sm'>min</p>
                   </div>
                 </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className='items-center'>
-            {
-              recordSaved == false ?
-                <Button
-                  className='animated-pulse w-full  p-6'
-                  disabled={true}
-                >
-                  正在保存...
-                </Button>
-                :
-                <AlertDialogAction className='w-full bg-[#42C83C] p-6' onClick={() => router.push('/')}>
-                  完成练习
-                </AlertDialogAction>
-            }
+          <AlertDialogFooter>
+
+            <Link href='/'>
+              <AlertDialogAction>Finish</AlertDialogAction>
+            </Link>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

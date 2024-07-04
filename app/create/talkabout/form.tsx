@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { updateScenario } from "@/lib/action/mongoIO"
+import { createTalkabout, updateScenario } from "@/lib/action/mongoIO"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,6 +25,8 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useState } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useRef } from "react"
+import { PutBlobResult } from "@vercel/blob"
 
 
 const levels = [
@@ -58,39 +60,51 @@ const levels = [
   }
 ]
 
-const rounds = [
-  15,
+const prepareTime = [
+  10,
   20,
-  25,
   30,
-  35,
-  40,
   45,
-  50
+  60,
+  90,
+  120,
+  180
+]
+
+
+const answerTime= [
+  10,
+  20,
+  30,
+  45,
+  60,
+  90,
+  120,
+  180
 ]
 
 const formSchema = z.object({
   name: z.string().min(1, {
-    message: "情景名称不可为空",
+    message: "名称不可为空",
+  }),
+  intro:z.string().min(1, {
+    message: "简介不可为空",
   }),
   character: z.string().min(1, {
     message: "Must have a character",
   }),
-  setup: z.string().min(1, {
-    message: "场景设定不能为空",
+  rule:z.string().min(1, {
+    message: "规则不可为空",
   }),
-  length: z.string(),
-  ai_role: z.string(),
+  prepare_time:z.string().min(1, {
+    message: "准备时间不可为空",
+  }),
+  answer_time:z.string().min(1, {
+    message: "作答时间不可为空",
+  }),
   level: z.string().min(1, {
     message: "难度设定不能为空",
   }),
-  target_words: z.string(),
-  target_sentences: z.string(),
-  topic: z.string(),
-  welcomeMessage: z.string().min(1, {
-    message: "Welcome Message cannot be empty.",
-  },),
-  flow: z.string(),
   access:z.string()
 })
 
@@ -107,31 +121,40 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
     defaultValues: {
       name: '',
       character: "6650346b4b838ac30d19694c",
-      topic: '',
-      setup: '',
-      length: '25',
-      ai_role: '',
+      answer_time: '60',
+      prepare_time: '30',
       level: 'CEFR A1',
-      target_words: '',
-      target_sentences: '',
-      welcomeMessage: 'Hello, how are you doing today!',
-      flow: defaultFlow
     },
   })
   const router = useRouter()
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [lessonId,setLessonId] = useState('')
+  const imgFileRef = useRef<HTMLInputElement>(null);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSaving(true)
+    if (!imgFileRef.current?.files) {
+      throw new Error("No Background selected");
+    }
+    const image = imgFileRef.current.files[0];
+    const res = await fetch(
+      `/api/character/upload?filename=talkabout/${image.name}`,
+      {
+        method: 'POST',
+        body: image,
+      },
+    );
+    const newImage = (await res.json()) as PutBlobResult;
+
+    const content = {image_url:newImage.url,...values}
     console.log('submitting')
     console.log(values)
-    const id = await createScenario(userId, values)
+    const id = await createTalkabout(userId, content)
     console.log('submit success')
     setIsSaving(false)
     setIsSaved(true)
     setLessonId(id)
-    // router.push('/scenario/' + id)
+    //router.push('/scenario/' + id)
   }
   if (isSaved) {
     return (
@@ -170,18 +193,18 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
           </div>
           <FormField
             control={form.control}
-            name="name"
+            name="rule"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>情景名称</FormLabel>
+                <FormLabel>题目</FormLabel>
                 <FormControl>
-                  <Input placeholder="请输入情景名称..." {...field} />
+                  < Textarea placeholder="请输入题目.." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
               <FormField
                 control={form.control}
@@ -213,12 +236,24 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
                 )}
               />
             </div>
-            <FormField
+
+            
+          </div>
+          <FormItem>
+                <FormLabel>图片</FormLabel>
+                <FormControl>
+                  <Input id="picture" ref={imgFileRef} type="file" />
+                </FormControl>
+  
+                <FormMessage />
+              </FormItem>
+                <div className="grid grid-cols-2 gap-4">
+              <FormField
               control={form.control}
-              name="length"
+              name="prepare_time"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>轮次</FormLabel>
+                  <FormLabel>准备时间（秒）</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
@@ -227,7 +262,7 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {rounds.map((item, index) => (
+                        {prepareTime.map((item, index) => (
                           <SelectItem key={index} value={item.toString()}>
                             <div className="flex flex-row gap-2">
                               {item.toString()}
@@ -240,7 +275,34 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
                 </FormItem>
               )}
             />
-          </div>
+            <FormField
+              control={form.control}
+              name="answer_time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>作答时间（秒）</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {answerTime.map((item, index) => (
+                          <SelectItem key={index} value={item.toString()}>
+                            <div className="flex flex-row gap-2">
+                              {item.toString()}
+                            </div></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            </div>
         </div>
         <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-6">
           <FormField
@@ -311,39 +373,20 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
             </FormItem>
           )}
         />
-          <div className="col-span-2">
-            <FormField
-              control={form.control}
-              name="topic"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>对话主题</FormLabel>
-                  <FormControl>
-                    <Textarea className="h-24" placeholder="请输入对话主题..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-          </div>
         </div>
-        <Separator />
+        
         <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-6">
-          <div className="text-xl font-bold">
-            教学设置
-          </div>
-          <div className="flex justify-end">
-            {/* <Button type="button" className="w-fit" >一键生成</Button> */}
-          </div>
+          {/* <div className="flex justify-end">
+            <Button type="button" className="w-fit" >一键生成</Button>
+          </div> */}
           <FormField
             control={form.control}
-            name="setup"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>场景设定</FormLabel>
+                <FormLabel>名称</FormLabel>
                 <FormControl>
-                  <Textarea className="h-24" placeholder="请描述对话发生的场景..." {...field} />
+                  <Textarea placeholder="请输入名称..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -351,64 +394,12 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
           />
           <FormField
             control={form.control}
-            name="ai_role"
+            name="intro"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>角色设定</FormLabel>
+                <FormLabel>简介</FormLabel>
                 <FormControl>
-                  <Textarea className="h-24" placeholder="请输入AI需要扮演的角色..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="target_words"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>目标词汇</FormLabel>
-                <FormControl>
-                  <Textarea className="h-24" placeholder="请输入希望练习的词汇，使用逗号“,”分隔..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="target_sentences"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>目标句型</FormLabel>
-                <FormControl>
-                  <Textarea className="h-24" placeholder="请输入希望练习的句型，使用斜杠“/”分隔..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="welcomeMessage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>欢迎语</FormLabel>
-                <FormControl>
-                  <Textarea className='h-24' placeholder="请输入欢迎语，如：Hello, how are you doing today?" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="flow"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>对话流程</FormLabel>
-                <FormControl>
-                  <Textarea className='h-24' placeholder={`请输入...`} {...field} />
+                  <Textarea placeholder="请输入简介..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

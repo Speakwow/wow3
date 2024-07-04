@@ -2,9 +2,13 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from '@ai-sdk/openai';
-import { StreamingTextResponse, streamText } from 'ai';
+import { StreamingTextResponse, streamText,tool } from 'ai'
+import { convertToCoreMessages } from 'ai';;
+import { z } from 'zod';
+import OpenAI from "openai";
 
-
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 const class_template = `
 ###Overall_Rules_to_follow
@@ -63,9 +67,9 @@ const profile = `
 
 export async function POST(req: NextRequest) {
   let { messages, scenario, character } = await req.json();
-
   scenario = await JSON.parse(scenario)
   character = await JSON.parse(character)
+  const imgUrl = scenario.referenceImage
   const promptTemplate = PromptTemplate.fromTemplate(class_template);
   const systemPrompt = await promptTemplate.invoke(
     {
@@ -84,16 +88,29 @@ export async function POST(req: NextRequest) {
     }
   )
 
+  const imgMessage = {
+    role: "user",
+    content: [
+      {type: "text", text: systemPrompt.toString()},
+      {type: "image",image: new URL(imgUrl)},
+    ],
+  }
+  // const imgMessage = {
+  //   role: "user",
+  //   content: systemPrompt
+  // }
+
   const welcomeMessage = {
     role:"assistant",
     content:scenario.welcomeMessage
   }
-   
-  messages.unshift(welcomeMessage);
+  messages.unshift(imgMessage,welcomeMessage );
+
+
+  const client = new OpenAI();
   const result = await streamText({
     model: openai('gpt-4o'),
-    system:systemPrompt.toString(),
-    messages,
+    messages:messages,
   });
   return new StreamingTextResponse(result.toAIStream());
 }

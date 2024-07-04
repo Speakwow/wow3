@@ -15,6 +15,7 @@ import { getAllLessons, getPublicData } from "@/lib/action/mongoIO";
 import { getAllLessonsByLessonId } from "@/lib/action/mongoIO-client";
 import { Badge } from "@/components/ui/badge";
 import SideBar from "@/components/side-bar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 export default async function Home() {
@@ -35,13 +36,16 @@ export default async function Home() {
                     <div>
                         为您推荐
                     </div>
+                    <ScrollArea className="w-full h-full">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        
                         {
                             //@ts-ignore
                             publicLessonList.map(item => (
                                 <LessonCard 
                                 name={item.name} 
-                                type={item.tag} 
+                                type={item.type} 
+                                tag={item.tag}
                                 id={item._id} 
                                 intro={item.intro} 
                                 key={item._id} 
@@ -49,13 +53,15 @@ export default async function Home() {
                             )
                             )
                         }
+                        
                     </div>
+                    </ScrollArea>
                 </div>
     )
 }
 
 
-function LessonCard({ name, type, id, intro,cover }: { name: string, type: string, id: string, intro: string ,cover:string}) {
+function LessonCard({ name, type, id, intro,cover ,tag}: { name: string, type: string, id: string, intro: string ,cover:string,tag:string}) {
     let coverImg = ''
     if(!cover){
         coverImg='https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/108cf320-27a7-4110-0312-6f0b32223200/avatar'
@@ -79,7 +85,7 @@ function LessonCard({ name, type, id, intro,cover }: { name: string, type: strin
                         {name}
                     </div>
                     <Badge className="text-xs w-fit" variant="outline">
-                        {type}
+                        {tag}
                     </Badge>
                     <div className="line-clamp-2 text-xs text-pretty truncate">
                         {intro}

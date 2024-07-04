@@ -28,30 +28,30 @@ const types = [
     }
     ,
     {
-        'type': 'word',
-        'name': '词汇练习',
-        'intro': '根据听力播放的词汇，完成词汇听写。',
+        'type': 'vocab',
+        'name': '词句练习',
+        'intro': '与 AI 一同复习目标词汇与句型',
         'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/4592e163-cf97-4cf4-5c41-9a55dedf5100/avatar'
     }
     ,
     {
         'type': 'repeat',
-        'name': '句型跟读',
-        'intro': '根据听力播放的词汇，完成词汇听写。',
+        'name': '绘本故事',
+        'intro': '一起创建生动有趣的绘本吧',
         'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/249ec15a-b7ea-4292-8236-e675a3596300/avatar'
     }
     ,
     {
-        'type': 'talkabout',
-        'name': '看图说话',
-        'intro': '根据图片进行长表达演讲训练，锻炼学生的句子组织能力。',
+        'type': 'story',
+        'name': '文字冒险',
+        'intro': '与 AI 展开一场生动有趣的文字冒险故事',
         'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/060a7a04-6c6a-4de6-408c-dffee9638b00/avatar'
     }
 ];
 
 export default async function CreateBoard() {
     return (
-        <div className="h-screen flex flex-col gap-4 lg:p-8 md:p-6 p-6">
+        <div className="h-screen flex flex-col gap-4 lg:p-8 md:p-6 p-6 bg-muted">
             <div className="flex flex-col p-8 text-center">
                 <div className=" w-full text-3xl font-bold text-primary">
                     你想要如何设计今日的教学活动？

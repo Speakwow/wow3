@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon, Edit2Icon, SwitchCameraIcon } from "lucide-react";
 import Link from "next/link";
-import { ScenarioForm } from "./form";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getAllCharacters } from "@/lib/action/mongoIO";
@@ -36,12 +35,12 @@ export default async function ScenarioCreator() {
                         <CardHeader className="flex flex-row justify-between">
                             <div>
                                 <CardTitle className="text-2xl">
-                                    创建 - 看图说话
+                                    升级中，敬请期待
                                 </CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent className="h-full">
-                            <ScenarioForm userId={userId} allCharacters={allCharacters} />
+                   
                         </CardContent>
                     </Card>
                 </div>

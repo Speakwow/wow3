@@ -71,11 +71,11 @@ const rounds = [
 ]
 
 const formSchema = z.object({
-  topic: z.string().min(6, {
-    message: "至少输入 6 个字符",
+  topic: z.string().min(4, {
+    message: "至少输入 4 个字符",
   }),
-  goal: z.string().min(6, {
-    message: "至少输入 6 个字符",
+  goal: z.string().min(4, {
+    message: "至少输入 4 个字符",
   }),
   name: z.string().min(1, {
     message: "情景名称不可为空",
@@ -101,12 +101,12 @@ const formSchema = z.object({
   access: z.string()
 })
 
-const defaultFlow = `第1-5轮：介绍自己并询问学习者的姓名，同时保持角色设定以建立场景。
-第6-10轮：逐渐介绍目标单词，一个接一个地进行。
-第11-15轮：开始讨论基于目标单词和目标句子的特定话题。
-第16-20轮：如果学习者已经掌握了最初的目标，开始教授额外的句子结构。
-第21-23轮：根据讨论的话题谈一些有趣的事情。
-第24-25轮：总结所学内容并道别，结束对话。`
+const defaultFlow = `
+Rounds 1-2: Introduce the background of the story, for example: where does the story happen,always provide two choices for the learner.,
+Rounds 3-4: Gradually transition to create a main-character with the learner, ask them to design the main-character's appearance and specialty, remember to use open questions or multiple choices.,
+Rounds 5-10: Continue expanding the story, create 3 key scenarios and let the learner choose what will happen next, let the learner guess what the main-character will choose in those scenarios. You can add on them to  make the story complete and interesting,
+Rounds 11-13: Engage in discussions and ask the learner’s opinions on some questions related to the story and learning topic.,
+Rounds 14-15: Create a Happy Ending or a meaningful ending for the Stor. Saying WOW, It was a nice story. You are a great story-teller!`
 
 export function ScenarioForm({ userId, allCharacters }: { userId: string, allCharacters: any[] }) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -115,14 +115,14 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
       name: '',
       character: "6650346b4b838ac30d19694c",
       intro: '',
-      setup: '',
-      length: '25',
-      ai_role: '',
+      setup: '/',
+      length: '15',
+      ai_role: '/',
       level: 'CEFR A1',
-      goal: '',
-      target_words: '',
-      target_sentences: '',
-      welcomeMessage: '',
+      goal: `#RULES: Create a story with a 10-year-old children. You should always PROVIDE CHOICES for the learner, and encourage them to decided how the story goes. The story should only use A2 English Level's vocabulary and grammar. REMEMBER you are talking to 10-year-old children, the story should be easily understood for a 10-year-old child. Create interesting and exciting plots for children. `,
+      target_words: '/',
+      target_sentences: '/',
+      welcomeMessage: 'Hello, ready for the adventure? ',
       flow: defaultFlow,
       access: "public"
     },
@@ -146,30 +146,24 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
   async function genData(values: z.infer<typeof formSchema>) {
     setIsGenerating(true)
     await Promise.all([
-      genScenarioTarget(values.topic, values.goal, values.level).then(res => {
-        if(res){
-        form.setValue("target_words", res.target_words.join('\n'))
-        form.setValue("target_sentences", res.target_sentences.join('\n'))
-        }
-      }
-      ),
+      // genScenarioTarget(values.topic, values.goal, values.level).then(res => {
+      //   if(res){
+      //   form.setValue("target_words", res.target_words.join('\n'))
+      //   form.setValue("target_sentences", res.target_sentences.join('\n'))
+      //   }
+      // }
+      // ),
       genScenarioBasic(values.topic, values.goal).then(res => {
         if(res){
         form.setValue("name", res.name)
-        form.setValue("setup", res.setting)
-        form.setValue("ai_role", res.ai_role)
         form.setValue("intro", res.intro)
+        form.setValue("setup", res.setting)
         form.setValue("welcomeMessage", res.welcomeMessage)
         const selectedCharacter = allCharacters.find(character => character._id === values.character);
-        genScenarioFlow(values.topic, values.goal, values.level, selectedCharacter.name, res.ai_role, values.length, res.setting)
-          .then(res => {
-            if(res){
-              form.setValue("flow", res.join('\n'))
-            }}).finally(() => setIsGenerating(false))
+        
         }
-      })
+      }).finally(() => setIsGenerating(false))
     ]);
-
   }
 
   if (isSaved && lessonId) {
@@ -210,16 +204,16 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
               name="topic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="">👋 想聊什么主题？</FormLabel>
+                  <FormLabel className="">👋 想要创造怎样的故事？</FormLabel>
                   <FormControl>
-                    <Textarea className="h-24 border-primary " placeholder="请描述你期望的对话主题，在哪里发生，与什么样的角色对话..." {...field} />
+                    <Textarea className="h-24 border-primary " placeholder="请描述你期望进行的故事..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-2 sr-only">
             <FormField
               control={form.control}
               name="goal"
@@ -383,7 +377,7 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>情景名称</FormLabel>
+                <FormLabel>课程名称</FormLabel>
                 <FormControl>
                   <Input placeholder="请输入情景名称..." {...field} />
                 </FormControl>
@@ -396,7 +390,7 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
             name="intro"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>情景简介</FormLabel>
+                <FormLabel>课程简介</FormLabel>
                 <FormControl>
                   <Input placeholder="请输入情景简介..." {...field} />
                 </FormControl>
@@ -404,6 +398,7 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
               </FormItem>
             )}
           />
+          <div className="sr-only">
           <FormField
             control={form.control}
             name="setup"
@@ -430,6 +425,8 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
               </FormItem>
             )}
           />
+          </div>
+          <div className="sr-only">
           <FormField
             control={form.control}
             name="target_words"
@@ -456,6 +453,8 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
               </FormItem>
             )}
           />
+          </div>
+          <div className="sr-only">
           <FormField
             control={form.control}
             name="welcomeMessage"
@@ -482,6 +481,7 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
               </FormItem>
             )}
           />
+          </div>
         </div>
         <Button type="submit">提交</Button>
       </form>

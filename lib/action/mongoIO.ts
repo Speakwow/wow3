@@ -27,7 +27,24 @@ export async function createScenario(userId: string, content: any) {
         star: 0
       }
     });
-  await addToUserLessonList(userId, res.insertedId.toString(), content.name, 'scenarios')
+  await addToUserLessonList(userId, res.insertedId.toString(), content.name, 'scenario')
+  return res.insertedId.toString()
+}
+
+export async function createTalkabout(userId: string, content: any) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('talkabouts')
+    .insertOne({
+      creator: userId,
+      ...content,
+      appData: {
+        click: 0,
+        like: 0,
+        star: 0
+      }
+    });
+  await addToUserLessonList(userId, res.insertedId.toString(), content.name, 'talkabout')
   return res.insertedId.toString()
 }
 
@@ -60,6 +77,15 @@ export async function getUserData(userId: string) {
     .collection('users')
     .findOne(
       { userId: userId })
+    if(!res){
+    const res = await mongo.db(DB)
+    .collection('users')
+    .insertOne(
+      { userId: userId ,
+        lessonList:[]
+      })
+    return {_id:res.insertedId,userId:userId,lessonList:[]}
+  }
   return JSON.parse(JSON.stringify(res))
 }
 
@@ -73,6 +99,8 @@ function collection2type(collection:string) {
       return 'repeat';
     case 'word_threads':
       return 'word';
+      case 'story_threads':
+        return 'story';
     default:
       return 'undefined';
   }
@@ -88,6 +116,8 @@ function type2tag(collection:string) {
       return '跟读练习';
     case 'word':
       return '词汇强化';
+      case 'story':
+        return '绘本阅读';
     default:
       return '';
   }
@@ -96,7 +126,7 @@ function type2tag(collection:string) {
 export async function getPublicData() {
   const mongo = await connect()
   let publicLessons = [] as any[]
-  const collections = ['scenarios', 'talkabouts', 'repeat_threads', 'word_threads']
+  const collections = ['scenarios', 'talkabouts', 'repeat_threads', 'word_threads','story_threads']
   const promises = collections.map(item => {
     return mongo.db(DB)
       .collection(item)
@@ -152,6 +182,30 @@ export async function getCharacterById(id: string) {
   const character = await mongo.db(DB).collection(C_CHARACTERS).findOne({ _id: new ObjectId(id as string) })
   return character
 }
+
+
+export async function getStoryById(threadId: string) {
+  const mongo = await connect()
+  const threadPromise =  mongo.db(DB).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
+  const pagesPromise =  mongo.db(DB).collection('story_pages').find({ _id: new ObjectId(threadId as string) })
+  const [thread,pages] = await Promise.all([threadPromise,pagesPromise.toArray()])
+  const res =  {...thread,pages:pages}
+  return JSON.parse(JSON.stringify(res))
+}
+
+export async function getStoryThreadById(threadId: string) {
+  const mongo = await connect()
+  const repeatThread = await mongo.db(DB).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
+  return repeatThread
+}
+
+
+export async function getStoryPageByIndex(threadId: string, index: number) {
+  const mongo = await connect()
+  const repeatPage = await mongo.db(DB).collection('story_pages').findOne({ threadId: new ObjectId(threadId), index: index })
+  return repeatPage
+}
+
 
 export async function getRepeatThreadById(threadId: string) {
   const mongo = await connect()
@@ -414,6 +468,24 @@ export async function getLessonListById(lessonId: string) {
   const mongo = await connect()
   const lesson = mongo.db(DB).collection('lessons').find({ _id: new ObjectId(lessonId as string) })
   return lesson
+}
+
+export async function getImgtalkById(id: string) {
+  const mongo = await connect()
+  const scenario = await mongo.db(DB).collection('imgtalks').findOne({ _id: new ObjectId(id as string) })
+  return scenario
+}
+
+export async function createImgtalkRecord(userId: string) {
+  const mongo = await connect()
+  const now = Date.now(); // 获取当前时间的时间戳
+  const date = new Date(now); // 将时间戳转换为 Date 对象
+  const res = await mongo.db(DB).collection('imgtalk_records').insertOne({
+    userId: userId,
+    isFinished: false,
+    createAt: date.toLocaleString()
+  });
+  return res.insertedId.toString()
 }
 
 
