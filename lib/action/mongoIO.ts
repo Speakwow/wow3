@@ -1,8 +1,9 @@
 'use server'
 import { connect } from '@/lib/mongo'
-import { C_CHARACTERS, C_REPEAT_PAGES, C_REPEAT_THREADS, C_SCENARIOS, DB } from '@/lib/constant'
+import { C_CHARACTERS, C_REPEAT_PAGES, C_REPEAT_THREADS, C_SCENARIOS, DB, lesson_collections } from '@/lib/constant'
 import { ObjectId } from 'mongodb'
 import { unstable_noStore as noStore } from 'next/cache';
+import { collection2type, findCollectionByType, type2tag } from '../db/db';
 
 export async function updateScenario(name: string, content: any) {
   const mongo = await connect()
@@ -71,70 +72,62 @@ export async function addToUserLessonList(userId: string, lessonId: string, name
   return res.acknowledged
 }
 
+export async function delFromUserLessonList(userId: string, lessonId: string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('users')
+    .updateOne(
+      { userId: userId },
+      {
+        //@ts-ignore
+        $pull: {
+          "lessonList": {_id:new ObjectId(lessonId)}
+        }
+      });
+  return res.acknowledged
+}
+
+export async function deleteLesson(userId: string, lessonId: string,type:string) {
+  const mongo = await connect()
+  const collection =findCollectionByType(type)
+  const res = await mongo.db(DB)
+    .collection(collection)
+    .deleteOne(
+      { creator: userId,_id:new ObjectId(lessonId)});
+  return res.acknowledged
+}
+
 export async function getUserData(userId: string) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('users')
     .findOne(
       { userId: userId })
-    if(!res){
+  if (!res) {
     const res = await mongo.db(DB)
-    .collection('users')
-    .insertOne(
-      { userId: userId ,
-        lessonList:[]
-      })
-      mongo.close()
-    return {_id:res.insertedId,userId:userId,lessonList:[]}
+      .collection('users')
+      .insertOne(
+        {
+          userId: userId,
+          lessonList: []
+        })
+    mongo.close()
+    return { _id: res.insertedId, userId: userId, lessonList: [] }
   }
- 
+
   return JSON.parse(JSON.stringify(res))
-}
-
-function collection2type(collection:string) {
-  switch (collection) {
-    case 'scenarios':
-      return 'scenario';
-    case 'talkabouts':
-      return 'talkabout';
-    case 'repeat_threads':
-      return 'repeat';
-    case 'word_threads':
-      return 'word';
-      case 'story_threads':
-        return 'story';
-    default:
-      return 'undefined';
-  }
-}
-
-function type2tag(collection:string) {
-  switch (collection) {
-    case 'scenario':
-      return '情景对话';
-    case 'talkabout':
-      return '看图说话';
-    case 'repeat':
-      return '跟读练习';
-    case 'word':
-      return '词汇强化';
-      case 'story':
-        return '绘本阅读';
-    default:
-      return '';
-  }
 }
 
 export async function getPublicData() {
   const mongo = await connect()
   let publicLessons = [] as any[]
-  const collections = ['scenarios', 'talkabouts', 'repeat_threads', 'word_threads','story_threads']
+  const collections = lesson_collections
   const promises = collections.map(item => {
     return mongo.db(DB)
       .collection(item)
       .find({ access: 'public' })
       .toArray()
-      .then(result => result.map(lesson => ({ type: collection2type(item), tag:type2tag(collection2type(item)), ...lesson })));
+      .then(result => result.map(lesson => ({ type: collection2type(item), tag: type2tag(collection2type(item)), ...lesson })));
   });
 
   // 使用 Promise.all 并行执行所有查询
@@ -145,6 +138,25 @@ export async function getPublicData() {
   return JSON.parse(JSON.stringify(publicLessons))
 }
 
+export async function getLessonsByCreator(userId:string) {
+  const mongo = await connect()
+  let resultLessons = [] as any[]
+  const collections = lesson_collections
+  const promises = collections.map(item => {
+    return mongo.db(DB)
+      .collection(item)
+      .find({ creator: userId })
+      .toArray()
+      .then(result => result.map(lesson => ({ type: collection2type(item), tag: type2tag(collection2type(item)), ...lesson })));
+  });
+
+  // 使用 Promise.all 并行执行所有查询
+  const results = await Promise.all(promises);
+  // 将结果平铺到 publicLessons 数组中
+  results.forEach(result => resultLessons.push(...result));
+  console.log(resultLessons)
+  return JSON.parse(JSON.stringify(resultLessons))
+}
 
 // export async function addToFavourite(userId: string, content: any, type: string) {
 //   console.log('saving')
@@ -188,10 +200,10 @@ export async function getCharacterById(id: string) {
 
 export async function getStoryById(threadId: string) {
   const mongo = await connect()
-  const threadPromise =  mongo.db(DB).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
-  const pagesPromise =  mongo.db(DB).collection('story_pages').find({ _id: new ObjectId(threadId as string) })
-  const [thread,pages] = await Promise.all([threadPromise,pagesPromise.toArray()])
-  const res =  {...thread,pages:pages}
+  const threadPromise = mongo.db(DB).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
+  const pagesPromise = mongo.db(DB).collection('story_pages').find({ _id: new ObjectId(threadId as string) })
+  const [thread, pages] = await Promise.all([threadPromise, pagesPromise.toArray()])
+  const res = { ...thread, pages: pages }
   return JSON.parse(JSON.stringify(res))
 }
 
@@ -533,12 +545,12 @@ export async function getScenarioRecordByUserId(userId: string) {
 }
 
 
-export async function createWrite(userId: string,values:any) {
+export async function createWrite(userId: string, values: any) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('writes')
-    .insertOne({ creator: userId,...values })
-    
+    .insertOne({ creator: userId, ...values })
+  await addToUserLessonList(userId, res.insertedId.toString(), values.name, 'write')
   return res.insertedId.toString()
 }
 
@@ -550,12 +562,12 @@ export async function getWriteById(Id: string) {
   return JSON.parse(JSON.stringify(res))
 }
 
-export async function createWriteRecord(userId: string,writeId:string) {
+export async function createWriteRecord(userId: string, writeId: string) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('write_records')
-    .insertOne({ writeId: writeId,userId:userId })
-    
+    .insertOne({ writeId: writeId, userId: userId })
+
   return res.insertedId.toString()
 }
 
@@ -565,16 +577,16 @@ export async function getWriteRecordById(Id: string) {
   const res = await mongo.db(DB)
     .collection('write_records')
     .findOne({ _id: new ObjectId(Id) })
-    
+
   return JSON.parse(JSON.stringify(res))
 }
 
 
-export async function saveWriteRecord(userId: string,writeId:string, content:string,feedback:any) {
+export async function saveWriteRecord(userId: string, writeId: string, content: string, feedback: any) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('write_records')
-    .insertOne({ threadId:writeId,userId:userId,content:content,feedback:feedback ,isFinished:true})
-    
+    .insertOne({ threadId: writeId, userId: userId, content: content, feedback: feedback, isFinished: true })
+
   return JSON.parse(JSON.stringify(res))
 }

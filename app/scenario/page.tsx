@@ -31,7 +31,7 @@ export default async function ChatPage() {
         </Button>
       </div> */}
         <div className="items-center justify-center p-2">
-          <code className="relative rounded bg-muted px-[0.3rem] py-[0.10rem] font-mono text-sm font-semibold">📚 Heeyo Learn</code>
+          <code className="relative rounded bg-muted px-[0.3rem] py-[0.10rem] font-mono text-sm font-semibold">📚 wow</code>
         </div>
         <Chat chatid={chatid} />
       </div>
