@@ -84,8 +84,10 @@ export async function getUserData(userId: string) {
       { userId: userId ,
         lessonList:[]
       })
+      mongo.close()
     return {_id:res.insertedId,userId:userId,lessonList:[]}
   }
+ 
   return JSON.parse(JSON.stringify(res))
 }
 
@@ -530,3 +532,49 @@ export async function getScenarioRecordByUserId(userId: string) {
   return res[0]
 }
 
+
+export async function createWrite(userId: string,values:any) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('writes')
+    .insertOne({ creator: userId,...values })
+    
+  return res.insertedId.toString()
+}
+
+export async function getWriteById(Id: string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('writes')
+    .findOne({ _id: new ObjectId(Id) })
+  return JSON.parse(JSON.stringify(res))
+}
+
+export async function createWriteRecord(userId: string,writeId:string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('write_records')
+    .insertOne({ writeId: writeId,userId:userId })
+    
+  return res.insertedId.toString()
+}
+
+
+export async function getWriteRecordById(Id: string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('write_records')
+    .findOne({ _id: new ObjectId(Id) })
+    
+  return JSON.parse(JSON.stringify(res))
+}
+
+
+export async function saveWriteRecord(userId: string,writeId:string, content:string,feedback:any) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('write_records')
+    .insertOne({ threadId:writeId,userId:userId,content:content,feedback:feedback ,isFinished:true})
+    
+  return JSON.parse(JSON.stringify(res))
+}

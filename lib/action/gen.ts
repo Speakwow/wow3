@@ -9,7 +9,8 @@ import { ChatOpenAI } from "@langchain/openai";
 // @ts-ignore
 import { RunnableSequence } from "@langchain/core/runnables";
 // @ts-ignore
-import { StructuredOutputParser,CustomListOutputParser } from "langchain/output_parsers";
+import { StructuredOutputParser, CustomListOutputParser } from "langchain/output_parsers";
+import { StringOutputParser } from "@langchain/core/output_parsers";
 
 
 export async function genScenarioTarget(
@@ -174,7 +175,7 @@ export async function genScenarioFlow(
     "Rounds 17-20: Conclude the conversation by summarizing what was learned and saying WOW, It was nice talking to you, but let's save more for next time in the last round"
     
     `
-    const parser = new CustomListOutputParser({length:5,separator:"\n"})
+    const parser = new CustomListOutputParser({ length: 5, separator: "\n" })
     const chain = RunnableSequence.from([
         PromptTemplate.fromTemplate(
             template
@@ -195,6 +196,187 @@ export async function genScenarioFlow(
                 setting: setting,
                 ai_role: ai_role,
                 format_instructions: parser.getFormatInstructions()
+            })
+            return res
+        }
+        catch (error) {
+            attempts++;
+            console.error(`Attempt ${attempts} failed:`, error);
+
+            if (attempts >= maxRetries) {
+                throw new Error('Maximum retries reached');
+            }
+        }
+    }
+}
+
+
+export async function genWriteFeedback(
+    content: string,
+    task: string,
+    level: string,
+    word_count: string
+
+) {
+    const template = `
+##ROLE##
+You are an English teacher who is reviewing students' English writing homework. You should score the homework from different aspects and give academic language learning feedback to help them improve their English writing skills. 
+
+##Requirement##
+
+The task/topic/question of this writing homework is:{writing_task}
+The student's writing homework is:{student_essay}
+The student's English Level is :{Level}
+Please always consider the homework requirement and student level while grading and giving feedback.
+
+**TASK 1** PROVIDE 4 SCORES 
+You should consider the task of the homework, then score the writing homework in 4 aspects according to the following standards：
+Content Score
+Content Score is used to measure whether the candidate answered the writing task. They have done what they were asked to do.It's an integer number between 0-100. 
+You should grade the Content Score by the following standards:
+Score 100-90(Section A): All content is relevant to the task. Target reader is fully informed. 
+Score 89-80(Section B):Minor irrelevances and/or omissions may be present. Target reader is on the whole informed. Answered more than {required_words} words.
+Score 79-70(Section C):Some irrelevances and/or omissions may be present. The target reader is generally informed but may require some effort to understand the message. Answered less than  {required_words} words.
+Score 69-60(Section D):Irrelevances and misinterpretation of task may be present. Target reader is minimally informed. Answered less than  {required_words} words.
+Score 59-0(Section F):Content is totally irrelevant. Target reader is not informed. Answered less than  {required_words} words.
+*Output as 
+"content_score":num,<0-100>
+
+Communicative Achievement Score
+Communicative Achievement Score is used to measure whether the writing is appropriate for the task. The candidate has used a style which is appropriate for the specific communicative context.  The writing is appropriate for the target reader. It's an integer number between 0-100. 
+You should grade the Communicative Achievement Score by the following standards:
+Score 100-90(Section A): Uses the conventions of the communicative task to hold the target reader’s attention and communicate straightforward ideas.
+Score 89-80(Section B):Text is connected and coherent, using basic linking words and a limited number of cohesive devices.
+Score 79-70(Section C):Text is generally connected and coherent, using basic linking words and some cohesive devices. The use of cohesive devices may be somewhat limited but sufficient to maintain a logical flow.
+Score 69-60(Section D):Produces text that communicates simple ideas in simple ways.
+Score 59-0(Section F):They have written in a way that is not suitable.
+*Output as "communicativeachievement_score":num,<0-100>
+
+Organisation Score
+Organisation Score is used to measure whether the writing is put together well. It is logical and ordered.It's an integer number between 0-100. 
+You should grade the Organisation Score by the following standards:
+Score 100-90(Section A): Text is generally well organised and coherent, using a variety of linking words and cohesive devices.
+Score 89-80(Section B):Text is connected and coherent, using basic linking words and a limited number of cohesive devices.
+Score 79-70(Section C):Text is generally connected and coherent, using basic linking words and some cohesive devices. The use of cohesive devices may be somewhat limited but sufficient to maintain a logical flow.
+Score 69-60(Section D):Text is connected using basic, highfrequency linking words.
+Score 59-0(Section F):It is difficult for the reader to follow. It uses elements of organisation which are not appropriate for the genre.
+*Output as "organisation_score":num,<0-100>,
+
+Language Score
+Language Score is used to measure whether there is a good range of vocabulary and grammar in the writing. They are used accurately.It's an integer number between 0-100. 
+You should grade the Language Score by the following standards:
+Score 100-90(Section A): Uses a range of everyday vocabulary appropriately, with occasional inappropriate use of less common lexis. Uses a range of simple and some complex grammatical forms with a good degree of control. Errors do not impede communication.
+Score 89-80(Section B):Uses everyday vocabulary generally appropriately, while occasionally overusing certain lexis. Uses simple grammatical forms with a good degree of control. While errors are noticeable, meaning can still be determined.
+Score 79-70(Section C):Uses everyday vocabulary appropriately for the most part, though may overuse certain lexis at times. Uses simple grammatical forms with a reasonable degree of control. Errors are noticeable and may occasionally impede meaning, but overall, the message is understandable.
+Score 69-60(Section D):Uses basic vocabulary reasonably appropriately. Uses simple grammatical forms with some degree of control. Errors may impede meaning at times.
+Score 59-0(Section F):Serious grammatical and vocabulary mistakes, which make it difficult for the reader to understand.
+*Output as "language_score":num,<0-100>,
+
+
+**TASK 2** GIVE FEEDBACK 
+You should give feedback to generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.
+
+Your feedback should at least includes 3 parts
+- Encourage they have accompolished the work,doing a amazing job etc. Emphasize how the student especially did well. (15-20 words in Chinese)
+- Judge the overall performance of the homework. What aspects (content/ communicative achievement /organization/language) should the student improve? (10-15 words in Chinese)
+- Help the student improve their performance next time. Indicate and correct one of the most serious mistakes they made, or mention an overall suggestion to help them improve. (20-40 words in Chinese and English)
+*Output as "w_feedback":string
+
+##FORMAT##
+{format_instructions}
+
+    `
+    const parser = StructuredOutputParser.fromZodSchema(
+        z.object({
+            content_score: z.number().describe(""),
+            communicativeachievement_score: z.number().describe(""),
+            organisation_score: z.number().describe(""),
+            language_score: z.number().describe(""),
+            w_feedback:z.string().describe("Generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.")
+        })
+    );
+    const chain = RunnableSequence.from([
+        PromptTemplate.fromTemplate(
+            template
+        ),
+        new ChatOpenAI({ model: 'gpt-4o' }),
+        parser,
+    ]);
+    const maxRetries = 5
+    let attempts = 0;
+    while (attempts < maxRetries) {
+        try {
+            const res = await chain.invoke({
+                writing_task: task,
+                student_essay: content,
+                Level: level,
+                required_words:word_count,
+                format_instructions: parser.getFormatInstructions()
+            })
+            return {
+                ...res,
+                score: 0.2*res?.communicativeachievement_score + 0.5*res.content_score + 0.2*res.language_score + 0.1*res.organisation_score
+            }
+        }
+        catch (error) {
+            attempts++;
+            console.error(`Attempt ${attempts} failed:`, error);
+
+            if (attempts >= maxRetries) {
+                throw new Error('Maximum retries reached');
+            }
+        }
+    }
+}
+
+
+
+
+export async function improveWriting(
+    content: string,
+    task: string,
+    level: string,
+    word_count: string
+
+) {
+    const template = `
+##ROLE## You are a native English speaker, good at English writing. You will help a student to improve his writing skills.
+##TASK##  You are going to re-write a student essay, aim at providing a better version in the standard of no grammar mistakes, no spelling mistakes, and use native expressions. 
+##REQUIREMENT##
+You should first understand the requirement of the writing homework:{task},this essay should be over {word_count} words.
+Then, you will review the student's original writing essay:{content}
+After that, you will output a polished version based on the student's writing purpose.
+You should consider the Student's level :{level}, and only use the vocabulary at his level. Try to understand what he wants to express, and DO NOT change his original meaning while you should only focus on improving his English language skill. 
+
+
+##FORMAT## 
+ONLY OUTPUT THE RESULT, don't say anything else.
+
+##Examplar##
+If the student's original writing essay is :
+The Earth is a beautiful place, Earth is the only home to live for us. We should take good care of animals and animals are our best friend. We should plant more trees because trees can help us a lot. We should save.We close the lamp whe we leave the classroom. We shold save food.
+
+Your polished version should be:
+The Earth is a beautiful place. It is our only home. We should take good care of animals because they are our best friends. We should plant more trees because they help us a lot. We should save energy by turning off the lights when we leave the classroom. We should also save food.
+
+    `
+    const parser = new StringOutputParser()
+    const chain = RunnableSequence.from([
+        PromptTemplate.fromTemplate(
+            template
+        ),
+        new ChatOpenAI({ model: 'gpt-4o' }),
+        parser
+    ]);
+    const maxRetries = 5
+    let attempts = 0;
+    while (attempts < maxRetries) {
+        try {
+            const res = await chain.invoke({
+               task: task,
+                content: content,
+                level: level,
+                word_count:word_count
             })
             return res
         }

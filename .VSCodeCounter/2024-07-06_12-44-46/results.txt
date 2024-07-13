@@ -1,0 +1,268 @@
+Date : 2024-07-06 12:44:46
+Directory : /Users/0xbrad/wow-3
+Total : 144 files,  27826 codes, 696 comments, 2633 blanks, all 31155 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| TypeScript JSX     |        101 |     10,555 |        536 |        966 |     12,057 |
+| JSON               |          4 |      9,419 |          0 |          3 |      9,422 |
+| YAML               |          1 |      5,754 |          0 |      1,330 |      7,084 |
+| TypeScript         |         30 |      1,886 |        149 |        292 |      2,327 |
+| JavaScript         |          5 |        107 |         11 |         20 |        138 |
+| CSS                |          1 |         56 |          0 |          7 |         63 |
+| JSON with Comments |          1 |         26 |          0 |          1 |         27 |
+| Markdown           |          1 |         23 |          0 |         14 |         37 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                        | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                           |        144 |     27,826 |        696 |      2,633 |     31,155 |
+| . (Files)                                                                   |         11 |     15,320 |          1 |      1,358 |     16,679 |
+| app                                                                         |         84 |      7,823 |        442 |        734 |      8,999 |
+| app (Files)                                                                 |          6 |        473 |         11 |         45 |        529 |
+| app/@sidebar                                                                |          3 |         94 |          7 |         14 |        115 |
+| app/admin                                                                   |         15 |      1,475 |         35 |        106 |      1,616 |
+| app/admin (Files)                                                           |          1 |         47 |          0 |          6 |         53 |
+| app/admin/character                                                         |          6 |        564 |          6 |         47 |        617 |
+| app/admin/character (Files)                                                 |          1 |         85 |          3 |          7 |         95 |
+| app/admin/character/[name]                                                  |          2 |        267 |          1 |         19 |        287 |
+| app/admin/character/create                                                  |          2 |        180 |          2 |         13 |        195 |
+| app/admin/character/ok                                                      |          1 |         32 |          0 |          8 |         40 |
+| app/admin/prompt                                                            |          2 |        111 |          4 |         12 |        127 |
+| app/admin/prompt/[prompt]                                                   |          2 |        111 |          4 |         12 |        127 |
+| app/admin/scenario                                                          |          6 |        753 |         25 |         41 |        819 |
+| app/admin/scenario (Files)                                                  |          1 |         84 |          0 |          7 |         91 |
+| app/admin/scenario/[name]                                                   |          3 |        490 |         17 |         25 |        532 |
+| app/admin/scenario/create                                                   |          2 |        179 |          8 |          9 |        196 |
+| app/api                                                                     |         11 |        406 |         53 |         86 |        545 |
+| app/api/ai                                                                  |          1 |         15 |          1 |          1 |         17 |
+| app/api/ai/[scenario]                                                       |          1 |         15 |          1 |          1 |         17 |
+| app/api/character                                                           |          1 |         10 |         11 |          5 |         26 |
+| app/api/character/upload                                                    |          1 |         10 |         11 |          5 |         26 |
+| app/api/chat                                                                |          2 |         54 |         12 |         15 |         81 |
+| app/api/chat (Files)                                                        |          1 |         27 |          6 |          7 |         40 |
+| app/api/chat/[scenario]                                                     |          1 |         27 |          6 |          8 |         41 |
+| app/api/correct                                                             |          1 |         34 |          2 |          3 |         39 |
+| app/api/get-speech-token                                                    |          1 |         27 |          0 |          6 |         33 |
+| app/api/getCurrent                                                          |          1 |          8 |          1 |          3 |         12 |
+| app/api/hint                                                                |          1 |         15 |          2 |          2 |         19 |
+| app/api/imgtalk                                                             |          1 |         93 |         13 |         21 |        127 |
+| app/api/imgtalk/[scenarioId]                                                |          1 |         93 |         13 |         21 |        127 |
+| app/api/imgtalk/[scenarioId]/[characterId]                                  |          1 |         93 |         13 |         21 |        127 |
+| app/api/learn                                                               |          1 |         80 |          9 |         21 |        110 |
+| app/api/learn/[scenarioId]                                                  |          1 |         80 |          9 |         21 |        110 |
+| app/api/learn/[scenarioId]/[characterId]                                    |          1 |         80 |          9 |         21 |        110 |
+| app/api/talkabout                                                           |          1 |         70 |          2 |          9 |         81 |
+| app/api/talkabout/feedback                                                  |          1 |         70 |          2 |          9 |         81 |
+| app/chat                                                                    |          5 |        711 |         70 |         69 |        850 |
+| app/chat (Files)                                                            |          2 |        285 |         22 |         29 |        336 |
+| app/chat/[scenarioId]                                                       |          3 |        426 |         48 |         40 |        514 |
+| app/create                                                                  |         10 |      2,099 |         56 |         79 |      2,234 |
+| app/create (Files)                                                          |          1 |         88 |          1 |          8 |         97 |
+| app/create/repeat                                                           |          1 |         41 |          5 |          4 |         50 |
+| app/create/scenario                                                         |          2 |        516 |         10 |         16 |        542 |
+| app/create/story                                                            |          2 |        509 |         17 |         16 |        542 |
+| app/create/talkabout                                                        |          2 |        433 |         13 |         19 |        465 |
+| app/create/vocab                                                            |          2 |        512 |         10 |         16 |        538 |
+| app/imgtalk                                                                 |          4 |        463 |         46 |         60 |        569 |
+| app/imgtalk (Files)                                                         |          2 |        363 |         40 |         40 |        443 |
+| app/imgtalk/[scenarioId]                                                    |          2 |        100 |          6 |         20 |        126 |
+| app/learn                                                                   |          1 |         37 |          5 |          1 |         43 |
+| app/learn/word                                                              |          1 |         37 |          5 |          1 |         43 |
+| app/learn/word/[word]                                                       |          1 |         37 |          5 |          1 |         43 |
+| app/organization-list                                                       |          1 |          8 |          0 |          1 |          9 |
+| app/organization-list/[[...organization-list]]                              |          1 |          8 |          0 |          1 |          9 |
+| app/playground                                                              |          2 |        118 |          2 |          9 |        129 |
+| app/playground/[apiName]                                                    |          2 |        118 |          2 |          9 |        129 |
+| app/price                                                                   |          1 |         19 |          2 |          3 |         24 |
+| app/prochat                                                                 |          1 |         65 |          6 |         13 |         84 |
+| app/prochat2                                                                |          1 |         77 |          2 |          8 |         87 |
+| app/repeat                                                                  |          4 |        301 |         17 |         38 |        356 |
+| app/repeat/[threadId]                                                       |          4 |        301 |         17 |         38 |        356 |
+| app/repeat/[threadId] (Files)                                               |          1 |         15 |          1 |          2 |         18 |
+| app/repeat/[threadId]/[recordId]                                            |          3 |        286 |         16 |         36 |        338 |
+| app/repeat/[threadId]/[recordId]/[index]                                    |          3 |        286 |         16 |         36 |        338 |
+| app/scenario                                                                |          6 |        539 |         48 |         64 |        651 |
+| app/scenario (Files)                                                        |          2 |        363 |         40 |         40 |        443 |
+| app/scenario/[scenarioId]                                                   |          4 |        176 |          8 |         24 |        208 |
+| app/scenario/[scenarioId] (Files)                                           |          2 |         98 |          3 |         16 |        117 |
+| app/scenario/[scenarioId]/[characterId]                                     |          2 |         78 |          5 |          8 |         91 |
+| app/story                                                                   |          6 |        310 |         17 |         62 |        389 |
+| app/story/[threadId]                                                        |          6 |        310 |         17 |         62 |        389 |
+| app/story/[threadId] (Files)                                                |          2 |        112 |          7 |         24 |        143 |
+| app/story/[threadId]/[index]                                                |          4 |        198 |         10 |         38 |        246 |
+| app/talkabout                                                               |          3 |        332 |         48 |         37 |        417 |
+| app/talkabout/[threadId]                                                    |          3 |        332 |         48 |         37 |        417 |
+| app/talkabout/[threadId] (Files)                                            |          1 |         36 |         15 |          4 |         55 |
+| app/talkabout/[threadId]/[recordId]                                         |          2 |        296 |         33 |         33 |        362 |
+| app/word                                                                    |          4 |        296 |         17 |         39 |        352 |
+| app/word/[threadId]                                                         |          4 |        296 |         17 |         39 |        352 |
+| app/word/[threadId] (Files)                                                 |          1 |         15 |          1 |          3 |         19 |
+| app/word/[threadId]/[recordId]                                              |          3 |        281 |         16 |         36 |        333 |
+| app/word/[threadId]/[recordId]/[index]                                      |          3 |        281 |         16 |         36 |        333 |
+| components                                                                  |         27 |      3,014 |        114 |        296 |      3,424 |
+| components (Files)                                                          |          7 |        942 |        114 |         79 |      1,135 |
+| components/ui                                                               |         20 |      2,072 |          0 |        217 |      2,289 |
+| lib                                                                         |         21 |      1,649 |        134 |        244 |      2,027 |
+| lib (Files)                                                                 |          3 |         24 |          0 |         11 |         35 |
+| lib/action                                                                  |         10 |      1,242 |         66 |        169 |      1,477 |
+| lib/db                                                                      |          1 |         13 |          0 |          1 |         14 |
+| lib/schema                                                                  |          2 |         32 |          4 |          7 |         43 |
+| lib/speech                                                                  |          5 |        338 |         64 |         56 |        458 |
+| public                                                                      |          1 |         20 |          5 |          1 |         26 |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                    | language           | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| /Users/0xbrad/wow-3/.eslintrc.json                                          | JSON               |          3 |          0 |          1 |          4 |
+| /Users/0xbrad/wow-3/README.md                                               | Markdown           |         23 |          0 |         14 |         37 |
+| /Users/0xbrad/wow-3/app/@sidebar/default.tsx                                | TypeScript JSX     |         34 |          0 |          6 |         40 |
+| /Users/0xbrad/wow-3/app/@sidebar/myLessons.tsx                              | TypeScript JSX     |         34 |          7 |          4 |         45 |
+| /Users/0xbrad/wow-3/app/@sidebar/page.tsx                                   | TypeScript JSX     |         26 |          0 |          4 |         30 |
+| /Users/0xbrad/wow-3/app/admin/character/[name]/form.tsx                     | TypeScript JSX     |        149 |          0 |          7 |        156 |
+| /Users/0xbrad/wow-3/app/admin/character/[name]/page.tsx                     | TypeScript JSX     |        118 |          1 |         12 |        131 |
+| /Users/0xbrad/wow-3/app/admin/character/create/form.tsx                     | TypeScript JSX     |        147 |          2 |          8 |        157 |
+| /Users/0xbrad/wow-3/app/admin/character/create/page.tsx                     | TypeScript JSX     |         33 |          0 |          5 |         38 |
+| /Users/0xbrad/wow-3/app/admin/character/ok/page.tsx                         | TypeScript JSX     |         32 |          0 |          8 |         40 |
+| /Users/0xbrad/wow-3/app/admin/character/page.tsx                            | TypeScript JSX     |         85 |          3 |          7 |         95 |
+| /Users/0xbrad/wow-3/app/admin/page.tsx                                      | TypeScript JSX     |         47 |          0 |          6 |         53 |
+| /Users/0xbrad/wow-3/app/admin/prompt/[prompt]/form.tsx                      | TypeScript JSX     |         59 |          4 |          7 |         70 |
+| /Users/0xbrad/wow-3/app/admin/prompt/[prompt]/page.tsx                      | TypeScript JSX     |         52 |          0 |          5 |         57 |
+| /Users/0xbrad/wow-3/app/admin/scenario/[name]/form.tsx                      | TypeScript JSX     |        142 |          8 |          8 |        158 |
+| /Users/0xbrad/wow-3/app/admin/scenario/[name]/page.tsx                      | TypeScript JSX     |         86 |          1 |          7 |         94 |
+| /Users/0xbrad/wow-3/app/admin/scenario/[name]/proform.tsx                   | TypeScript JSX     |        262 |          8 |         10 |        280 |
+| /Users/0xbrad/wow-3/app/admin/scenario/create/form.tsx                      | TypeScript JSX     |        137 |          8 |          7 |        152 |
+| /Users/0xbrad/wow-3/app/admin/scenario/create/page.tsx                      | TypeScript JSX     |         42 |          0 |          2 |         44 |
+| /Users/0xbrad/wow-3/app/admin/scenario/page.tsx                             | TypeScript JSX     |         84 |          0 |          7 |         91 |
+| /Users/0xbrad/wow-3/app/api/ai/[scenario]/route.ts                          | TypeScript         |         15 |          1 |          1 |         17 |
+| /Users/0xbrad/wow-3/app/api/character/upload/route.ts                       | TypeScript         |         10 |         11 |          5 |         26 |
+| /Users/0xbrad/wow-3/app/api/chat/[scenario]/route.ts                        | TypeScript         |         27 |          6 |          8 |         41 |
+| /Users/0xbrad/wow-3/app/api/chat/route.ts                                   | TypeScript         |         27 |          6 |          7 |         40 |
+| /Users/0xbrad/wow-3/app/api/correct/route.ts                                | TypeScript         |         34 |          2 |          3 |         39 |
+| /Users/0xbrad/wow-3/app/api/get-speech-token/route.ts                       | TypeScript         |         27 |          0 |          6 |         33 |
+| /Users/0xbrad/wow-3/app/api/getCurrent/route.ts                             | TypeScript         |          8 |          1 |          3 |         12 |
+| /Users/0xbrad/wow-3/app/api/hint/route.ts                                   | TypeScript         |         15 |          2 |          2 |         19 |
+| /Users/0xbrad/wow-3/app/api/imgtalk/[scenarioId]/[characterId]/route.ts     | TypeScript         |         93 |         13 |         21 |        127 |
+| /Users/0xbrad/wow-3/app/api/learn/[scenarioId]/[characterId]/route.ts       | TypeScript         |         80 |          9 |         21 |        110 |
+| /Users/0xbrad/wow-3/app/api/talkabout/feedback/route.ts                     | TypeScript         |         70 |          2 |          9 |         81 |
+| /Users/0xbrad/wow-3/app/chat/[scenarioId]/chat.tsx                          | TypeScript JSX     |        348 |         37 |         31 |        416 |
+| /Users/0xbrad/wow-3/app/chat/[scenarioId]/page.tsx                          | TypeScript JSX     |         52 |          6 |          6 |         64 |
+| /Users/0xbrad/wow-3/app/chat/[scenarioId]/start.tsx                         | TypeScript JSX     |         26 |          5 |          3 |         34 |
+| /Users/0xbrad/wow-3/app/chat/chat.tsx                                       | TypeScript JSX     |        257 |         12 |         27 |        296 |
+| /Users/0xbrad/wow-3/app/chat/page.tsx                                       | TypeScript JSX     |         28 |         10 |          2 |         40 |
+| /Users/0xbrad/wow-3/app/create/page.tsx                                     | TypeScript JSX     |         88 |          1 |          8 |         97 |
+| /Users/0xbrad/wow-3/app/create/repeat/page.tsx                              | TypeScript JSX     |         41 |          5 |          4 |         50 |
+| /Users/0xbrad/wow-3/app/create/scenario/form.tsx                            | TypeScript JSX     |        473 |          5 |         13 |        491 |
+| /Users/0xbrad/wow-3/app/create/scenario/page.tsx                            | TypeScript JSX     |         43 |          5 |          3 |         51 |
+| /Users/0xbrad/wow-3/app/create/story/form.tsx                               | TypeScript JSX     |        466 |         12 |         13 |        491 |
+| /Users/0xbrad/wow-3/app/create/story/page.tsx                               | TypeScript JSX     |         43 |          5 |          3 |         51 |
+| /Users/0xbrad/wow-3/app/create/talkabout/form.tsx                           | TypeScript JSX     |        390 |          8 |         16 |        414 |
+| /Users/0xbrad/wow-3/app/create/talkabout/page.tsx                           | TypeScript JSX     |         43 |          5 |          3 |         51 |
+| /Users/0xbrad/wow-3/app/create/vocab/form.tsx                               | TypeScript JSX     |        469 |          5 |         13 |        487 |
+| /Users/0xbrad/wow-3/app/create/vocab/page.tsx                               | TypeScript JSX     |         43 |          5 |          3 |         51 |
+| /Users/0xbrad/wow-3/app/current-lesson.tsx                                  | TypeScript JSX     |        134 |          4 |          9 |        147 |
+| /Users/0xbrad/wow-3/app/globals.css                                         | CSS                |         56 |          0 |          7 |         63 |
+| /Users/0xbrad/wow-3/app/imgtalk/[scenarioId]/page.tsx                       | TypeScript JSX     |         59 |          6 |         13 |         78 |
+| /Users/0xbrad/wow-3/app/imgtalk/[scenarioId]/start.tsx                      | TypeScript JSX     |         41 |          0 |          7 |         48 |
+| /Users/0xbrad/wow-3/app/imgtalk/chat.tsx                                    | TypeScript JSX     |        334 |         31 |         38 |        403 |
+| /Users/0xbrad/wow-3/app/imgtalk/page.tsx                                    | TypeScript JSX     |         29 |          9 |          2 |         40 |
+| /Users/0xbrad/wow-3/app/layout.tsx                                          | TypeScript JSX     |         52 |          0 |          4 |         56 |
+| /Users/0xbrad/wow-3/app/learn/word/[word]/page.tsx                          | TypeScript JSX     |         37 |          5 |          1 |         43 |
+| /Users/0xbrad/wow-3/app/lessonInfo.tsx                                      | TypeScript JSX     |         39 |          0 |          3 |         42 |
+| /Users/0xbrad/wow-3/app/organization-list/[[...organization-list]]/page.tsx | TypeScript JSX     |          8 |          0 |          1 |          9 |
+| /Users/0xbrad/wow-3/app/page.tsx                                            | TypeScript JSX     |         85 |          4 |         11 |        100 |
+| /Users/0xbrad/wow-3/app/pageBackUp.tsx                                      | TypeScript JSX     |        107 |          3 |         11 |        121 |
+| /Users/0xbrad/wow-3/app/playground/[apiName]/form.tsx                       | TypeScript JSX     |         84 |          2 |          7 |         93 |
+| /Users/0xbrad/wow-3/app/playground/[apiName]/page.tsx                       | TypeScript JSX     |         34 |          0 |          2 |         36 |
+| /Users/0xbrad/wow-3/app/price/page.tsx                                      | TypeScript JSX     |         19 |          2 |          3 |         24 |
+| /Users/0xbrad/wow-3/app/prochat/page.tsx                                    | TypeScript JSX     |         65 |          6 |         13 |         84 |
+| /Users/0xbrad/wow-3/app/prochat2/page.tsx                                   | TypeScript JSX     |         77 |          2 |          8 |         87 |
+| /Users/0xbrad/wow-3/app/repeat/[threadId]/[recordId]/[index]/correct.tsx    | TypeScript JSX     |         23 |          3 |          5 |         31 |
+| /Users/0xbrad/wow-3/app/repeat/[threadId]/[recordId]/[index]/page.tsx       | TypeScript JSX     |         46 |          0 |          9 |         55 |
+| /Users/0xbrad/wow-3/app/repeat/[threadId]/[recordId]/[index]/text.tsx       | TypeScript JSX     |        217 |         13 |         22 |        252 |
+| /Users/0xbrad/wow-3/app/repeat/[threadId]/page.tsx                          | TypeScript JSX     |         15 |          1 |          2 |         18 |
+| /Users/0xbrad/wow-3/app/scenario/[scenarioId]/[characterId]/page.tsx        | TypeScript JSX     |         51 |          5 |          6 |         62 |
+| /Users/0xbrad/wow-3/app/scenario/[scenarioId]/[characterId]/start.tsx       | TypeScript JSX     |         27 |          0 |          2 |         29 |
+| /Users/0xbrad/wow-3/app/scenario/[scenarioId]/page.tsx                      | TypeScript JSX     |         58 |          3 |          9 |         70 |
+| /Users/0xbrad/wow-3/app/scenario/[scenarioId]/start.tsx                     | TypeScript JSX     |         40 |          0 |          7 |         47 |
+| /Users/0xbrad/wow-3/app/scenario/chat.tsx                                   | TypeScript JSX     |        334 |         31 |         38 |        403 |
+| /Users/0xbrad/wow-3/app/scenario/page.tsx                                   | TypeScript JSX     |         29 |          9 |          2 |         40 |
+| /Users/0xbrad/wow-3/app/story/[threadId]/[index]/bravo.tsx                  | TypeScript JSX     |         50 |          0 |          9 |         59 |
+| /Users/0xbrad/wow-3/app/story/[threadId]/[index]/correct.tsx                | TypeScript JSX     |         22 |          3 |          5 |         30 |
+| /Users/0xbrad/wow-3/app/story/[threadId]/[index]/page.tsx                   | TypeScript JSX     |         51 |          2 |         11 |         64 |
+| /Users/0xbrad/wow-3/app/story/[threadId]/[index]/text.tsx                   | TypeScript JSX     |         75 |          5 |         13 |         93 |
+| /Users/0xbrad/wow-3/app/story/[threadId]/page.tsx                           | TypeScript JSX     |          7 |          0 |          5 |         12 |
+| /Users/0xbrad/wow-3/app/story/[threadId]/story.tsx                          | TypeScript JSX     |        105 |          7 |         19 |        131 |
+| /Users/0xbrad/wow-3/app/talkabout/[threadId]/[recordId]/page.tsx            | TypeScript JSX     |         33 |         13 |          9 |         55 |
+| /Users/0xbrad/wow-3/app/talkabout/[threadId]/[recordId]/text.tsx            | TypeScript JSX     |        263 |         20 |         24 |        307 |
+| /Users/0xbrad/wow-3/app/talkabout/[threadId]/page.tsx                       | TypeScript JSX     |         36 |         15 |          4 |         55 |
+| /Users/0xbrad/wow-3/app/word/[threadId]/[recordId]/[index]/correct.tsx      | TypeScript JSX     |         23 |          3 |          5 |         31 |
+| /Users/0xbrad/wow-3/app/word/[threadId]/[recordId]/[index]/page.tsx         | TypeScript JSX     |         47 |          0 |          9 |         56 |
+| /Users/0xbrad/wow-3/app/word/[threadId]/[recordId]/[index]/text.tsx         | TypeScript JSX     |        211 |         13 |         22 |        246 |
+| /Users/0xbrad/wow-3/app/word/[threadId]/page.tsx                            | TypeScript JSX     |         15 |          1 |          3 |         19 |
+| /Users/0xbrad/wow-3/components.json                                         | JSON               |         17 |          0 |          0 |         17 |
+| /Users/0xbrad/wow-3/components/bravo.tsx                                    | TypeScript JSX     |         48 |          0 |          7 |         55 |
+| /Users/0xbrad/wow-3/components/chat.tsx                                     | TypeScript JSX     |        382 |         33 |         30 |        445 |
+| /Users/0xbrad/wow-3/components/chatimg.tsx                                  | TypeScript JSX     |        385 |         33 |         30 |        448 |
+| /Users/0xbrad/wow-3/components/report.tsx                                   | TypeScript JSX     |         49 |         16 |          2 |         67 |
+| /Users/0xbrad/wow-3/components/showimage.tsx                                | TypeScript JSX     |         29 |          1 |          4 |         34 |
+| /Users/0xbrad/wow-3/components/side-bar.tsx                                 | TypeScript JSX     |         41 |         31 |          5 |         77 |
+| /Users/0xbrad/wow-3/components/sidebar.tsx                                  | TypeScript JSX     |          8 |          0 |          1 |          9 |
+| /Users/0xbrad/wow-3/components/ui/accordion.tsx                             | TypeScript JSX     |         50 |          0 |          8 |         58 |
+| /Users/0xbrad/wow-3/components/ui/alert-dialog.tsx                          | TypeScript JSX     |        127 |          0 |         15 |        142 |
+| /Users/0xbrad/wow-3/components/ui/alert.tsx                                 | TypeScript JSX     |         53 |          0 |          7 |         60 |
+| /Users/0xbrad/wow-3/components/ui/avatar.tsx                                | TypeScript JSX     |         44 |          0 |          7 |         51 |
+| /Users/0xbrad/wow-3/components/ui/badge.tsx                                 | TypeScript JSX     |         31 |          0 |          6 |         37 |
+| /Users/0xbrad/wow-3/components/ui/button.tsx                                | TypeScript JSX     |         52 |          0 |          6 |         58 |
+| /Users/0xbrad/wow-3/components/ui/card.tsx                                  | TypeScript JSX     |         68 |          0 |          9 |         77 |
+| /Users/0xbrad/wow-3/components/ui/dropdown-menu.tsx                         | TypeScript JSX     |        187 |          0 |         19 |        206 |
+| /Users/0xbrad/wow-3/components/ui/form.tsx                                  | TypeScript JSX     |        152 |          0 |         25 |        177 |
+| /Users/0xbrad/wow-3/components/ui/icons.tsx                                 | TypeScript JSX     |        798 |          0 |         40 |        838 |
+| /Users/0xbrad/wow-3/components/ui/input.tsx                                 | TypeScript JSX     |         21 |          0 |          5 |         26 |
+| /Users/0xbrad/wow-3/components/ui/label.tsx                                 | TypeScript JSX     |         21 |          0 |          6 |         27 |
+| /Users/0xbrad/wow-3/components/ui/progress.tsx                              | TypeScript JSX     |         24 |          0 |          5 |         29 |
+| /Users/0xbrad/wow-3/components/ui/radio-group.tsx                           | TypeScript JSX     |         39 |          0 |          6 |         45 |
+| /Users/0xbrad/wow-3/components/ui/resizable.tsx                             | TypeScript JSX     |         39 |          0 |          7 |         46 |
+| /Users/0xbrad/wow-3/components/ui/scroll-area.tsx                           | TypeScript JSX     |         43 |          0 |          6 |         49 |
+| /Users/0xbrad/wow-3/components/ui/select.tsx                                | TypeScript JSX     |        151 |          0 |         14 |        165 |
+| /Users/0xbrad/wow-3/components/ui/separator.tsx                             | TypeScript JSX     |         27 |          0 |          5 |         32 |
+| /Users/0xbrad/wow-3/components/ui/sheet.tsx                                 | TypeScript JSX     |        125 |          0 |         16 |        141 |
+| /Users/0xbrad/wow-3/components/ui/textarea.tsx                              | TypeScript JSX     |         20 |          0 |          5 |         25 |
+| /Users/0xbrad/wow-3/lib/action/ai.tsx                                       | TypeScript JSX     |        129 |         32 |         22 |        183 |
+| /Users/0xbrad/wow-3/lib/action/ai_test.tsx                                  | TypeScript JSX     |         51 |          1 |          7 |         59 |
+| /Users/0xbrad/wow-3/lib/action/cache.ts                                     | TypeScript         |          0 |          8 |          1 |          9 |
+| /Users/0xbrad/wow-3/lib/action/create.ts                                    | TypeScript         |         36 |          0 |          7 |         43 |
+| /Users/0xbrad/wow-3/lib/action/gen.ts                                       | TypeScript         |        190 |          3 |         17 |        210 |
+| /Users/0xbrad/wow-3/lib/action/invoke.ts                                    | TypeScript         |         11 |          1 |          1 |         13 |
+| /Users/0xbrad/wow-3/lib/action/learn.ts                                     | TypeScript         |          6 |          0 |          1 |          7 |
+| /Users/0xbrad/wow-3/lib/action/mongoIO-client.ts                            | TypeScript         |        335 |          5 |         44 |        384 |
+| /Users/0xbrad/wow-3/lib/action/mongoIO.ts                                   | TypeScript         |        454 |         16 |         63 |        533 |
+| /Users/0xbrad/wow-3/lib/action/update.ts                                    | TypeScript         |         30 |          0 |          6 |         36 |
+| /Users/0xbrad/wow-3/lib/constant.ts                                         | TypeScript         |         10 |          0 |          4 |         14 |
+| /Users/0xbrad/wow-3/lib/db/db.js                                            | JavaScript         |         13 |          0 |          1 |         14 |
+| /Users/0xbrad/wow-3/lib/mongo.ts                                            | TypeScript         |          9 |          0 |          5 |         14 |
+| /Users/0xbrad/wow-3/lib/schema/chat.ts                                      | TypeScript         |         28 |          1 |          4 |         33 |
+| /Users/0xbrad/wow-3/lib/schema/word.ts                                      | TypeScript         |          4 |          3 |          3 |         10 |
+| /Users/0xbrad/wow-3/lib/speech/asr.ts                                       | TypeScript         |         45 |         21 |         10 |         76 |
+| /Users/0xbrad/wow-3/lib/speech/asrWithEval.ts                               | TypeScript         |         49 |          4 |         11 |         64 |
+| /Users/0xbrad/wow-3/lib/speech/eval.ts                                      | TypeScript         |        129 |         30 |         15 |        174 |
+| /Users/0xbrad/wow-3/lib/speech/tts.ts                                       | TypeScript         |         51 |          4 |          5 |         60 |
+| /Users/0xbrad/wow-3/lib/speech/wav.js                                       | JavaScript         |         64 |          5 |         15 |         84 |
+| /Users/0xbrad/wow-3/lib/utils.ts                                            | TypeScript         |          5 |          0 |          2 |          7 |
+| /Users/0xbrad/wow-3/middleware.ts                                           | TypeScript         |          5 |          0 |          2 |          7 |
+| /Users/0xbrad/wow-3/next.config.mjs                                         | JavaScript         |          4 |          1 |          2 |          7 |
+| /Users/0xbrad/wow-3/package-lock.json                                       | JSON               |      9,326 |          0 |          1 |      9,327 |
+| /Users/0xbrad/wow-3/package.json                                            | JSON               |         73 |          0 |          1 |         74 |
+| /Users/0xbrad/wow-3/pnpm-lock.yaml                                          | YAML               |      5,754 |          0 |      1,330 |      7,084 |
+| /Users/0xbrad/wow-3/postcss.config.js                                       | JavaScript         |          6 |          0 |          1 |          7 |
+| /Users/0xbrad/wow-3/public/audio-processor.js                               | JavaScript         |         20 |          5 |          1 |         26 |
+| /Users/0xbrad/wow-3/tailwind.config.ts                                      | TypeScript         |         83 |          0 |          5 |         88 |
+| /Users/0xbrad/wow-3/tsconfig.json                                           | JSON with Comments |         26 |          0 |          1 |         27 |
+| Total                                                                       |                    |     27,826 |        696 |      2,633 |     31,155 |
++-----------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

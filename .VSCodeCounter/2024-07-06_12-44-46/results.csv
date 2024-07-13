@@ -1,0 +1,146 @@
+"filename", "language", "JSON with Comments", "JSON", "JavaScript", "TypeScript", "Markdown", "TypeScript JSX", "YAML", "CSS", "comment", "blank", "total"
+"/Users/0xbrad/wow-3/.eslintrc.json", "JSON", 0, 3, 0, 0, 0, 0, 0, 0, 0, 1, 4
+"/Users/0xbrad/wow-3/README.md", "Markdown", 0, 0, 0, 0, 23, 0, 0, 0, 0, 14, 37
+"/Users/0xbrad/wow-3/app/@sidebar/default.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 34, 0, 0, 0, 6, 40
+"/Users/0xbrad/wow-3/app/@sidebar/myLessons.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 34, 0, 0, 7, 4, 45
+"/Users/0xbrad/wow-3/app/@sidebar/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 26, 0, 0, 0, 4, 30
+"/Users/0xbrad/wow-3/app/admin/character/[name]/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 149, 0, 0, 0, 7, 156
+"/Users/0xbrad/wow-3/app/admin/character/[name]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 118, 0, 0, 1, 12, 131
+"/Users/0xbrad/wow-3/app/admin/character/create/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 147, 0, 0, 2, 8, 157
+"/Users/0xbrad/wow-3/app/admin/character/create/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 33, 0, 0, 0, 5, 38
+"/Users/0xbrad/wow-3/app/admin/character/ok/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 32, 0, 0, 0, 8, 40
+"/Users/0xbrad/wow-3/app/admin/character/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 85, 0, 0, 3, 7, 95
+"/Users/0xbrad/wow-3/app/admin/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 47, 0, 0, 0, 6, 53
+"/Users/0xbrad/wow-3/app/admin/prompt/[prompt]/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 59, 0, 0, 4, 7, 70
+"/Users/0xbrad/wow-3/app/admin/prompt/[prompt]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 52, 0, 0, 0, 5, 57
+"/Users/0xbrad/wow-3/app/admin/scenario/[name]/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 142, 0, 0, 8, 8, 158
+"/Users/0xbrad/wow-3/app/admin/scenario/[name]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 86, 0, 0, 1, 7, 94
+"/Users/0xbrad/wow-3/app/admin/scenario/[name]/proform.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 262, 0, 0, 8, 10, 280
+"/Users/0xbrad/wow-3/app/admin/scenario/create/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 137, 0, 0, 8, 7, 152
+"/Users/0xbrad/wow-3/app/admin/scenario/create/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 42, 0, 0, 0, 2, 44
+"/Users/0xbrad/wow-3/app/admin/scenario/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 84, 0, 0, 0, 7, 91
+"/Users/0xbrad/wow-3/app/api/ai/[scenario]/route.ts", "TypeScript", 0, 0, 0, 15, 0, 0, 0, 0, 1, 1, 17
+"/Users/0xbrad/wow-3/app/api/character/upload/route.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 11, 5, 26
+"/Users/0xbrad/wow-3/app/api/chat/[scenario]/route.ts", "TypeScript", 0, 0, 0, 27, 0, 0, 0, 0, 6, 8, 41
+"/Users/0xbrad/wow-3/app/api/chat/route.ts", "TypeScript", 0, 0, 0, 27, 0, 0, 0, 0, 6, 7, 40
+"/Users/0xbrad/wow-3/app/api/correct/route.ts", "TypeScript", 0, 0, 0, 34, 0, 0, 0, 0, 2, 3, 39
+"/Users/0xbrad/wow-3/app/api/get-speech-token/route.ts", "TypeScript", 0, 0, 0, 27, 0, 0, 0, 0, 0, 6, 33
+"/Users/0xbrad/wow-3/app/api/getCurrent/route.ts", "TypeScript", 0, 0, 0, 8, 0, 0, 0, 0, 1, 3, 12
+"/Users/0xbrad/wow-3/app/api/hint/route.ts", "TypeScript", 0, 0, 0, 15, 0, 0, 0, 0, 2, 2, 19
+"/Users/0xbrad/wow-3/app/api/imgtalk/[scenarioId]/[characterId]/route.ts", "TypeScript", 0, 0, 0, 93, 0, 0, 0, 0, 13, 21, 127
+"/Users/0xbrad/wow-3/app/api/learn/[scenarioId]/[characterId]/route.ts", "TypeScript", 0, 0, 0, 80, 0, 0, 0, 0, 9, 21, 110
+"/Users/0xbrad/wow-3/app/api/talkabout/feedback/route.ts", "TypeScript", 0, 0, 0, 70, 0, 0, 0, 0, 2, 9, 81
+"/Users/0xbrad/wow-3/app/chat/[scenarioId]/chat.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 348, 0, 0, 37, 31, 416
+"/Users/0xbrad/wow-3/app/chat/[scenarioId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 52, 0, 0, 6, 6, 64
+"/Users/0xbrad/wow-3/app/chat/[scenarioId]/start.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 26, 0, 0, 5, 3, 34
+"/Users/0xbrad/wow-3/app/chat/chat.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 257, 0, 0, 12, 27, 296
+"/Users/0xbrad/wow-3/app/chat/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 28, 0, 0, 10, 2, 40
+"/Users/0xbrad/wow-3/app/create/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 88, 0, 0, 1, 8, 97
+"/Users/0xbrad/wow-3/app/create/repeat/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 41, 0, 0, 5, 4, 50
+"/Users/0xbrad/wow-3/app/create/scenario/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 473, 0, 0, 5, 13, 491
+"/Users/0xbrad/wow-3/app/create/scenario/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 43, 0, 0, 5, 3, 51
+"/Users/0xbrad/wow-3/app/create/story/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 466, 0, 0, 12, 13, 491
+"/Users/0xbrad/wow-3/app/create/story/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 43, 0, 0, 5, 3, 51
+"/Users/0xbrad/wow-3/app/create/talkabout/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 390, 0, 0, 8, 16, 414
+"/Users/0xbrad/wow-3/app/create/talkabout/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 43, 0, 0, 5, 3, 51
+"/Users/0xbrad/wow-3/app/create/vocab/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 469, 0, 0, 5, 13, 487
+"/Users/0xbrad/wow-3/app/create/vocab/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 43, 0, 0, 5, 3, 51
+"/Users/0xbrad/wow-3/app/current-lesson.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 134, 0, 0, 4, 9, 147
+"/Users/0xbrad/wow-3/app/globals.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 56, 0, 7, 63
+"/Users/0xbrad/wow-3/app/imgtalk/[scenarioId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 59, 0, 0, 6, 13, 78
+"/Users/0xbrad/wow-3/app/imgtalk/[scenarioId]/start.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 41, 0, 0, 0, 7, 48
+"/Users/0xbrad/wow-3/app/imgtalk/chat.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 334, 0, 0, 31, 38, 403
+"/Users/0xbrad/wow-3/app/imgtalk/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 29, 0, 0, 9, 2, 40
+"/Users/0xbrad/wow-3/app/layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 52, 0, 0, 0, 4, 56
+"/Users/0xbrad/wow-3/app/learn/word/[word]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 37, 0, 0, 5, 1, 43
+"/Users/0xbrad/wow-3/app/lessonInfo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 39, 0, 0, 0, 3, 42
+"/Users/0xbrad/wow-3/app/organization-list/[[...organization-list]]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 9
+"/Users/0xbrad/wow-3/app/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 85, 0, 0, 4, 11, 100
+"/Users/0xbrad/wow-3/app/pageBackUp.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 107, 0, 0, 3, 11, 121
+"/Users/0xbrad/wow-3/app/playground/[apiName]/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 84, 0, 0, 2, 7, 93
+"/Users/0xbrad/wow-3/app/playground/[apiName]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 34, 0, 0, 0, 2, 36
+"/Users/0xbrad/wow-3/app/price/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 19, 0, 0, 2, 3, 24
+"/Users/0xbrad/wow-3/app/prochat/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 65, 0, 0, 6, 13, 84
+"/Users/0xbrad/wow-3/app/prochat2/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 77, 0, 0, 2, 8, 87
+"/Users/0xbrad/wow-3/app/repeat/[threadId]/[recordId]/[index]/correct.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 23, 0, 0, 3, 5, 31
+"/Users/0xbrad/wow-3/app/repeat/[threadId]/[recordId]/[index]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 46, 0, 0, 0, 9, 55
+"/Users/0xbrad/wow-3/app/repeat/[threadId]/[recordId]/[index]/text.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 217, 0, 0, 13, 22, 252
+"/Users/0xbrad/wow-3/app/repeat/[threadId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 15, 0, 0, 1, 2, 18
+"/Users/0xbrad/wow-3/app/scenario/[scenarioId]/[characterId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 51, 0, 0, 5, 6, 62
+"/Users/0xbrad/wow-3/app/scenario/[scenarioId]/[characterId]/start.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 27, 0, 0, 0, 2, 29
+"/Users/0xbrad/wow-3/app/scenario/[scenarioId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 58, 0, 0, 3, 9, 70
+"/Users/0xbrad/wow-3/app/scenario/[scenarioId]/start.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 40, 0, 0, 0, 7, 47
+"/Users/0xbrad/wow-3/app/scenario/chat.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 334, 0, 0, 31, 38, 403
+"/Users/0xbrad/wow-3/app/scenario/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 29, 0, 0, 9, 2, 40
+"/Users/0xbrad/wow-3/app/story/[threadId]/[index]/bravo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 50, 0, 0, 0, 9, 59
+"/Users/0xbrad/wow-3/app/story/[threadId]/[index]/correct.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 22, 0, 0, 3, 5, 30
+"/Users/0xbrad/wow-3/app/story/[threadId]/[index]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 51, 0, 0, 2, 11, 64
+"/Users/0xbrad/wow-3/app/story/[threadId]/[index]/text.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 75, 0, 0, 5, 13, 93
+"/Users/0xbrad/wow-3/app/story/[threadId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 7, 0, 0, 0, 5, 12
+"/Users/0xbrad/wow-3/app/story/[threadId]/story.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 105, 0, 0, 7, 19, 131
+"/Users/0xbrad/wow-3/app/talkabout/[threadId]/[recordId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 33, 0, 0, 13, 9, 55
+"/Users/0xbrad/wow-3/app/talkabout/[threadId]/[recordId]/text.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 263, 0, 0, 20, 24, 307
+"/Users/0xbrad/wow-3/app/talkabout/[threadId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 36, 0, 0, 15, 4, 55
+"/Users/0xbrad/wow-3/app/word/[threadId]/[recordId]/[index]/correct.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 23, 0, 0, 3, 5, 31
+"/Users/0xbrad/wow-3/app/word/[threadId]/[recordId]/[index]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 47, 0, 0, 0, 9, 56
+"/Users/0xbrad/wow-3/app/word/[threadId]/[recordId]/[index]/text.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 211, 0, 0, 13, 22, 246
+"/Users/0xbrad/wow-3/app/word/[threadId]/page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 15, 0, 0, 1, 3, 19
+"/Users/0xbrad/wow-3/components.json", "JSON", 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 17
+"/Users/0xbrad/wow-3/components/bravo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 48, 0, 0, 0, 7, 55
+"/Users/0xbrad/wow-3/components/chat.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 382, 0, 0, 33, 30, 445
+"/Users/0xbrad/wow-3/components/chatimg.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 385, 0, 0, 33, 30, 448
+"/Users/0xbrad/wow-3/components/report.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 49, 0, 0, 16, 2, 67
+"/Users/0xbrad/wow-3/components/showimage.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 29, 0, 0, 1, 4, 34
+"/Users/0xbrad/wow-3/components/side-bar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 41, 0, 0, 31, 5, 77
+"/Users/0xbrad/wow-3/components/sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 9
+"/Users/0xbrad/wow-3/components/ui/accordion.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 50, 0, 0, 0, 8, 58
+"/Users/0xbrad/wow-3/components/ui/alert-dialog.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 127, 0, 0, 0, 15, 142
+"/Users/0xbrad/wow-3/components/ui/alert.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 53, 0, 0, 0, 7, 60
+"/Users/0xbrad/wow-3/components/ui/avatar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 44, 0, 0, 0, 7, 51
+"/Users/0xbrad/wow-3/components/ui/badge.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 31, 0, 0, 0, 6, 37
+"/Users/0xbrad/wow-3/components/ui/button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 52, 0, 0, 0, 6, 58
+"/Users/0xbrad/wow-3/components/ui/card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 68, 0, 0, 0, 9, 77
+"/Users/0xbrad/wow-3/components/ui/dropdown-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 187, 0, 0, 0, 19, 206
+"/Users/0xbrad/wow-3/components/ui/form.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 152, 0, 0, 0, 25, 177
+"/Users/0xbrad/wow-3/components/ui/icons.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 798, 0, 0, 0, 40, 838
+"/Users/0xbrad/wow-3/components/ui/input.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 21, 0, 0, 0, 5, 26
+"/Users/0xbrad/wow-3/components/ui/label.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 21, 0, 0, 0, 6, 27
+"/Users/0xbrad/wow-3/components/ui/progress.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 24, 0, 0, 0, 5, 29
+"/Users/0xbrad/wow-3/components/ui/radio-group.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 39, 0, 0, 0, 6, 45
+"/Users/0xbrad/wow-3/components/ui/resizable.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 39, 0, 0, 0, 7, 46
+"/Users/0xbrad/wow-3/components/ui/scroll-area.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 43, 0, 0, 0, 6, 49
+"/Users/0xbrad/wow-3/components/ui/select.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 151, 0, 0, 0, 14, 165
+"/Users/0xbrad/wow-3/components/ui/separator.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 27, 0, 0, 0, 5, 32
+"/Users/0xbrad/wow-3/components/ui/sheet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 125, 0, 0, 0, 16, 141
+"/Users/0xbrad/wow-3/components/ui/textarea.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 20, 0, 0, 0, 5, 25
+"/Users/0xbrad/wow-3/lib/action/ai.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 129, 0, 0, 32, 22, 183
+"/Users/0xbrad/wow-3/lib/action/ai_test.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 51, 0, 0, 1, 7, 59
+"/Users/0xbrad/wow-3/lib/action/cache.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 8, 1, 9
+"/Users/0xbrad/wow-3/lib/action/create.ts", "TypeScript", 0, 0, 0, 36, 0, 0, 0, 0, 0, 7, 43
+"/Users/0xbrad/wow-3/lib/action/gen.ts", "TypeScript", 0, 0, 0, 190, 0, 0, 0, 0, 3, 17, 210
+"/Users/0xbrad/wow-3/lib/action/invoke.ts", "TypeScript", 0, 0, 0, 11, 0, 0, 0, 0, 1, 1, 13
+"/Users/0xbrad/wow-3/lib/action/learn.ts", "TypeScript", 0, 0, 0, 6, 0, 0, 0, 0, 0, 1, 7
+"/Users/0xbrad/wow-3/lib/action/mongoIO-client.ts", "TypeScript", 0, 0, 0, 335, 0, 0, 0, 0, 5, 44, 384
+"/Users/0xbrad/wow-3/lib/action/mongoIO.ts", "TypeScript", 0, 0, 0, 454, 0, 0, 0, 0, 16, 63, 533
+"/Users/0xbrad/wow-3/lib/action/update.ts", "TypeScript", 0, 0, 0, 30, 0, 0, 0, 0, 0, 6, 36
+"/Users/0xbrad/wow-3/lib/constant.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 0, 4, 14
+"/Users/0xbrad/wow-3/lib/db/db.js", "JavaScript", 0, 0, 13, 0, 0, 0, 0, 0, 0, 1, 14
+"/Users/0xbrad/wow-3/lib/mongo.ts", "TypeScript", 0, 0, 0, 9, 0, 0, 0, 0, 0, 5, 14
+"/Users/0xbrad/wow-3/lib/schema/chat.ts", "TypeScript", 0, 0, 0, 28, 0, 0, 0, 0, 1, 4, 33
+"/Users/0xbrad/wow-3/lib/schema/word.ts", "TypeScript", 0, 0, 0, 4, 0, 0, 0, 0, 3, 3, 10
+"/Users/0xbrad/wow-3/lib/speech/asr.ts", "TypeScript", 0, 0, 0, 45, 0, 0, 0, 0, 21, 10, 76
+"/Users/0xbrad/wow-3/lib/speech/asrWithEval.ts", "TypeScript", 0, 0, 0, 49, 0, 0, 0, 0, 4, 11, 64
+"/Users/0xbrad/wow-3/lib/speech/eval.ts", "TypeScript", 0, 0, 0, 129, 0, 0, 0, 0, 30, 15, 174
+"/Users/0xbrad/wow-3/lib/speech/tts.ts", "TypeScript", 0, 0, 0, 51, 0, 0, 0, 0, 4, 5, 60
+"/Users/0xbrad/wow-3/lib/speech/wav.js", "JavaScript", 0, 0, 64, 0, 0, 0, 0, 0, 5, 15, 84
+"/Users/0xbrad/wow-3/lib/utils.ts", "TypeScript", 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 7
+"/Users/0xbrad/wow-3/middleware.ts", "TypeScript", 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 7
+"/Users/0xbrad/wow-3/next.config.mjs", "JavaScript", 0, 0, 4, 0, 0, 0, 0, 0, 1, 2, 7
+"/Users/0xbrad/wow-3/package-lock.json", "JSON", 0, 9326, 0, 0, 0, 0, 0, 0, 0, 1, 9327
+"/Users/0xbrad/wow-3/package.json", "JSON", 0, 73, 0, 0, 0, 0, 0, 0, 0, 1, 74
+"/Users/0xbrad/wow-3/pnpm-lock.yaml", "YAML", 0, 0, 0, 0, 0, 0, 5754, 0, 0, 1330, 7084
+"/Users/0xbrad/wow-3/postcss.config.js", "JavaScript", 0, 0, 6, 0, 0, 0, 0, 0, 0, 1, 7
+"/Users/0xbrad/wow-3/public/audio-processor.js", "JavaScript", 0, 0, 20, 0, 0, 0, 0, 0, 5, 1, 26
+"/Users/0xbrad/wow-3/tailwind.config.ts", "TypeScript", 0, 0, 0, 83, 0, 0, 0, 0, 0, 5, 88
+"/Users/0xbrad/wow-3/tsconfig.json", "JSON with Comments", 26, 0, 0, 0, 0, 0, 0, 0, 0, 1, 27
+"Total", "-", 26, 9419, 107, 1886, 23, 10555, 5754, 56, 696, 2633, 31155
