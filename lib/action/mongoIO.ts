@@ -112,8 +112,7 @@ export async function getUserData(userId: string) {
           lessonList: [],
           favourite:[]
         })
-    mongo.close()
-    return { _id: res.insertedId, userId: userId, lessonList: [] }
+    return { _id: res.insertedId, userId: userId, lessonList: [] ,favourite:[]}
   }
 
   return JSON.parse(JSON.stringify(res))
