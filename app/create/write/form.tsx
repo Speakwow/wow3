@@ -67,7 +67,9 @@ const formSchema = z.object({
   topic: z.string().min(6, {
     message: "至少输入 6 个字符",
   }),
-  word_count: z.number().min(10),
+  word_count:  z.string().min(1, {
+    message: "字数设定不能为空",
+  }),
   level: z.string().min(1, {
     message: "难度设定不能为空",
   }),
@@ -85,7 +87,7 @@ export function WriteForm({ userId }: { userId: string }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      word_count: 70,
+      word_count: "70",
       level: 'CEFR A1',
       access: "public"
     },
@@ -147,7 +149,7 @@ export function WriteForm({ userId }: { userId: string }) {
                 <FormItem>
                   <FormLabel className="">作文标题</FormLabel>
                   <FormControl>
-                    < Input placeholder="作文题目，如save the earth" {...field} />
+                    < Input placeholder="作文题目如save the earth" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -224,7 +226,7 @@ export function WriteForm({ userId }: { userId: string }) {
               <FormItem>
                 <FormLabel className="">👋 字数限制</FormLabel>
                 <FormControl>
-                  <Input  {...field} />
+                  <Input  {...field} type="number"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>

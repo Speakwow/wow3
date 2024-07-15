@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/resizable"
 
 import { Input } from "@/components/ui/input";
-import { getAllLessons, getLessonsByCreator, getPublicData } from "@/lib/action/mongoIO";
+import { getAllLessons, getFavouriteLessons, getLessonsByCreator, getPublicData, getUserData } from "@/lib/action/mongoIO";
 import { getAllLessonsByLessonId } from "@/lib/action/mongoIO-client";
 import { Badge } from "@/components/ui/badge";
 import SideBar from "@/components/side-bar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LessonCard } from "./lessonInfo";
+import { LessonCard } from "@/components/lessonInfo";
 import { ChevronLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,7 +27,7 @@ export default async function UserCenter() {
     const user = await currentUser();
 
     // const publicLessonList = await getAllLessonsByLessonId(publicLessonListId)
-    const userLessonList = await getLessonsByCreator(user?.id as string)
+    const [userLessonList, userData,favourieList] = await Promise.all([getLessonsByCreator(user?.id as string),getUserData(user?.id as string),getFavouriteLessons(user?.id as string)])
     // console.log(publicLessonList)
     return (
 
@@ -68,6 +68,7 @@ export default async function UserCenter() {
                                 userLessonList.map(item => (
                                     <LessonCard
                                         userId={user?.id as string}
+                                        userData={userData}
                                         name={item.name}
                                         type={item.type}
                                         tag={item.tag}
@@ -85,12 +86,13 @@ export default async function UserCenter() {
                 <TabsContent value="favourite">
                     <ScrollArea className="w-full h-full">
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-                            暂未开放
-                            {/* {
+                            
+                            {
                                 //@ts-ignore
-                                userLessonList.map(item => (
+                                favourieList.map(item => (
                                     <LessonCard
                                         userId={user?.id as string}
+                                        userData={userData}
                                         name={item.name}
                                         type={item.type}
                                         tag={item.tag}
@@ -100,7 +102,7 @@ export default async function UserCenter() {
                                         cover='' />
                                 )
                                 )
-                            } */}
+                            }
                         </div>
                     </ScrollArea>
                 </TabsContent>

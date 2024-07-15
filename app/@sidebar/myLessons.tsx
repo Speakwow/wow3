@@ -17,13 +17,13 @@ import {
 import { useState } from "react";
 
 
-export function MyLessons ({lessonList,userId}:{lessonList:any[],userId:string}){
-    const [listData,setListData] = useState(lessonList)
+export function MyLessons({ lessonList, userId }: { lessonList: any[], userId: string }) {
+    const [listData, setListData] = useState(lessonList)
     console.log(listData)
 
-    function deleteLessonFromList(userId:string,lessonId:string){
-        delFromUserLessonList(userId,lessonId)
-        .then(res=>setListData(prevList => prevList.filter(lesson => lesson._id !== lessonId)))
+    function deleteLessonFromList(userId: string, lessonId: string) {
+        delFromUserLessonList(userId, lessonId)
+            .then(res => setListData(prevList => prevList.filter(lesson => lesson._id !== lessonId)))
     }
 
     return (
@@ -33,27 +33,21 @@ export function MyLessons ({lessonList,userId}:{lessonList:any[],userId:string})
             </div>
             <div>
                 {listData.map((item: any) =>
-                    <Button asChild className="w-full py-2" variant="ghost" key={item.name}>
-                        <div className="flex flex-row justify-between">
-                            <Link href={`/${item.type}/${item._id}`}>
-                                <div className="flex flex-row flex-1 items-left gap-2">
-                                    {/* <Image
-                                 className="rounded-full"
-                                 alt='Frank'
-                                 width={30}
-                                 height={30}
-                                 src="https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/108cf320-27a7-4110-0312-6f0b32223200/avatar" /> */}
-                                    <div className="text-foreground texl-xl">
+                    <Button asChild className="w-full py-2 px-2" variant="ghost" key={item.name}>
+                        <div className="flex flex-row justify-between w-full">
+                            <Link href={`/${item.type}/${item._id}`} className="w-5/6 " >
+
+                                    <div className="w-full truncate text-ellipsis overflow-hidden text-foreground texl-xl">
                                         {item.name}
                                     </div>
-                                </div>
+                                
                             </Link>
                             <DropdownMenu>
                                 <DropdownMenuTrigger className=" hover:bg-black/25 active:bg-black/25 focus:bg-black/25 h-6 w-6 p-1 rounded-full z-10" >
                                     <MoreHorizontalIcon className="w-4 h-4" color="background" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={()=>deleteLessonFromList(userId,item._id)}>删除记录</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => deleteLessonFromList(userId, item._id)}>删除记录</DropdownMenuItem>
                                     {/* <DropdownMenuSeparator />
                                     <DropdownMenuItem>Profile</DropdownMenuItem>
                                     <DropdownMenuItem>Billing</DropdownMenuItem>
@@ -72,31 +66,33 @@ export function MyLessons ({lessonList,userId}:{lessonList:any[],userId:string})
 
 }
 
-export  function lessonRecord(lesson: any,userId:string) {
-    return (
-        <Button asChild className="w-full py-2" variant="ghost" key={lesson.name}>
-        <div className="flex flex-row justify-between">
-            <Link href={`/${lesson.type}/${lesson._id}`}>
-                <div className="flex flex-row flex-1 items-left gap-2">
-                    <div className="text-foreground texl-xl">
-                        {lesson.name}
-                    </div>
-                </div>
-            </Link>
-            <DropdownMenu>
-                <DropdownMenuTrigger className=" hover:bg-black/25 active:bg-black/25 focus:bg-black/25 h-6 w-6 p-1 rounded-full z-10" >
-                    <MoreHorizontalIcon className="w-4 h-4" color="background" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                    <DropdownMenuItem onClick={()=>delFromUserLessonList(userId,lesson._id)}>删除记录</DropdownMenuItem>
-                    {/* <DropdownMenuSeparator />
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem>Subscription</DropdownMenuItem> */}
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
-    </Button>
-    )
-}
+// export function lessonRecord(lesson: any, userId: string) {
+//     return (
+//         <Button asChild className="w-full py-2" variant="ghost" key={lesson.name}>
+//             <div className="flex flex-row justify-between w-full">
+
+                
+//                     <Link href={`/${lesson.type}/${lesson._id}`}>
+//                         <div className="truncate text-ellipsis overflow-hidden text-foreground texl-xl ">
+//                             {lesson.name}
+//                         </div>
+//                     </Link>
+                
+
+//                 <DropdownMenu>
+//                     <DropdownMenuTrigger className=" hover:bg-black/25 active:bg-black/25 focus:bg-black/25 h-6 w-6 p-1 rounded-full z-10" >
+//                         <MoreHorizontalIcon className="w-4 h-4" color="background" />
+//                     </DropdownMenuTrigger>
+//                     <DropdownMenuContent>
+//                         <DropdownMenuItem onClick={() => delFromUserLessonList(userId, lesson._id)}>删除记录</DropdownMenuItem>
+//                         {/* <DropdownMenuSeparator />
+//                     <DropdownMenuItem>Profile</DropdownMenuItem>
+//                     <DropdownMenuItem>Billing</DropdownMenuItem>
+//                     <DropdownMenuItem>Team</DropdownMenuItem>
+//                     <DropdownMenuItem>Subscription</DropdownMenuItem> */}
+//                     </DropdownMenuContent>
+//                 </DropdownMenu>
+//             </div>
+//         </Button>
+//     )
+// }

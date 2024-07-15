@@ -109,7 +109,8 @@ export async function getUserData(userId: string) {
       .insertOne(
         {
           userId: userId,
-          lessonList: []
+          lessonList: [],
+          favourite:[]
         })
     mongo.close()
     return { _id: res.insertedId, userId: userId, lessonList: [] }
@@ -134,7 +135,6 @@ export async function getPublicData() {
   const results = await Promise.all(promises);
   // 将结果平铺到 publicLessons 数组中
   results.forEach(result => publicLessons.push(...result));
-  console.log(publicLessons)
   return JSON.parse(JSON.stringify(publicLessons))
 }
 
@@ -154,6 +154,63 @@ export async function getLessonsByCreator(userId:string) {
   const results = await Promise.all(promises);
   // 将结果平铺到 publicLessons 数组中
   results.forEach(result => resultLessons.push(...result));
+  return JSON.parse(JSON.stringify(resultLessons))
+}
+
+
+
+export async function addFavourite(userId: string, lessonId: string, name: string, type: string) {
+  const mongo = await connect()
+  const newLesson = {
+    id: lessonId,
+    name: name,
+    type: type,
+    lastModified: new Date()
+  }
+  const res = await mongo.db(DB)
+    .collection('users')
+    .updateOne(
+      { userId: userId },
+      {
+        //@ts-ignore
+        $push: {
+          "favourite": newLesson
+        }
+      });
+  return res.acknowledged
+}
+
+export async function deleteFavourite(userId: string, lessonId: string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('users')
+    .updateOne(
+      { userId: userId },
+      {
+        //@ts-ignore
+        $pull: {
+          "favourite": {id:lessonId}
+        }
+      });
+  return res.acknowledged
+}
+
+export async function getFavouriteLessons(userId:string) {
+  const mongo = await connect()
+  let resultLessons = [] as any[]
+  const userData = await getUserData(userId)
+  const favouriteList = userData.favourite
+  const promises = favouriteList.map((item:any) => {
+    return mongo.db(DB)
+      .collection(findCollectionByType(item.type))
+      .findOne({ _id: new ObjectId(item.id as string) })
+      .then(lesson => ({ type: item.type,tag: type2tag(item.type), ...lesson }));
+  });
+
+  // 使用 Promise.all 并行执行所有查询
+  const results = await Promise.all(promises);
+  // 将结果平铺到 publicLessons 数组中
+  results.forEach(result => {if(result._id){resultLessons.push(result)}});
   console.log(resultLessons)
   return JSON.parse(JSON.stringify(resultLessons))
 }

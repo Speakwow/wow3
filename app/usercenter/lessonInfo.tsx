@@ -150,3 +150,81 @@ export function LessonCard({ userId, name, type, id, intro, cover, tag }: { user
     )
 
 }
+
+
+
+export function FavouriteCard({ userId, name, type, id, intro, cover, tag }: { userId: string, name: string, type: string, id: string, intro: string, cover: string, tag: string }) {
+    let coverImg = ''
+    if (!cover) {
+        coverImg = 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/108cf320-27a7-4110-0312-6f0b32223200/avatar'
+    } else {
+        coverImg = cover
+    }
+
+    const router = useRouter();
+    const [isDeleting, setIsDeleting] = useState(false);
+    function handleDeleteLesson(userId:string, id:string, type:string) {
+        setIsDeleting(true);
+        try {
+            deleteLesson(userId, id, type).then(res=>router.refresh())
+        } catch (error) {
+            console.error('Failed to delete lesson:', error);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    return (
+
+            <Card className={`bg-white rounded-[10px] ${isDeleting?'disabled':''}`}>
+                <CardContent className="flex flex-row w-full p-0">
+                    <div className="h-full p-3 w-[100px]">
+                        <Image
+                            alt='SC'
+                            width={200}
+                            height={50}
+                            objectFit="cover"
+                            className="rounded-[10px]"
+                            src={coverImg} />
+                    </div>
+                    <div className=" text-pretty truncate w-full col-span-2 p-3 flex flex-col gap-2">
+                        <div className="font-semibold text-sm">
+                            {name}
+                        </div>
+                        <Badge className="text-xs w-fit" variant="outline">
+                            {tag}
+                        </Badge>
+                        <div className="line-clamp-2 text-xs text-pretty truncate">
+                            {intro}
+                        </div>
+                    </div>
+                </CardContent>
+
+                <CardFooter className="flex flex-row justify-end gap-2 border-t p-2">
+                    <Button className="hover:muted active:bg-black/25 focus:bg-black/25 h-6 w-6 p-1 h-6 w-6 p-1 rounded-full z-10" variant="ghost" asChild>
+                    <Link href={`/${type}/${id}`}>
+                        <EnterIcon className="w-6 h-6" color="black" />
+                        </Link>
+                    </Button>
+                    {/* <Button className="hover:muted active:bg-black/25 focus:bg-black/25 h-6 w-6 p-1 h-6 w-6 p-1 rounded-full z-10" variant="ghost">
+                        <EditIcon className="w-6 h-6" color="black" />
+                    </Button> */}
+                    {/* <DropdownMenu>
+                        
+                        <Button className="hover:muted active:bg-black/25 focus:bg-black/25 h-6 w-6 p-1 h-6 w-6 p-1 rounded-full z-10" variant="ghost" asChild>
+                        <DropdownMenuTrigger >
+                            <MoreHorizontalIcon className="w-6 h-6" color="black" />
+                            </DropdownMenuTrigger>
+                            </Button>
+
+                        <DropdownMenuContent>
+                            <DropdownMenuItem onClick={()=>handleDeleteLesson(userId,id,type)} className="text-[#D21F1F] font-medium">删除课程</DropdownMenuItem>
+                           
+                        </DropdownMenuContent>
+                    </DropdownMenu> */}
+                </CardFooter>
+            </Card>
+
+    )
+
+}
