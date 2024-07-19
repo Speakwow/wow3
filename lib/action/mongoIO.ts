@@ -650,9 +650,10 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
 
 export async function createRepeat(userId: string, name: string, content: string[],access:string) {
   const mongo = await connect()
+  const trimed_content = content.filter(item => item.trim() !== "");
   const res = await mongo.db(DB)
     .collection('repeats')
-    .insertOne({ creator: userId, name: name, content: content ,access:access})
+    .insertOne({ creator: userId, name: name, content: trimed_content ,access:access})
   await addToUserLessonList(userId, res.insertedId.toString(), name, 'repeat')
   return res.insertedId.toString()
 }
