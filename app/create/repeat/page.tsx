@@ -8,16 +8,17 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getAllCharacters } from "@/lib/action/mongoIO";
+import { RepeatForm } from "./form";
 
-export default async function ScenarioCreator() {
+export default async function RepeatCreator() {
     const { userId } = auth();
-    if(!userId) redirect('/')
+    if (!userId) redirect('/')
     // const characterList = await kv.smembers('characterList@all')
     // const promises = characterList.map(async (id) => {
     //     const character = await kv.hgetall('character@' + id)
     //     return { id: id, ...character }
     // })
-    const allCharacters = await getAllCharacters()
+    // const allCharacters = await getAllCharacters()
 
 
     return (
@@ -35,12 +36,12 @@ export default async function ScenarioCreator() {
                         <CardHeader className="flex flex-row justify-between">
                             <div>
                                 <CardTitle className="text-2xl">
-                                    升级中，敬请期待
+                                    创建 - 跟读练习
                                 </CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent className="h-full">
-                   
+                            <RepeatForm userId={userId} />
                         </CardContent>
                     </Card>
                 </div>

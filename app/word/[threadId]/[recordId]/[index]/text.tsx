@@ -180,7 +180,7 @@ export default function RepeatText({ text, index ,info,recordId}: { text: any, i
                 <Card className="z-50 p-4 rounded-[36px] w-full sticky font-semibold text-center bg-white/75 backdrop-blur">
                     <div className="flex justify-center pb-4">
                         {recognitionText.length > 0  && !isRecognizing ?
-                            <Bravo score={pronscore} mistakeCount={mistakeCount} />
+                            <Bravo score={pronscore}/>
                             :
                             <div>
                                 <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying}>

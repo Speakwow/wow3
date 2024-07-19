@@ -36,8 +36,8 @@ const types = [
     ,
     {
         'type': 'repeat',
-        'name': '绘本故事',
-        'intro': '一起创建生动有趣的绘本吧',
+        'name': '跟读练习',
+        'intro': '一起读一读单词和句子吧',
         'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/249ec15a-b7ea-4292-8236-e675a3596300/avatar'
     }
     ,

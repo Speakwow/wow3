@@ -21,32 +21,38 @@ import { auth } from '@clerk/nextjs/server'
 export default async function Talkabout({ params }: { params: { threadId: string } }) {
     const { userId, orgId } = auth();
 
-    const data = await getTalkaboutById(params.threadId) as any
-    const recordId = await createTalkaboutRecord(params.threadId,userId as string)
+    const [data,recordId ] = await Promise.all([getTalkaboutById(params.threadId) ,createTalkaboutRecord(params.threadId, userId as string)])
     // if (thread) {
     //     redirect(`/talkabout/${params.threadId}/${recordId}`)
     // }
     // const recordId = '1'
-    return(
-        <div className='h-screen flex items-center justify-center p-10 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%'>
+    return (
+        <div className='relative h-screen flex items-center justify-center p-10 bg-muted'>
+            <div className="absolute top-2 left-2">
+                <Button asChild size="icon" variant="outline">
+                    <Link href="/">
+                        <ChevronLeft />
+                    </Link>
+                </Button>
+            </div>
             <Card className='md:w-1/2 xs:w-full p-4'>
                 <CardHeader>
-                    <CardTitle className='text-center text-4xl p-6 font-bold text-[#42C83C]'>
+                    <CardTitle className='text-center text-2xl p-2 font-bold text-[#42C83C]'>
                         看图说话
                     </CardTitle>
-                    <CardDescription className='text-center text-xl flex flex-row justify-center gap-8'>
-                        <div>准备时间：<span className='text-[#42C83C] text-4xl'>{data.prepare_time}</span> 秒</div>   <div>练习时间：<span className='text-[#42C83C] text-4xl'>{data.answer_time}</span> 秒</div>  
+                    <CardDescription className='text-center  flex flex-row justify-center gap-8'>
+                        <div>准备时间：<span className='text-[#42C83C] text-2xl'>{data?.prepare_time}</span> 秒</div>   <div>练习时间：<span className='text-[#42C83C] text-2xl'>{data?.answer_time}</span> 秒</div>
                     </CardDescription>
                 </CardHeader>
-                <CardContent className='text-xl'>
-                    {data.rule}
+                <CardContent className=''>
+                    {data?.rule}
                 </CardContent>
                 <CardFooter className='p-6 flex justify-center'>
                     <Link href={`/talkabout/${params.threadId}/${recordId}`}>
-                    <Button size="lg" className='px-12 py-6 rounded-full text-2xl bg-[#42C83C]'>
-                        开始练习
+                        <Button size="lg" className='px-12 py-6 rounded-full text-xl bg-[#42C83C]'>
+                            开始练习
                         </Button>
-                        </Link>
+                    </Link>
                 </CardFooter>
             </Card>
         </div>

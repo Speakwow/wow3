@@ -81,19 +81,19 @@ export async function delFromUserLessonList(userId: string, lessonId: string) {
       {
         //@ts-ignore
         $pull: {
-          "lessonList": {_id:new ObjectId(lessonId)}
+          "lessonList": { _id: new ObjectId(lessonId) }
         }
       });
   return res.acknowledged
 }
 
-export async function deleteLesson(userId: string, lessonId: string,type:string) {
+export async function deleteLesson(userId: string, lessonId: string, type: string) {
   const mongo = await connect()
-  const collection =findCollectionByType(type)
+  const collection = findCollectionByType(type)
   const res = await mongo.db(DB)
     .collection(collection)
     .deleteOne(
-      { creator: userId,_id:new ObjectId(lessonId)});
+      { creator: userId, _id: new ObjectId(lessonId) });
   return res.acknowledged
 }
 
@@ -110,9 +110,9 @@ export async function getUserData(userId: string) {
         {
           userId: userId,
           lessonList: [],
-          favourite:[]
+          favourite: []
         })
-    return { _id: res.insertedId, userId: userId, lessonList: [] ,favourite:[]}
+    return { _id: res.insertedId, userId: userId, lessonList: [], favourite: [] }
   }
 
   return JSON.parse(JSON.stringify(res))
@@ -137,7 +137,7 @@ export async function getPublicData() {
   return JSON.parse(JSON.stringify(publicLessons))
 }
 
-export async function getLessonsByCreator(userId:string) {
+export async function getLessonsByCreator(userId: string) {
   const mongo = await connect()
   let resultLessons = [] as any[]
   const collections = lesson_collections
@@ -188,28 +188,28 @@ export async function deleteFavourite(userId: string, lessonId: string) {
       {
         //@ts-ignore
         $pull: {
-          "favourite": {id:lessonId}
+          "favourite": { id: lessonId }
         }
       });
   return res.acknowledged
 }
 
-export async function getFavouriteLessons(userId:string) {
+export async function getFavouriteLessons(userId: string) {
   const mongo = await connect()
   let resultLessons = [] as any[]
   const userData = await getUserData(userId)
   const favouriteList = userData.favourite
-  const promises = favouriteList.map((item:any) => {
+  const promises = favouriteList.map((item: any) => {
     return mongo.db(DB)
       .collection(findCollectionByType(item.type))
       .findOne({ _id: new ObjectId(item.id as string) })
-      .then(lesson => ({ type: item.type,tag: type2tag(item.type), ...lesson }));
+      .then(lesson => ({ type: item.type, tag: type2tag(item.type), ...lesson }));
   });
 
   // 使用 Promise.all 并行执行所有查询
   const results = await Promise.all(promises);
   // 将结果平铺到 publicLessons 数组中
-  results.forEach(result => {if(result._id){resultLessons.push(result)}});
+  results.forEach(result => { if (result._id) { resultLessons.push(result) } });
   console.log(resultLessons)
   return JSON.parse(JSON.stringify(resultLessons))
 }
@@ -645,4 +645,50 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
     .insertOne({ threadId: writeId, userId: userId, content: content, feedback: feedback, isFinished: true })
 
   return JSON.parse(JSON.stringify(res))
+}
+
+
+export async function createRepeat(userId: string, name: string, content: string[],access:string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('repeats')
+    .insertOne({ creator: userId, name: name, content: content ,access:access})
+  await addToUserLessonList(userId, res.insertedId.toString(), name, 'repeat')
+  return res.insertedId.toString()
+}
+
+
+export async function getRepeatById(threadId:string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('repeats')
+    .findOne({ _id: new ObjectId(threadId) })
+  return JSON.parse(JSON.stringify(res))
+}
+
+// export async function saveRepeatRecord(userId: string, name: string, content: string[]) {
+//   const mongo = await connect()
+//   const res = await mongo.db(DB)
+//     .collection('repeats')
+//     .insertOne({ creator: userId, name: name, content: content })
+//   await addToUserLessonList(userId, res.insertedId.toString(), name, 'repeat')
+//   return res.insertedId.toString()
+// }
+
+
+export async function saveRepeatRecord(userId: string,threadId:string,score:number,report:any,record:any[]) {
+  const now = Date.now(); // 获取当前时间的时间戳
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('repeat_records')
+    .insertOne({  
+      userId: userId, 
+      threadId: threadId ,
+      score:score.toFixed(0),
+      report:report,
+      record:record,
+      isFinished: true,
+      finishAt: now,
+    })
+  return res.insertedId.toString()
 }

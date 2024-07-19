@@ -16,7 +16,7 @@ import Image from 'next/image'
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
 // }
 
-export default function Talkabout({ image_url, intro, recordId,prepare_time,answer_time,topic }: { image_url: any, intro: string, recordId: string ,prepare_time:number,answer_time:number,topic:string}) {
+export default function Talkabout({ image_url,  recordId,prepare_time,answer_time,topic }: { image_url: any,  recordId: string ,prepare_time:number,answer_time:number,topic:string}) {
 
     const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
@@ -170,12 +170,12 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                         src={image_url} // 外部图片 URL
                         alt="Reference Image"
                         width={800}
-                        height={200}
+                        height={400}
                         style={{
                             objectFit: 'cover', // cover, contain, none
                         }}
 
-                        className={`rounded-[36px] border-4 border-white ${step=='end'?"h-[200px]":"h-[400px]"}`}
+                        className={`rounded-[36px] border-4 border-white ${step=='end'?"h-[400px]":"h-[400px]"}`}
                     />
                 </div>
             </div>
@@ -190,7 +190,7 @@ export default function Talkabout({ image_url, intro, recordId,prepare_time,answ
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-center">
-                            {intro}
+                            {topic}
                         </CardContent>
                         <CardFooter className="flex justify-center text-xs items-center">
                             <div className="text-center text-black/50">

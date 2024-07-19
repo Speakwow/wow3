@@ -17,7 +17,7 @@ const Bad = {
     text: 'Bad ~'
 }
 
-export const Bravo = ({ score, mistakeCount }: { score: number, mistakeCount: number }) => {
+export const Bravo = ({ score }: { score: number }) => {
     
     var sound = new Howl({
         src: ['/sound/game_correct.mp3'],
@@ -35,7 +35,7 @@ export const Bravo = ({ score, mistakeCount }: { score: number, mistakeCount: nu
                 </Avatar><span className="px-4 mr-4 mt-0.5 text-[#333333]">{Perfect.text}</span>
             </div>
         )
-    } else if (score < 80) {
+    } else if (score < 70) {
         return (
             <div className="flex items-center text-center bg-[#FFF5DA] rounded-full px-2 text-2xl">
                 <Avatar className="w-12 h-12  bg-[#FFF5DA] rounded-full p-2">

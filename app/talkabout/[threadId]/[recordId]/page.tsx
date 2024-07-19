@@ -40,15 +40,15 @@ export default async function Page({ params }: { params: { threadId: string,reco
     const data = await getTalkaboutById(params.threadId) as any
 
     return (
-        <div className='flex w-full h-screen justify-center relative p-10 gap-12 bg-[#FFD44C]'>
-            <div className="fixed top-2 left-2">
+        <div className='relative flex w-full h-screen justify-center relative p-10 gap-12 bg-muted'>
+            <div className="absolute top-2 left-2">
                 <Button asChild size="icon" variant="outline">
                     <Link href="/">
                         <ChevronLeft />
                     </Link>
                 </Button>
             </div>
-            <Talkabout image_url={data.image_url} intro={data.instruction} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} topic={data.title}/>
+            <Talkabout image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} topic={data.title}/>
         </div>
 
     )

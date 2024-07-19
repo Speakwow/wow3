@@ -1,7 +1,7 @@
 'use client'
 import { Button } from "@/components/ui/button"
 import { Card, CardFooter } from "@/components/ui/card";
-import { IconRightArrow} from "@/components/ui/icons"
+import { IconRightArrow } from "@/components/ui/icons"
 import { sttFromMic, sttFromMicWithAssess } from "@/lib/speech/asr";
 import { EvalResult, evalSpeechFromFile } from "@/lib/speech/eval";
 import { synthesizeSpeech } from "@/lib/speech/tts";
@@ -14,15 +14,66 @@ import TextWithHighlights from "./correct";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Bravo } from "@/components/bravo";
-import { updateRepeatRecord } from "@/lib/action/mongoIO";
+import { saveRepeatRecord, updateRepeatRecord } from "@/lib/action/mongoIO";
+import { LessonReport } from "@/components/report";
+import { threadId } from "worker_threads";
 
-// function HighlightWords({ story }: { story: any }) {
-//     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
-// }
-let pronscore = 0;
-export default function RepeatText({ text, index,recordId }: { text: any, index: number,recordId:string}) {
+
+function calculateAverages(data: any[]): any {
+    const count = data.length;
+    if (count === 0) {
+        throw new Error("The data array is empty.");
+    }
+
+    let totalScore = 0;
+    let totalAccuracy = 0;
+    let totalFluency = 0;
+    let totalCompleteness = 0;
+    let totalProsody = 0;
+
+    data.forEach(item => {
+        totalScore += item.score;
+        totalAccuracy += item.detail_score.accuracy;
+        totalFluency += item.detail_score.fluency;
+        totalCompleteness += item.detail_score.completeness;
+        totalProsody += item.detail_score.prosody;
+    });
+
+    const avgScore = totalScore / count;
+    const avgAccuracy = totalAccuracy / count;
+    const avgFluency = totalFluency / count;
+    const avgCompleteness = totalCompleteness / count;
+    const avgProsody = totalProsody / count;
+
+    return {
+        score: avgScore,
+        detailScore: {
+            accuracy: avgAccuracy,
+            fluency: avgFluency,
+            completeness: avgCompleteness,
+            prosody: avgProsody,
+        }
+    };
+}
+
+export default function RepeatText({ thread, userId, threadId }: { thread: string[], userId: string, threadId: string }) {
 
     const [audioFile, setAudioFile] = useState('')
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [threadRecord, setThreadRecord] = useState<any[]>([])
+
+    const [report, setReport] = useState<any>()
+    const [saveState, setSaveState] = useState('unsaved')
+
+    const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
+    const [displayText, setDisplayText] = useState('');
+
+    const [loading, setLoading] = useState(true);
+    //是否在播放
+    const [isPlaying, setIsPlaying] = useState(false);
+    //是否在识别
+    const [isRecognizing, setIsRecognizing] = useState(false)
+    const audioRef = useRef<HTMLAudioElement>(null);
 
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
@@ -45,42 +96,23 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
         });
         sound.play();
     }
-    const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
-    const [displayText, setDisplayText] = useState('');
-    const [resultText, setResultText] = useState('')
 
-    const [loading, setLoading] = useState(true);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [completed, setIsCompleted] = useState(false);
-    const [isRecognizing, setIsRecognizing] = useState(false)
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const router = useRouter()
-    const [mistakeCount, setMistakeCount] = useState(0)
-    const [pronResult, setPronResult] = useState(
-        {
-            accuray: 0,
-            fluency: 0,
-            completeness: 0,
-            prosody: 0,
-            sum: 0,
-        });
 
 
     //Welcome Messgae TTS
     useEffect(() => {
         setDisplayText('Listen carefully...')
-        synthesizeSpeech(text, audioData => {
+        synthesizeSpeech(thread[currentIndex], audioData => {
             if (audioData) {
                 handleAudioPlay(audioData)
             } else {
                 console.error('Speech synthesis failed or returned no audio');
             }
         })
-    }, []);
+    }, [currentIndex]);
 
     //handle Play
     const handleReplay = async () => {
-        setCorrect('')
         setDisplayText('Replaying...');
         setRecognitionText('')
         var sound = new Howl({
@@ -101,25 +133,9 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
         sound.play();
     }
 
-    //Handle Correct
-    const [correct, setCorrect] = useState('')
-    async function handleCorrect(reference: string, result: string) {
-        const res = await fetch('/api/correct',
-            {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ reference: reference, result: result })
-            })
-        const data = await res.json()
-        setCorrect(data.message)
-    }
-
 
     //Handle Asr with Eval
     const handleSpeechToText = async () => {
-        setCorrect('')
         setDisplayText('Repeat After Me...');
         setLoading(true)
         setRecognitionText('');
@@ -135,7 +151,7 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
             };
 
             const asrText = await sttFromMic() as string;
-            handleCorrect(text, asrText)
+            
             setDisplayText('Reviewing...');
             setRecognitionText(asrText);
             mediaRecorder.stop();
@@ -144,17 +160,20 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                 stream.getTracks().forEach(track => track.stop());
                 const wavBlob = await webm2Wav(audioBlob)
-                // const audioUrl = URL.createObjectURL(wavBlob);
-                // downloadWavFile(wavBlob, 'output.wav');
-                const evalResult = await evalSpeechFromFile(text, wavBlob) as EvalResult;
-                setPronResult({
-                    accuray: evalResult.accuracy,
-                    fluency: evalResult.fluency,
-                    completeness: evalResult.completeness,
-                    prosody: evalResult.prosody,
-                    sum: evalResult.pronunciation
-                })
-                pronscore = evalResult.pronunciation
+                const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as EvalResult;
+                setThreadRecord([
+                    ...threadRecord,
+                    {
+                        index: currentIndex,
+                        text: thread[currentIndex],
+                        score: evalResult.pronunciation,
+                        detail_score: {
+                            accuray: evalResult.accuracy,
+                            fluency: evalResult.fluency,
+                            completeness: evalResult.completeness,
+                            prosody: evalResult.prosody,
+                        }
+                    }])
                 setDisplayText('');
                 console.log(evalResult)
                 // URL.revokeObjectURL(audioUrl);
@@ -169,22 +188,49 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
             setIsRecognizing(false)
         }
     };
-
     const nextPage = () => {
-        updateRepeatRecord(recordId,index,+pronscore.toFixed(0),text)
-        router.push('./' + (index + 1))
+        if (currentIndex +1 <= thread.length - 1) {
+            setLoading(true)
+            setAudioFile("")
+            setDisplayText('')
+            setRecognitionText('')
+            setCurrentIndex(currentIndex + 1)
+        } else {
+            setSaveState('saving')
+            const final_report = calculateAverages(threadRecord)
+            setReport(final_report)
+            saveRepeatRecord(userId, threadId, final_report.score, final_report, threadRecord)
+                .then(res => setSaveState('saved'))
+        }
+    }
+
+    if (saveState == 'saving') {
+        return (
+            <div className=' h-screen flex flex-col justify-center items-center animate-pulse'>
+                AI 评分中...
+            </div>
+        )
+    }
+
+
+    if (saveState == 'saved'&&report.score) {
+        return (
+            <div className=' h-screen flex flex-col justify-center items-center '>
+                <LessonReport score={report.score} detail={report.detailScore} />
+            </div>
+        )
     }
 
     return (
-        <div className="flex flex-col items-center justify-center h-full">
-            <div className="w-full relative text-3xl  mx-6 flex">
+        <div className="w-full flex flex-col items-center justify-center h-full">
+            <div className="w-full text-2xl  mx-6 flex  flex-col h-full justify-center items-center">
                 <audio ref={audioRef} className="sr-only">
                 </audio>
 
-                <Card className="z-50 p-4 rounded-[36px] w-full sticky font-semibold text-center bg-white/75 backdrop-blur">
-                    <div className="flex justify-center pb-4">
-                        {recognitionText.length > 0 && correct && !isRecognizing ?
-                            <Bravo score={pronscore} mistakeCount={mistakeCount} />
+                <Card className="w-5/6 z-50 p-4 pb-8 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
+                    <div className="flex justify-center pb-4 w-full">
+                        {recognitionText.length > 0 && !isRecognizing&&threadRecord[currentIndex].score ?
+                            <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
                                 <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying}>
@@ -196,16 +242,12 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
                     </div>
 
                     {!recognitionText ?
-                        <div>{text}</div>
+                        <div className="w-full text-pretty text-ellipsis overflow-hidden">
+                            {thread[currentIndex]}
+                        </div>
                         :
-                        !correct ? <div>{recognitionText}</div> :
-                            <div className="text-[#19B700]">
-                                <TextWithHighlights text={correct} setMistakeCount={setMistakeCount} />
-                            </div>
+                        <div>{recognitionText}</div> 
                     }
-                    <div className='flex justify-center text-xl text-black/50 mt-8'>
-                         
-                    </div>
 
                 </Card>
             </div>
@@ -216,7 +258,7 @@ export default function RepeatText({ text, index,recordId }: { text: any, index:
                     <Button
                         type='button'
                         size={'icon'}
-                        className={`h-fit p-6 bg-[#3F51B5] w-fit rounded-full border-8 border-white ${isRecognizing === true ? 'animate-bounce' : ''}`}
+                        className={`h-fit p-6 bg-[#42C83C] w-fit rounded-full border-8 border-white ${isRecognizing === true ? 'animate-bounce' : ''}`}
                         onClick={handleSpeechToText}
                         disabled={loading}
                     >   {
