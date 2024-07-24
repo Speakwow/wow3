@@ -54,6 +54,13 @@ const types = [
         'intro': '与 AI 一同提高你的写作技巧，通过有趣的写作任务和及时反馈来增强你的表达能力。',
         'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/060a7a04-6c6a-4de6-408c-dffee9638b00/avatar'
     }
+    ,
+    {
+        'type': 'talkabout',
+        'name': '看图说话',
+        'intro': '创建一个看图说话练习',
+        'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/060a7a04-6c6a-4de6-408c-dffee9638b00/avatar'
+    }
 ];
 
 export default async function CreateBoard() {

@@ -91,8 +91,13 @@ const formSchema = z.object({
     message: "简介不可为空",
   }),
   rule: z.string().min(1, {
-    message: "规则不可为空",
+    message: "题目不可为空",
   }),
+  instruction: z.string().min(1, {
+    message: "思路提示不可为空",
+  }),
+  image_description: z.string(),
+  examplar:z.string(),
   prepare_time: z.string().min(1, {
     message: "准备时间不可为空",
   }),
@@ -230,146 +235,186 @@ export function ScenarioForm({ userId, allCharacters }: { userId: string, allCha
               </FormItem>
             )}
           />
-          </div>
-          <div className="grid grid-cols-2 gap-6">
+        </div>
+        <div className="">
+          <FormField
+            control={form.control}
+            name="instruction"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>思路提示</FormLabel>
+                <FormControl>
+                  < Textarea className="h-24" placeholder="请输入思路提示.." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="">
+          <FormField
+            control={form.control}
+            name="image_description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>图片描述</FormLabel>
+                <FormControl>
+                  < Textarea className="h-24" placeholder="请输入图片描述.." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="">
+          <FormField
+            control={form.control}
+            name="examplar"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>范文</FormLabel>
+                <FormControl>
+                  < Textarea className="h-24" placeholder="请输入范文.." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-6">
 
-            <FormField
-              control={form.control}
-              name="level"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>难度</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <FormField
+            control={form.control}
+            name="level"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>难度</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {levels.map((item, index) => (
+                        <SelectItem key={index} value={item.value}>
+                          <div className="flex flex-row gap-2">
+                            <Badge className="">
+                              {item.label}
+                            </Badge>
+                          </div></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormItem>
+            <FormLabel>图片</FormLabel>
+            <FormControl>
+              <Input id="picture" ref={imgFileRef} type="file" />
+            </FormControl>
+
+            <FormMessage />
+          </FormItem>
+
+          <FormField
+            control={form.control}
+            name="prepare_time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>准备时间（秒）</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {prepareTime.map((item, index) => (
+                        <SelectItem key={index} value={item.toString()}>
+                          <div className="flex flex-row gap-2">
+                            {item.toString()}
+                          </div></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="answer_time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>作答时间（秒）</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {answerTime.map((item, index) => (
+                        <SelectItem key={index} value={item.toString()}>
+                          <div className="flex flex-row gap-2">
+                            {item.toString()}
+                          </div></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+        </div>
+        <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-6">
+          <FormField
+            control={form.control}
+            name="access"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>权限</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-row space-y-1"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <RadioGroupItem value="public" />
                       </FormControl>
-                      <SelectContent>
-                        {levels.map((item, index) => (
-                          <SelectItem key={index} value={item.value}>
-                            <div className="flex flex-row gap-2">
-                              <Badge className="">
-                                {item.label}
-                              </Badge>
-                            </div></SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-
-
-
-            <FormItem>
-              <FormLabel>图片</FormLabel>
-              <FormControl>
-                <Input id="picture" ref={imgFileRef} type="file" />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-
-            <FormField
-              control={form.control}
-              name="prepare_time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>准备时间（秒）</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel className="font-normal">
+                        公开
+                      </FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <RadioGroupItem value="private" />
                       </FormControl>
-                      <SelectContent>
-                        {prepareTime.map((item, index) => (
-                          <SelectItem key={index} value={item.toString()}>
-                            <div className="flex flex-row gap-2">
-                              {item.toString()}
-                            </div></SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="answer_time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>作答时间（秒）</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {answerTime.map((item, index) => (
-                          <SelectItem key={index} value={item.toString()}>
-                            <div className="flex flex-row gap-2">
-                              {item.toString()}
-                            </div></SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-          </div>
-          <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-6">
-            <FormField
-              control={form.control}
-              name="access"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>权限</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-row space-y-1"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="public" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          公开
-                        </FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="private" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          私有
-                        </FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-
-          <Button type="submit">提交</Button>
+                      <FormLabel className="font-normal">
+                        私有
+                      </FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <Button type="submit">提交</Button>
       </form>
     </Form>
   )
