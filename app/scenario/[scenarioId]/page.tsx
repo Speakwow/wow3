@@ -47,12 +47,12 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
             </Link>
           </Button>
         </div>
-        <div className="absolute top-2 right-2">
+        {/* <div className="absolute top-2 right-2">
           <Button size="icon" variant="secondary">
             
               <MoreVerticalIcon />
           </Button>
-        </div>
+        </div> */}
         <div className="items-center justify-center p-2">
           <code className="relative rounded bg-muted px-[0.3rem] py-[0.10rem] font-mono text-sm font-semibold">📚上课中：{scenario.name}</code>
         </div>

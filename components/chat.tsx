@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
 import React, { useState, useEffect, useRef } from 'react';
-import { Keyboard, Mic, PlayIcon, SendIcon } from 'lucide-react';
+import { Keyboard, Mic, MoreVerticalIcon, PlayIcon, SendIcon, SkipForwardIcon } from 'lucide-react';
 import { Avatar, AvatarImage, } from "@/components/ui/avatar"
 import { synthesizeSpeech, synthesizeSpeechWithVoice } from '@/lib/speech/tts';
 import { sttFromMic } from '@/lib/speech/asr';
@@ -25,13 +25,16 @@ let totalPronScore = 0
 let dialogLength = 0
 let stayTime = 0;
 
+
+
 export default function Chat(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
+  const [sound, setSound] = useState<Howl | null>(null);
 
   //Handle Playing Audio
   function handleAudioPlay(audioData: ArrayBuffer) {
     const audioBlob = new Blob([audioData], { type: 'audio/wav' });
     const audioUrl = URL.createObjectURL(audioBlob);
-    var sound = new Howl({
+    const newSound = new Howl({
       src: [audioUrl],
       format: ['wav'],
       autoplay: true,
@@ -50,7 +53,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         }
       }
     });
-    sound.play();
+    setSound(newSound);
+    newSound.play();
   }
   // Cache Current Message
   let currentMessage = ''
@@ -215,12 +219,13 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       if (audioData) {
         const audioBlob = new Blob([audioData], { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
-        var sound = new Howl({
+        const newSound = new Howl({
           src: [audioUrl],
           format: ['wav'],
           autoplay: true,
         });
-        sound.play();
+        setSound(newSound)
+        newSound.play();
       } else {
         console.error('Speech synthesis failed or returned no audio');
       }
@@ -235,7 +240,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
     const keywords = ['goodbye', 'bye', 'see you', 'bye-bye'];
-    if (keywords.some(keyword => lowerCaseMessage.includes(keyword))||messages.length>45) {
+    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 30) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
@@ -256,10 +261,45 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       return true
     }
   }
+  //handle Report
+  function handleEnd() {
+      if (reportTriggerRef.current) {
+        stayTime = Date.now() - startTime
+        const reportResult = {
+          score: Math.round(totalPronScore / dialogLength),
+          accuracy: Math.round(totalAccuracyScore / dialogLength),
+          fluency: Math.round(totalFluencyScore / dialogLength),
+          duration: Math.round((stayTime / 1000)),
+          round: messages.length,
+        }
+        console.log(reportResult)
+        updateScenarioRecord(params.chatid, reportResult).then(() => setRecordSaved(true))
+        reportTriggerRef.current.click();
+      }
+    }
+
+  // Cleanup on component unmount or page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (sound) {
+        sound.stop();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (sound) {
+        sound.stop();
+      }
+    };
+  }, [sound]);
 
   return (
 
     <div className='relative h-full bg-transparent rounded-10 min-w-full'>
+
       <CardHeader className='h-screen w-full relative'>
         <div className='flex justify-center'>
           <div>
@@ -439,7 +479,29 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <div className='fixed right-6 top-6'>
+        <AlertDialog>
+          <AlertDialogTrigger >
+            <Button size="icon" variant="destructive">
+              <SkipForwardIcon />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className='text-center'>是否立即结束练习？</AlertDialogTitle>
 
+            </AlertDialogHeader>
+            <AlertDialogFooter className='flex flex-row justify-between'>
+              <AlertDialogAction  onClick={handleEnd}>
+                立即结束
+              </AlertDialogAction>
+              <AlertDialogCancel>
+                继续练习
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }

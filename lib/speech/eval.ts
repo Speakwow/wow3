@@ -113,7 +113,7 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
 
   export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob) {
     return new Promise(async (resolve, reject) => {
-    const speechConfig = sdk.SpeechConfig.fromSubscription("e0a6ee26db64464b970d108a12022c79", "eastasia");
+    const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
     speechConfig.speechRecognitionLanguage = 'en-US';
     const audioFile = new File([audioBlob], "input.wav", { type: "audio/wav" });
     var audioConfig = sdk.AudioConfig.fromWavFileInput(audioFile)

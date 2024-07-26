@@ -84,7 +84,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
         setContentScore(feedbackData.score)
         setFinishFeedback(true)
         setIsSaving(true)
-        const finalScore = (feedbackData.score * 4 + pronResult.accuracy + pronResult.fluency) / 6
+        const finalScore = feedbackData.score * 0.6 + pronResult.accuracy*0.28+ pronResult.fluency*0.12
         finishTalkaboutRecord(recordId, +finalScore.toFixed(0), {
             user_answer:pronResult.text,
             themeScore: feedbackData.theme_relevance_score,
