@@ -48,7 +48,7 @@ export default async function Page({ params }: { params: { threadId: string,reco
                     </Link>
                 </Button>
             </div>
-            <Talkabout image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} topic={data.title}/>
+            <Talkabout image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} instruction={data.instruction} topic={data.topic}/>
         </div>
 
     )

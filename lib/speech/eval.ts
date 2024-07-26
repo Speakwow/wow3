@@ -100,16 +100,6 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
         }             
         resolve(evalResult);
         reco.close();
-        // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',
-        //   "pronunciation score: ", pronunciation_result.pronunciationScore, '\n',
-        //   "completeness score : ", pronunciation_result.completenessScore, '\n',
-        //   "fluency score: ", pronunciation_result.fluencyScore, '\n',
-        //   "prosody score: ", pronunciation_result.prosodyScore
-        // );
-        // console.log("Word-level details:");
-        // _.forEach(pronunciation_result.detailResult.Words, (word, idx) => {
-        //   console.log("    ", idx + 1, ": word: ", word.Word, "\taccuracy score: ", word.PronunciationAssessment?.AccuracyScore, "\terror type: ", word.PronunciationAssessment?.ErrorType, ";");
-        // });
       }, err => {
       
           reject(err);  // Reject the promise if there's an error
@@ -134,10 +124,9 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
       sdk.PronunciationAssessmentGranularity.Phoneme,
       false
     );
-    pronunciationAssessmentConfig.enableProsodyAssessment = true;
-    pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
+    // pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
     pronunciationAssessmentConfig.applyTo(reco);
-    console.log(`Topic: `+topic)
+    // console.log(`Topic: `+topic)
     reco.recognizeOnceAsync(result => {
         console.log(`RECOGNIZED: Text=${result.text}`);
         var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
@@ -148,22 +137,10 @@ export async function evalSpeech(referenceText: string, audioBlob: Blob) {
           accuracy: pronunciation_result.accuracyScore,
           fluency: pronunciation_result.fluencyScore,
           completeness: pronunciation_result.completenessScore,
-          prosody: pronunciation_result.prosodyScore,
           length: pronunciation_result.detailResult.Words.length,
         }             
         console.log(pronunciation_result)
         resolve(evalResult);
-        reco.close();
-        // console.log(" Accuracy score: ", pronunciation_result.accuracyScore, '\n',
-        //   "pronunciation score: ", pronunciation_result.pronunciationScore, '\n',
-        //   "completeness score : ", pronunciation_result.completenessScore, '\n',
-        //   "fluency score: ", pronunciation_result.fluencyScore, '\n',
-        //   "prosody score: ", pronunciation_result.prosodyScore
-        // );
-        // console.log("Word-level details:");
-        // _.forEach(pronunciation_result.detailResult.Words, (word, idx) => {
-        //   console.log("    ", idx + 1, ": word: ", word.Word, "\taccuracy score: ", word.PronunciationAssessment?.AccuracyScore, "\terror type: ", word.PronunciationAssessment?.ErrorType, ";");
-        // });
         reco.close();
       }, err => {
       

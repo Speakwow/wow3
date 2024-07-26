@@ -2,21 +2,21 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconRightArrow } from "@/components/ui/icons"
-import { evalSpeechWithTopicFromFile } from "@/lib/speech/eval";
+import { evalSpeechFromFile, evalSpeechWithTopicFromFile } from "@/lib/speech/eval";
 import { webm2Wav } from "@/lib/speech/wav";
-import {  Mic } from "lucide-react";
+import { Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from 'react';
-import { Howl} from 'howler';
+import { Howl } from 'howler';
 import { Badge } from "@/components/ui/badge";
-import { finishTalkaboutRecord} from "@/lib/action/mongoIO-client";
+import { finishTalkaboutRecord } from "@/lib/action/mongoIO-client";
 import Image from 'next/image'
 
 // function HighlightWords({ story }: { story: any }) {
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
 // }
 
-export default function Talkabout({ image_url,  recordId,prepare_time,answer_time,topic }: { image_url: any,  recordId: string ,prepare_time:number,answer_time:number,topic:string}) {
+export default function Talkabout({ image_url, recordId, prepare_time, answer_time, instruction,topic }: { image_url: any, recordId: string, prepare_time: number, answer_time: number, instruction: string ,topic:string}) {
 
     const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
@@ -38,12 +38,12 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
             countdownInterval = setInterval(() => {
                 setCountdown(prevCountdown => prevCountdown - 1);
             }, 1000);
-        } else if (countdown === 0 && !isRecording&&step =='prepare') {
+        } else if (countdown === 0 && !isRecording && step == 'prepare') {
             setCountdown(answer_time);
             startSpeechToText();
             setStep('practice')
         }
-        else if (countdown === 0 && isRecording&&step =='practice') {
+        else if (countdown === 0 && isRecording && step == 'practice') {
             stopSpeechToText();
             setStep('end')
         }
@@ -52,30 +52,50 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
     }, [countdown, isRecording]);
 
 
+    async function handleSkipPrepare(){
+        setCountdown(answer_time);
+        startSpeechToText();
+        setStep('practice')
+    }
+
+    const [finishFeedback, setFinishFeedback] = useState(false)
     //Handle Correct
     const [feedback, setFeedback] = useState('')
     const [themeScore, setThemeScore] = useState(0)
     const [vocabScore, setVocabScore] = useState(0)
     const [grammarScore, setGrammarScore] = useState(0)
     const [contentScore, setContentScore] = useState(0)
-    async function handleFeedback(image_url: string, answer:string) {
+    async function handleFeedback(image_url: string, user_answer: string,pronResult:any) {
         const res = await fetch('/api/talkabout/feedback',
             {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ image_url: image_url, answer: answer })
+                body: JSON.stringify({ image_url: image_url, user_answer: user_answer })
             })
-        const data = await res.json()
-        const feedbackJson = JSON.parse(data.message)
-        console.log(feedbackJson)
+        const feedbackData = await res.json()
+
         // console.log(data.message)
-        setThemeScore(feedbackJson.Theme_Relevance_Score)
-        setVocabScore(feedbackJson.Vocabulary_Score)
-        setGrammarScore(feedbackJson.Grammarza_Syntax_Score)
-        setFeedback(feedbackJson.feedback)
-        setContentScore(feedbackJson.Overall_score)
+        setThemeScore(feedbackData.theme_relevance_score)
+        setVocabScore(feedbackData.vocabulary_score)
+        setGrammarScore(feedbackData.grammarza_syntax_score)
+        setFeedback(feedbackData.feedback)
+        setContentScore(feedbackData.score)
+        setFinishFeedback(true)
+        setIsSaving(true)
+        const finalScore = (feedbackData.score * 4 + pronResult.accuracy + pronResult.fluency) / 6
+        finishTalkaboutRecord(recordId, +finalScore.toFixed(0), {
+            user_answer:pronResult.text,
+            themeScore: feedbackData.theme_relevance_score,
+            vocabScore: feedbackData.vocabulary_score,
+            grammarScore: feedbackData.grammarza_syntax_score,
+            feedback: feedbackData.feedback,
+            overallContentScore: feedbackData.score,
+            overallPronScore: pronResult.accuracy *0.7 + pronResult.fluency*0.3,
+            accuracy: pronResult.accuracy,
+            fluency: pronResult.fluency
+        }).then(()=>setIsSaving(false)).finally(()=>setIsSaving(false))
     }
 
 
@@ -91,10 +111,10 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
                         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                         stream.getTracks().forEach(track => track.stop());
                         webm2Wav(audioBlob).then(wavBlob => {
-                            evalSpeechWithTopicFromFile(topic, wavBlob).then(evalResult => {
+                            evalSpeechWithTopicFromFile(instruction, wavBlob).then(evalResult => {
                                 setPronResult(evalResult as any)
                                 //@ts-ignore
-                                handleFeedback(image_url,evalResult.text)
+                                handleFeedback(image_url, evalResult.text, evalResult)
                                 console.log(evalResult)
                             })
                         }
@@ -134,21 +154,9 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
         mediaRecorderRef.current?.stop();
     }
 
-    const [isSaving,setIsSaving] = useState(false)
-    const finishLesson = async ()=>{
-        const finalScore = (contentScore*4+pronResult.accuracy+pronResult.fluency)/6
-        console.log(finalScore.toFixed(0))
-        setIsSaving(true)
-        await finishTalkaboutRecord(recordId,+finalScore.toFixed(0),{
-            themeScore:themeScore,
-            vocabScore:vocabScore,
-            grammarScore:grammarScore,
-            feedback:feedback,
-            overallContentScore:contentScore,
-            overallPronScore:(pronResult.accuracy+pronResult.fluency)/2,
-            accuracy:pronResult.accuracy,
-            fluency:pronResult.fluency
-        })
+    const [isSaving, setIsSaving] = useState(false)
+    const finishLesson = async () => {
+
         router.push('/')
     }
 
@@ -156,10 +164,11 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
 
     return (
         <div className="flex flex-col items-center justify-center h-full gap-4">
-            <Card className={`p-2 text-center rounded-[36px] w-[250px] whitespace-pre-line ${step =="end"&&'text-white bg-[#42C83C]'} ${step =="practice"&&'border-2 border-[#42C83C]'}`}>
-                {step =="prepare"&&<p>准备时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
-                {step =="practice"&&<p>作答时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
-                {step =="end"&&<p className="text-xl">🎉 练习已完成</p>}
+            <Card className={`p-2 text-center flex flex-row justify-center  items-center  gap-4 rounded-[36px] w-[250px] whitespace-pre-line ${step == "end" && 'text-white bg-[#42C83C]'} ${step == "practice" && 'border-2 border-[#42C83C]'}`}>
+                {step == "prepare" && <p>准备时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
+                {step == "practice" && <p>作答时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
+                {step == "end" && <p className="text-xl">🎉 练习已完成</p>}
+                {step == "prepare" && <Button variant="secondary" size="sm" onClick={handleSkipPrepare}>跳过</Button>}
             </Card>
             <div className="w-full relative text-3xl  mx-6 flex justify-center items-center">
                 <audio ref={audioRef} className="sr-only">
@@ -172,16 +181,16 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
                         width={800}
                         height={400}
                         style={{
-                            objectFit: 'cover', // cover, contain, none
+                            objectFit: 'contain', // cover, contain, none
                         }}
 
-                        className={`rounded-[36px] border-4 border-white ${step=='end'?"h-[400px]":"h-[400px]"}`}
+                        className={`rounded-[36px] border-4 border-white ${step == 'end' ? "h-[400px]" : "h-[400px]"}`}
                     />
                 </div>
             </div>
 
             {
-                step == 'prepare' &&
+                step == 'prepare'||step=='practice' &&
                 <div className="flex flex-col gap-4 justify-center items-center">
                     <Card className="rounded-[36px] w-[800px] whitespace-pre-line">
                         <CardHeader className="p-4">
@@ -190,13 +199,28 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-center">
-                            {topic}
+                            {instruction}
                         </CardContent>
                         <CardFooter className="flex justify-center text-xs items-center">
                             <div className="text-center text-black/50">
                                 做好笔记哟～
                             </div>
                         </CardFooter>
+                    </Card>
+                </div>
+            }
+            {
+                step == 'end' &&
+                <div className="flex flex-col gap-4 justify-center items-center">
+                    <Card className="rounded-[36px] w-[800px] whitespace-pre-line">
+                        <CardHeader className="p-4">
+                            <CardTitle className="text-center text-xl text-[#42C83C]">
+                                你的回答
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center">
+                            {pronResult&&pronResult.text}
+                        </CardContent>
                     </Card>
                 </div>
             }
@@ -249,57 +273,46 @@ export default function Talkabout({ image_url,  recordId,prepare_time,answer_tim
             }
             {step == 'end' &&
                 <div className="flex flex-col gap-4 justify-center items-center">
-                <Card className="rounded-[36px] w-[800px] whitespace-pre-line">
-                    <CardHeader className="p-4">
-                        {/* <CardTitle className="text-center text-xl">
-                            练习结果
-                        </CardTitle> */}
-                    </CardHeader>
-                    {!feedback?
-                    <CardContent className="animated-pulse text-center grid grid-cols-3 gap-4 text-black/50">
-                        Frank 正在写评语...
-                    </CardContent>
-                    :
-                    <CardContent className="text-center grid grid-cols-4 gap-4">
-                        {/* <div className="border-r">
-                            主题相关性：<span className="text-[#42C83C] text-3xl">{pronResult?.topic as any}</span>
-                        </div>
-                        <div>
-                            词汇丰富度：<span className="text-[#42C83C] text-3xl">{pronResult?.vocab}</span>
-                        </div>
-                        <div>
-                            语法丰富度：<span className="text-[#42C83C] text-3xl">{pronResult?.grammar}</span>
-                        </div> */}
-                        <div className="col-span-4">
-                            <Badge className="rounded-full px-6" variant="outline">
-                            总分：<span className="text-[#42C83C] text-3xl">{(contentScore*4+pronResult.accuracy+pronResult.fluency)/6}</span>
-                            </Badge>
-                        </div>
-                        <div className="col-span-4 px-6 text-xl text-[#42C83C] mb-4">
-                            {feedback}
-                        </div>
-                        <div>
-                            词汇丰富度：<span className="text-[#42C83C] text-3xl">{vocabScore}</span>
-                        </div>
-                        <div>
-                        句式丰富度：<span className="text-[#42C83C] text-3xl">{grammarScore}</span>
-                        </div>
-                        <div>
-                            发音准确度：<span className="text-[#42C83C] text-3xl">{pronResult?.accuracy}</span>
-                        </div>
-                        <div>
-                            表达流利度：<span className="text-[#42C83C] text-3xl">{pronResult?.fluency}</span>
-                        </div>
-                    </CardContent>
-                    }
-                    <CardFooter className="flex justify-center text-xs items-center border-t p-6">
-                        <Button className="text-xl rounded-full w-1/2 py-6 bg-[#42C83C] text-white" onClick={finishLesson} disabled={isSaving}>
-                            完成练习
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </div>
-                
+                    <Card className="rounded-[36px] w-[800px] whitespace-pre-line">
+                        <CardHeader className="p-4">
+
+                        </CardHeader>
+                        {!finishFeedback ?
+                            <CardContent className="animate-pulse text-center grid grid-cols-3 gap-4 text-primary">
+                                🐸 Frank 正在写评语...
+                            </CardContent>
+                            :
+                            <CardContent className="text-center grid grid-cols-4 gap-4">
+                                <div className="col-span-4">
+                                    <Badge className="rounded-full px-6  border-[#42C83C]" variant="outline">
+                                        总分：<span className="text-[#42C83C] text-3xl">{(contentScore * 0.6 + pronResult.accuracy*0.2 + pronResult.fluency*0.2).toFixed(0)}</span>
+                                    </Badge>
+                                </div>
+                                <div className="col-span-4 px-6 text-xl text-[#42C83C] mb-4">
+                                    {feedback}
+                                </div>
+                                <div>
+                                    内容相关度：<span className="text-[#42C83C] text-3xl">{contentScore}</span>
+                                </div>
+                                <div>
+                                    语言丰富度：<span className="text-[#42C83C] text-3xl">{grammarScore*0.5+vocabScore*0.5}</span>
+                                </div>
+                                <div>
+                                    发音准确度：<span className="text-[#42C83C] text-3xl">{pronResult?.accuracy}</span>
+                                </div>
+                                <div>
+                                    表达流利度：<span className="text-[#42C83C] text-3xl">{pronResult?.fluency}</span>
+                                </div>
+                            </CardContent>
+                        }
+                        <CardFooter className="flex justify-center text-xs items-center border-t p-6">
+                            <Button className="text-xl rounded-full w-1/2 py-6 bg-[#42C83C] text-white" onClick={finishLesson} disabled={isSaving}>
+                                完成练习
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </div>
+
             }
         </div>
 
