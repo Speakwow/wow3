@@ -446,6 +446,17 @@ export async function getWordPageByIndex(threadId: string, index: number) {
   return repeatPage
 }
 
+export async function getWordById(threadId: string) {
+  const mongo = await connect()
+  const threadPromise = mongo.db(DB).collection("word_threads").findOne({_id:new ObjectId(threadId)})
+  const pagesPromise = mongo.db(DB).collection("word_pages").find({ threadId: threadId}).sort({index:1}).toArray()
+  const [thread,pages] = await Promise.all([threadPromise,pagesPromise])
+  const repeatData = {...thread,content:pages}
+  return repeatData
+}
+
+
+
 export async function createWordRecord(threadId: string, userId: string) {
   const now = Date.now(); // 获取当前时间的时间戳
   const mongo = await connect()
@@ -513,6 +524,23 @@ export async function getWordRecordByUserId(userId: string) {
     .limit(1) // 只获取一条记录
     .toArray();
   return res[0]
+}
+
+export async function saveWordRecord(userId: string,threadId:string,score:number,report:any,record:any[]) {
+  const now = Date.now(); // 获取当前时间的时间戳
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('word_records')
+    .insertOne({  
+      userId: userId, 
+      threadId: threadId ,
+      score:score.toFixed(0),
+      report:report,
+      record:record,
+      isFinished: true,
+      finishAt: now,
+    })
+  return res.insertedId.toString()
 }
 
 
