@@ -74,6 +74,8 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     //是否在识别
     const [isRecognizing, setIsRecognizing] = useState(false)
     //是否在识别
+    const [isReviewing, setIsReviewing] = useState(false)
+    //是否有结果
     const [isFinish, setIsFinish] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -90,6 +92,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 setIsPlaying(true)
             },
             onend: function () {
+                setDisplayText('Take a try!');
                 setIsPlaying(false)
                 console.log('Playback finished');
             }
@@ -165,9 +168,11 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                         },
                     },
                 ]);
-                setDisplayText('');
+                setDisplayText('Good job!');
                 setIsRecognizing(false);
                 setRecognitionText(thread[currentIndex]);
+                setIsFinish(true)
+                setIsReviewing(false)
                 console.log(evalResult);
                 audioChunksRef.current = []; // Clear array to release memory
             } catch (error){
@@ -189,6 +194,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     const handleStopRecording = async () => {
         if (mediaRecorderRef.current) {
+            setIsReviewing(true)
             mediaRecorderRef.current.stop();
             setDisplayText('Reviewing...');
 
@@ -282,10 +288,10 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                                 size={'icon'}
                                 className={`h-fit p-6 bg-[#42C83C] w-fit rounded-full border-8 border-white }`}
                                 onClick={handleStartRecording}
-                                disabled={isPlaying}
+                                disabled={isPlaying||isReviewing}
                             >
                                 {
-                                    isRecognizing || isPlaying ?
+                                    !isFinish ?
                                         <Mic width="60" height="60" />
                                         :
                                         <RefreshCwIcon width="60" height="60" />
@@ -296,8 +302,9 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                             <Button
                                 type='button'
                                 size={'icon'}
-                                className={`h-fit p-6 bg-red-500 w-fit rounded-full border-8 border-white animate-bounce`}
+                                className={`h-fit p-6 bg-red-500 hover:bg-red-900 w-fit rounded-full border-8 border-white animate-bounce`}
                                 onClick={handleStopRecording}
+                                disabled={isPlaying||isReviewing}
                             >
                                 <StopIcon width="60" height="60" />
                             </Button>

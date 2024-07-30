@@ -24,6 +24,8 @@ export function collection2type(collection: string) {
       return 'story';
     case 'writes':
       return 'write';
+      case 'repeats':
+        return 'repeat';
     default:
       return 'undefined';
   }

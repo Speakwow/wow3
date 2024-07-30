@@ -13,4 +13,4 @@ export const COOKIES_EXPIRES = 60 * 60 * 24 * 30 * 1000
 export const SKILL_COLORS = ['yellow', 'cyan', 'pink', 'green', 'orange', 'purple', 'red', 'blue']
 
 
-export const lesson_collections = ['scenarios', 'talkabouts', 'repeat_threads', 'word_threads', 'story_threads', 'writes']
+export const lesson_collections = ['scenarios', 'talkabouts', 'word_threads', 'story_threads', 'writes','repeats']
