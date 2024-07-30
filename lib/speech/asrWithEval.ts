@@ -5,6 +5,7 @@ import _ from "lodash"
 import * as wav from "wav";
 import { error } from "console";
 import { createWavBlob, downloadWavFile } from "./wav"
+import AzureConfig from './config'
 
 export async function setupAudioWorklet(audioContext: AudioContext) {
   await audioContext.audioWorklet.addModule('/audio-processor.js').catch(error => { console.log(error) });
@@ -14,7 +15,7 @@ export async function setupAudioWorklet(audioContext: AudioContext) {
 }
 
 export async function sttFromMic() {
-  const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+  const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
   speechConfig.speechRecognitionLanguage = 'en-US';
   const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);

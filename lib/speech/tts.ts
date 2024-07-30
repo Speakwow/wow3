@@ -1,4 +1,5 @@
 import * as sdk from "microsoft-cognitiveservices-speech-sdk"
+import AzureConfig from "./config";
 
 export function createSSML(text: string, name: string, style: string, degree: string) {
     const template =
@@ -18,7 +19,7 @@ export function createSSML(text: string, name: string, style: string, degree: st
 type AudioDataCallback = (audioData: ArrayBuffer|null) => void;
 
 export function synthesizeSpeech(text: string,onComplete:AudioDataCallback) {
-    const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+    const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(
@@ -39,7 +40,7 @@ export function synthesizeSpeech(text: string,onComplete:AudioDataCallback) {
 }
 
 export function synthesizeSpeechWithVoice(text: string,voice:string,onComplete:AudioDataCallback) {
-    const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+    const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(

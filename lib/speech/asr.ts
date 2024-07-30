@@ -2,9 +2,10 @@ import * as sdk from "microsoft-cognitiveservices-speech-sdk"
 import { ResultReason } from 'microsoft-cognitiveservices-speech-sdk';
 import { evalSpeechFromFile } from "./eval";
 import { webm2Wav } from "./wav";
+import AzureConfig from "./config";
 
 export async function sttFromMic() {
-  const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+  const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
   speechConfig.speechRecognitionLanguage = 'en-US';
   const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
@@ -47,7 +48,7 @@ export async function sttFromMic() {
 
 
 export async function sttFromMicWithAssess(referenceText: string) {
-  const speechConfig = sdk.SpeechConfig.fromSubscription("5c24cca5b354414eb1c58a92d9830f06", "northcentralus");
+  const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
   speechConfig.speechRecognitionLanguage = 'en-US';
   const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
