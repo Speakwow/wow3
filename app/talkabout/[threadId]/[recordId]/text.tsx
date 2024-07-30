@@ -164,7 +164,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
 
     return (
         <div className="flex flex-col items-center justify-center h-full gap-4">
-            <Card className={`p-2 text-center flex flex-row justify-center  items-center  gap-4 rounded-[36px] w-[250px] whitespace-pre-line ${step == "end" && 'text-white bg-[#42C83C]'} ${step == "practice" && 'border-2 border-[#42C83C]'}`}>
+            <Card className={`p-2 text-center flex flex-row justify-center  items-center  gap-4 rounded-[36px] w-[300px] whitespace-pre-line ${step == "end" && 'text-white bg-[#42C83C]'} ${step == "practice" && 'border-2 border-[#42C83C]'}`}>
                 {step == "prepare" && <p>准备时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
                 {step == "practice" && <p>作答时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
                 {step == "end" && <p className="text-xl">🎉 练习已完成</p>}
@@ -190,7 +190,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
             </div>
 
             {
-                step == 'prepare'||step=='practice' &&
+                step == 'prepare'||step=='practice' ?
                 <div className="flex flex-col gap-4 justify-center items-center">
                     <Card className="rounded-[36px] w-[800px] whitespace-pre-line">
                         <CardHeader className="p-4">
@@ -208,6 +208,8 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                         </CardFooter>
                     </Card>
                 </div>
+                :
+                null
             }
             {
                 step == 'end' &&
