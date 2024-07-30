@@ -128,7 +128,7 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
       false
     );
     // pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
-    pronunciationAssessmentConfig.enableProsodyAssessment = false;
+    pronunciationAssessmentConfig.enableProsodyAssessment = true;
     pronunciationAssessmentConfig.applyTo(reco);
     // console.log(`Topic: `+topic)
     reco.recognizeOnceAsync(result => {
@@ -147,7 +147,6 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
       console.log(`[${new Date().toISOString()}]:`,'[END] Eval Result');
       reco.close();
     }, err => {
-
       reject(err);  // Reject the promise if there's an error
       reco.close();
     });

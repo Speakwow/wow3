@@ -17,6 +17,7 @@ import { Bravo } from "@/components/bravo";
 import { saveRepeatRecord, updateRepeatRecord } from "@/lib/action/mongoIO";
 import { LessonReport } from "@/components/report";
 import { threadId } from "worker_threads";
+import { StopIcon } from "@radix-ui/react-icons";
 
 
 function calculateAverages(data: any[]): any {
@@ -68,11 +69,12 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
 
-    const [loading, setLoading] = useState(true);
     //是否在播放
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(true);
     //是否在识别
     const [isRecognizing, setIsRecognizing] = useState(false)
+    //是否在识别
+    const [isFinish, setIsFinish] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null);
 
     //Handle Playing Audio
@@ -85,13 +87,11 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             format: ['wav'],
             autoplay: true,
             onload: function () {
-                setLoading(true);
                 setIsPlaying(true)
             },
             onend: function () {
                 setIsPlaying(false)
                 console.log('Playback finished');
-                handleSpeechToText()
             }
         });
         sound.play();
@@ -120,82 +120,102 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             format: ['wav'],
             autoplay: true,
             onload: function () {
-                setLoading(true);
                 setIsPlaying(true)
             },
             onend: function () {
                 setDisplayText('Take a try!');
                 setIsPlaying(false)
-                setLoading(false);
                 console.log('Playback finished');
             }
         });
         sound.play();
     }
 
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
 
-    //Handle Asr with Eval
-    const handleSpeechToText = async () => {
-        setDisplayText('Repeat After Me...');
-        setLoading(true)
-        setRecognitionText('');
-        setIsRecognizing(true)
+    const handleStartRecording = async () => {
         try {
-            // 使用 MediaRecorder API 进行录音
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const mediaRecorder = new MediaRecorder(stream);
-            let audioChunks: Blob[] = [];
-            mediaRecorder.start();
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
             mediaRecorder.ondataavailable = event => {
-                audioChunks.push(event.data);
+                audioChunksRef.current.push(event.data);
             };
 
-            const asrText = await sttFromMic() as string;
-            
-            setDisplayText('Reviewing...');
-            setRecognitionText(asrText);
-            mediaRecorder.stop();
             mediaRecorder.onstop = async () => {
-                // 创建 Blob 保存音频文件
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                 stream.getTracks().forEach(track => track.stop());
-                const wavBlob = await webm2Wav(audioBlob)
-                const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as EvalResult;
-                setThreadRecord([
-                    ...threadRecord,
+                try{
+                const wavBlob = await webm2Wav(audioBlob);
+                const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as any;
+                setThreadRecord(prev => [
+                    ...prev,
                     {
                         index: currentIndex,
                         text: thread[currentIndex],
                         score: evalResult.pronunciation,
                         detail_score: {
-                            accuray: evalResult.accuracy,
+                            accuracy: evalResult.accuracy,
                             fluency: evalResult.fluency,
                             completeness: evalResult.completeness,
                             prosody: evalResult.prosody,
-                        }
-                    }])
+                        },
+                    },
+                ]);
                 setDisplayText('');
-                console.log(evalResult)
-                // URL.revokeObjectURL(audioUrl);
-                audioChunks = []; // 清空数组以释放内存」
-                setLoading(false)
-                setIsRecognizing(false)
+                setIsRecognizing(false);
+                setRecognitionText(thread[currentIndex]);
+                console.log(evalResult);
+                audioChunksRef.current = []; // Clear array to release memory
+            } catch (error){
+                console.error('Error ASR:', error);
+                setDisplayText('Not Hearing...Try again');
+                setIsRecognizing(false);
             }
+            };
+
+            mediaRecorder.start();
+            setDisplayText('Repeat After Me...');
+            setIsRecognizing(true);
         } catch (error) {
-            console.error('Speech recognition error:', error);
+            console.error('Error starting recording:', error);
             setDisplayText('Not Hearing...Try again');
-            setLoading(false)
-            setIsRecognizing(false)
+            setIsRecognizing(false);
         }
     };
+
+    const handleStopRecording = async () => {
+        if (mediaRecorderRef.current) {
+            mediaRecorderRef.current.stop();
+            setDisplayText('Reviewing...');
+
+        }
+    };
+
+
+
+
+
+
+
+
+
     const nextPage = () => {
-        if (currentIndex +1 <= thread.length - 1) {
-            setLoading(true)
+        if (currentIndex + 1 <= thread.length - 1) {
+            setIsRecognizing(false);
+            setIsFinish(false);
+            setIsPlaying(false);
             setAudioFile("")
             setDisplayText('')
             setRecognitionText('')
             setCurrentIndex(currentIndex + 1)
         } else {
+            setIsRecognizing(false);
+            setIsFinish(false);
+            setIsPlaying(true);
             setSaveState('saving')
             const final_report = calculateAverages(threadRecord)
             setReport(final_report)
@@ -213,7 +233,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     }
 
 
-    if (saveState == 'saved'&&report.score) {
+    if (saveState == 'saved' && report.score) {
         return (
             <div className=' h-screen flex flex-col justify-center items-center '>
                 <LessonReport score={report.score} detail={report.detailScore} />
@@ -229,7 +249,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
                 <Card className="w-5/6 z-50 p-4 pb-8 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center pb-4 w-full">
-                        {recognitionText.length > 0 && !isRecognizing&&threadRecord[currentIndex].score ?
+                        {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex].score ?
                             <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
@@ -246,7 +266,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                             {thread[currentIndex]}
                         </div>
                         :
-                        <div>{recognitionText}</div> 
+                        <div>{recognitionText}</div>
                     }
 
                 </Card>
@@ -255,20 +275,33 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             <div className='w-full flex flex-col-reverse gap-8 h-full p-8'>
                 <div className='grid grid-cols-3 object-center gap-4 justify-items-center items-center'>
                     <div></div>
-                    <Button
-                        type='button'
-                        size={'icon'}
-                        className={`h-fit p-6 bg-[#42C83C] w-fit rounded-full border-8 border-white ${isRecognizing === true ? 'animate-bounce' : ''}`}
-                        onClick={handleSpeechToText}
-                        disabled={loading}
-                    >   {
-                            isRecognizing || isPlaying ?
-                                <Mic width="60" height="60" />
-                                :
-                                <RefreshCwIcon width="60" height="60" />
-                        }
+                    {
+                        !isRecognizing ?
+                            <Button
+                                type='button'
+                                size={'icon'}
+                                className={`h-fit p-6 bg-[#42C83C] w-fit rounded-full border-8 border-white }`}
+                                onClick={handleStartRecording}
+                                disabled={isPlaying}
+                            >
+                                {
+                                    isRecognizing || isPlaying ?
+                                        <Mic width="60" height="60" />
+                                        :
+                                        <RefreshCwIcon width="60" height="60" />
+                                }
 
-                    </Button>
+                            </Button>
+                            :
+                            <Button
+                                type='button'
+                                size={'icon'}
+                                className={`h-fit p-6 bg-red-500 w-fit rounded-full border-8 border-white animate-bounce`}
+                                onClick={handleStopRecording}
+                            >
+                                <StopIcon width="60" height="60" />
+                            </Button>
+                    }
                     {recognitionText.length > 0 && !isRecognizing ?
                         <Button size="icon" className='rounded-full p-3 w-fit h-fit bg-[#42C83C] border-4 border-white ' onClick={() => nextPage()}>
                             <IconRightArrow className="w-6 h-6" />
@@ -282,7 +315,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                     {`
                  ${displayText == 'Repeat After Me...' ? 'animate-bounce text-3xl' : 'text-2xl'} 
                  ${displayText == 'Great!' ? 'text-4xl' : ''} 
-                 ${loading == true ? '' : ''}
                 w-full text-center text-white`
                     } style={{ textShadow: '2px 2px 2px #333' }}>
                     {displayText}

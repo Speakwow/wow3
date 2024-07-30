@@ -14,8 +14,12 @@ export default async function Repeat({ params }: { params: { threadId: string } 
     // const section = await kv.hgetall('repeatPage@' +params.bookid + ':' params.id) as unknown as RepeatPage
     const repeat_data = await getRepeatById(params.threadId)
 
-
-    const bg_url = repeat_data.background ?? 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/7287e3e4-1f5d-403f-e878-9fe8ca213d00/public'
+    let bg_url
+    if(repeat_data&&repeat_data.background){
+    bg_url = repeat_data.background ?? 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/7287e3e4-1f5d-403f-e878-9fe8ca213d00/public'
+    }else{
+        bg_url='https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/7287e3e4-1f5d-403f-e878-9fe8ca213d00/public'
+    }
     const bgImage = {
         // 设置背景图片
         backgroundImage: `url(${bg_url})`,
