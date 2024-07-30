@@ -163,7 +163,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
 
 
     return (
-        <div className="flex flex-col items-center justify-center h-full gap-4">
+        <div className="flex flex-col items-center justify-center h-full gap-2">
             <Card className={`p-2 text-center flex flex-row justify-center  items-center  gap-4 rounded-[36px] w-[300px] whitespace-pre-line ${step == "end" && 'text-white bg-[#42C83C]'} ${step == "practice" && 'border-2 border-[#42C83C]'}`}>
                 {step == "prepare" && <p>准备时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
                 {step == "practice" && <p>作答时间剩余 ： <span className="text-3xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
@@ -174,25 +174,25 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                 <audio ref={audioRef} className="sr-only">
                 </audio>
 
-                <div className="z-50 rounded-[36px]  sticky font-semibold text-center bg-white/75">
+                <div className="z-50 rounded-[36px]  sticky font-semibold text-center">
                     <Image
                         src={image_url} // 外部图片 URL
                         alt="Reference Image"
-                        width={800}
-                        height={400}
+                        width={500}
+                        height={300}
                         style={{
                             objectFit: 'contain', // cover, contain, none
                         }}
 
-                        className={`rounded-[36px] border-4 border-white ${step == 'end' ? "h-[400px]" : "h-[400px]"}`}
+                        className={`rounded-[36px]  ${step == 'end' ? "h-[400px]" : "h-[400px]"}`}
                     />
                 </div>
             </div>
 
             {
                 step == 'prepare'||step=='practice' ?
-                <div className="flex flex-col gap-4 justify-center items-center">
-                    <Card className="rounded-[36px] w-[800px] whitespace-pre-line">
+                <div className="flex w-full flex-col gap-4 justify-center items-center">
+                    <Card className="rounded-[36px] w-full whitespace-pre-line">
                         <CardHeader className="p-4">
                             <CardTitle className="text-center text-xl text-[#42C83C]">
                                 思路提示
@@ -227,7 +227,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                 </div>
             }
             {step == 'practice' &&
-                <div className='w-full flex flex-col gap-8 h-full p-8'>
+                <div className='w-full flex flex-col  h-full p-8'>
                     <div className='grid grid-cols-3 object-center gap-4 justify-items-center items-center'>
                         <div></div>
                         {
@@ -235,11 +235,11 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                                 <Button
                                     type='button'
                                     size={'icon'}
-                                    className={`h-fit p-6 bg-[#3F51B5] w-fit rounded-full border-8 border-white}`}
+                                    className={`h-fit p-6 bg-[#3F51B5] w-fit rounded-full border-4 border-white}`}
                                     onClick={startSpeechToText}
                                     disabled={isRecording}
                                 >
-                                    <Mic width="60" height="60" />
+                                    <Mic width="40" height="40" />
 
                                 </Button>
                                 :
@@ -247,11 +247,11 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                                     type='button'
                                     size={'icon'}
                                     variant="destructive"
-                                    className={`h-fit p-6 w-fit rounded-full border-8 border-white ${isRecording === true ? 'animate-bounce' : ''}`}
+                                    className={`h-fit p-6 w-fit rounded-full border-4 border-white ${isRecording === true ? 'animate-bounce' : ''}`}
                                     onClick={stopSpeechToText}
                                     disabled={isRecording}
                                 >
-                                    <Mic width="60" height="60" />
+                                    <Mic width="40" height="40" />
                                 </Button>
                         }
                         {recognitionText.length > 0 && !isRecognizing ?
@@ -264,7 +264,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                     </div>
 
                     <div className=
-                        {`
+                        {`text-lg
                  ${displayText == 'Repeat After Me...' ? 'animate-bounce text-3xl' : 'text-2xl'} 
                  ${displayText == 'Great!' ? 'text-4xl' : ''} 
                 w-full text-center text-white`

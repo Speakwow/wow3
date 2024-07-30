@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { finishRepeatRecord, getTalkaboutById } from '@/lib/action/mongoIO'
 import { RepeatReport } from '@/components/report'
+import { ScrollArea } from '@/components/ui/scroll-area'
+
 
 interface RepeatBook {
     name: string,
@@ -40,7 +42,7 @@ export default async function Page({ params }: { params: { threadId: string,reco
     const data = await getTalkaboutById(params.threadId) as any
 
     return (
-        <div className='relative flex w-full h-screen justify-center relative p-10 gap-12 bg-muted'>
+        <div className='relative flex w-full h-screen justify-center relative gap-6 bg-muted'>
             <div className="absolute top-2 left-2">
                 <Button asChild size="icon" variant="outline">
                     <Link href="/">
@@ -48,7 +50,9 @@ export default async function Page({ params }: { params: { threadId: string,reco
                     </Link>
                 </Button>
             </div>
+            <ScrollArea className='h-full w-full p-6'>
             <Talkabout image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} instruction={data.instruction} topic={data.topic}/>
+            </ScrollArea>
         </div>
 
     )
