@@ -11,6 +11,7 @@ import { Howl } from 'howler';
 import { Badge } from "@/components/ui/badge";
 import { finishTalkaboutRecord } from "@/lib/action/mongoIO-client";
 import Image from 'next/image'
+import logger from "@/lib/logger";
 
 // function HighlightWords({ story }: { story: any }) {
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
@@ -110,6 +111,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                     mediaRecorderRef.current.onstop = () => {
                         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                         stream.getTracks().forEach(track => track.stop());
+                        logger.info('[START] Webm2wav');
                         webm2Wav(audioBlob).then(wavBlob => {
                             evalSpeechWithTopicFromFile(instruction, wavBlob).then(evalResult => {
                                 setPronResult(evalResult as any)
