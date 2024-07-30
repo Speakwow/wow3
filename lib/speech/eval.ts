@@ -2,7 +2,6 @@ import * as sdk from "microsoft-cognitiveservices-speech-sdk"
 import { ResultReason } from 'microsoft-cognitiveservices-speech-sdk';
 import _ from "lodash"
 import AzureConfig from "./config";
-import logger from "../logger";
 
 
 export interface EvalResult {
@@ -116,7 +115,7 @@ export async function evalSpeechFromFile(referenceText: string, audioBlob: Blob)
 
 export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob) {
   return new Promise(async (resolve, reject) => {
-    logger.info('[START] Eval Result');
+    console.log(`[${new Date().toISOString()}]:`,'[START] Eval Result');
     const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
     speechConfig.speechRecognitionLanguage = 'en-US';
     const audioFile = new File([audioBlob], "input.wav", { type: "audio/wav" });
@@ -145,7 +144,7 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
       }
       console.log(pronunciation_result)
       resolve(evalResult);
-      logger.info('[END] Eval Result');
+      console.log(`[${new Date().toISOString()}]:`,'[END] Eval Result');
       reco.close();
     }, err => {
 
