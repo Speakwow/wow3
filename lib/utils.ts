@@ -38,3 +38,26 @@ export function adjustScore(score:number, factor:number) {
   
   return newScore;
 }
+
+export function calculateTalkaboutSpeedScore(wordsPerSecond: number): number {
+  const m = 112.37;
+  const b = -87.11;
+  const score = m * wordsPerSecond + b;
+
+  // 限制分数在40到100之间
+  if (score > 100) {
+    return 100;
+  } else if (score < 40) {
+    return 40;
+  } else {
+    return score;
+  }
+}
+
+export function countWords(input: string): number {
+  // 去掉字符串前后的空白符，并按空白符（包括空格、制表符和换行符）分割字符串
+  const words = input.trim().split(/\s+/);
+  
+  // 过滤掉空字符串并返回单词数量
+  return words.filter(word => word.length > 0).length;
+}
