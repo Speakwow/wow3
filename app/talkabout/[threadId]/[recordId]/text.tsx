@@ -16,7 +16,7 @@ import Image from 'next/image'
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
 // }
 
-export default function Talkabout({ image_url, recordId, prepare_time, answer_time, instruction,topic }: { image_url: any, recordId: string, prepare_time: number, answer_time: number, instruction: string ,topic:string}) {
+export default function Talkabout({ image_url,threadId, recordId, prepare_time, answer_time, instruction,topic }: { image_url: any, threadId:string, recordId: string, prepare_time: number, answer_time: number, instruction: string ,topic:string}) {
 
     const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
@@ -72,7 +72,7 @@ export default function Talkabout({ image_url, recordId, prepare_time, answer_ti
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ image_url: image_url, user_answer: user_answer })
+                body: JSON.stringify({ threadId: threadId, user_answer: user_answer })
             })
         const feedbackData = await res.json()
 
