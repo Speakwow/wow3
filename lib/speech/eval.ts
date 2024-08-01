@@ -127,7 +127,7 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
       sdk.PronunciationAssessmentGranularity.Phoneme,
       false
     );
-    // pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
+    pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
     pronunciationAssessmentConfig.enableProsodyAssessment = true;
     pronunciationAssessmentConfig.applyTo(reco);
     // console.log(`Topic: `+topic)

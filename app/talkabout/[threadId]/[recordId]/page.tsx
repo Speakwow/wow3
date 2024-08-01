@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: { threadId: string,reco
                 </Button>
             </div>
             <ScrollArea className='h-full w-full p-6'>
-            <Talkabout threadId={params.threadId} image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} instruction={data.instruction} topic={data.topic}/>
+            <Talkabout threadId={params.threadId} examplar={data.examplar} image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} instruction={data.instruction} topic={data.topic}/>
             </ScrollArea>
         </div>
 
