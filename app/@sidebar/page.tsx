@@ -5,8 +5,11 @@ import Link from "next/link";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { MyLessons } from "./myLessons";
 import { getUserData } from "@/lib/action/mongoIO";
-import { SignedIn, UserButton } from "@clerk/nextjs";
+import { OrganizationProfile, OrganizationSwitcher, SignedIn, UserButton } from "@clerk/nextjs";
 import { IconProfile } from "@/components/ui/icons";
+import { GroupIcon } from "@radix-ui/react-icons";
+import { GraduationCapIcon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function SideBar() {
     const { userId, orgId } = auth();
@@ -19,10 +22,20 @@ export default async function SideBar() {
             <div className="flex flex-col gap-6 ">
                 <div className="w-full text-xl font-semibold" >
                     <Link href="/">
-                        🐸 Speakwow.ai
+                    <div className="flex flex-row items-center gap-2">
+                    <Avatar className="h-9 p-0.5">
+                        <AvatarImage
+                            src={`/logo.png`}
+                            alt={'speakwow'}
+                        />
+                        <AvatarFallback>🐸</AvatarFallback>
+                    </Avatar>
+                    <span className="inline text-xl">Speakwow.ai</span>
+                    </div>
                     </Link>
                 </div>
-                <div className="">
+                <div className="flex flex-col gap-2">
+
                     <Button asChild className="w-full" size="lg">
                         <Link href='/create'>
                             创建课程
@@ -30,16 +43,27 @@ export default async function SideBar() {
                     </Button>
                 </div>
                 < MyLessons lessonList={lessonList} userId={userId as string} />
-
             </div>
-            <div className="bottom-4 w-full">
+            <div className="bottom-4 w-full flex flex-col gap-4">
+
+                <Card className="p-2 w-full flex flex-col gap-2">
+                    <div className="w-full flex flex-row justify-center mt-2">
+                    <OrganizationSwitcher />
+                    </div>
+                    <Button variant="outline" className="" asChild>
+                        <Link href="/dashboard">
+                            <GraduationCapIcon className="mr-2 h-4 w-4" /> 班级管理
+                        </Link>
+                    </Button>
+                </Card>
+                
                 <Card className="p-2 w-full flex flex-row justify-between items-center">
                     <SignedIn>
-                        <UserButton/>
+                        <UserButton />
                     </SignedIn>
-                    <Button  variant="outline" className="" asChild>
+                    <Button variant="outline" className="" asChild>
                         <Link href="/usercenter">
-                        <IconProfile className="mr-2 h-4 w-4"/> 个人中心
+                            <IconProfile className="mr-2 h-4 w-4" /> 个人中心
                         </Link>
                     </Button>
                 </Card>

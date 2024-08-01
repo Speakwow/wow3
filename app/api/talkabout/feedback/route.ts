@@ -60,12 +60,11 @@ Your feedback MUST be less than 80 words.
 The student level is {level} level.
 
 #Output Format:
-{
-  "vocabulary_score":"" #<Score number of the vocabulary accuracy,0-100>
-  "theme_relevance_score":"" #<Score number of the theme relevance,0-100>
-  "grammarza_syntax_score":"" #<Score number of Grammatical accuracy,0-100>,
-  "feedback":"" #<Feedback text>"
-}
+"vocabulary_score":"" #<Score number of the vocabulary accuracy,0-100>,
+"theme_relevance_score":"" #<Score number of the theme relevance,0-100>,
+"grammarza_syntax_score":"" #<Score number of Grammatical accuracy,0-100>,
+"feedback":"" #<Feedback text>"
+
 
 `
 
