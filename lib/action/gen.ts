@@ -2,7 +2,7 @@
 
 // @ts-ignore
 import { PromptTemplate } from "@langchain/core/prompts";
-import { generateObject } from 'ai';
+import { generateObject, streamObject } from 'ai';
 import { z } from 'zod';
 import { openai } from '@ai-sdk/openai';
 import { ChatOpenAI } from "@langchain/openai";
@@ -12,6 +12,7 @@ import { RunnableSequence } from "@langchain/core/runnables";
 import { StructuredOutputParser, CustomListOutputParser } from "langchain/output_parsers";
 // @ts-ignore
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import { createStreamableValue } from "ai/rsc";
 
 
 export async function genScenarioTarget(
@@ -342,13 +343,12 @@ export async function improveWriting(
 ) {
     const template = `
 ##ROLE## You are a native English speaker, good at English writing. You will help a student to improve his writing skills.
-##TASK##  You are going to re-write a student essay, aim at providing a better version in the standard of no grammar mistakes, no spelling mistakes, and use native expressions. 
+##TASK## You are going to re-write a student essay, aim at providing a better version in the standard of no grammar mistakes, no spelling mistakes, use more native expressions and correct any confusing expression if necessary. 
 ##REQUIREMENT##
-You should first understand the requirement of the writing homework:{task},this essay should be over {word_count} words.
+You should first understand the requirement of the writing homework:{task}.
 Then, you will review the student's original writing essay:{content}
-After that, you will output a polished version based on the student's writing purpose.
-You should consider the Student's level :{level}, and only use the vocabulary at his level. Try to understand what he wants to express, and DO NOT change his original meaning while you should only focus on improving his English language skill. 
-
+After that, you will output a polished version based on the student's writing purpose. REMEMBER you should always provide a new answer over {word_count} words. 
+You should consider the Student's level, which is {level}, you should only use the vocabulary at his level. Try to understand what he wants to express, and DO NOT change his original meaning while you should only focus on improving his English language skill. You can add some supplemental description to make the essay idea more complete.
 
 ##FORMAT## 
 ONLY OUTPUT THE RESULT, don't say anything else.
@@ -356,10 +356,8 @@ ONLY OUTPUT THE RESULT, don't say anything else.
 ##Examplar##
 If the student's original writing essay is :
 The Earth is a beautiful place, Earth is the only home to live for us. We should take good care of animals and animals are our best friend. We should plant more trees because trees can help us a lot. We should save.We close the lamp whe we leave the classroom. We shold save food.
-
 Your polished version should be:
 The Earth is a beautiful place. It is our only home. We should take good care of animals because they are our best friends. We should plant more trees because they help us a lot. We should save energy by turning off the lights when we leave the classroom. We should also save food.
-
     `
     const parser = new StringOutputParser()
     const chain = RunnableSequence.from([
@@ -490,3 +488,30 @@ Score 59-0(Section F):Very simple and fragmented sentence structures; Persistent
         }
     }
 }
+
+export async function getTalkaboutFeedback(input: string) {
+    'use server';
+    const stream = createStreamableValue();
+    (async () => {
+      const { partialObjectStream } = await streamObject({
+        model: openai('gpt-4-turbo'),
+        system: 'You generate three notifications for a messages app.',
+        prompt: input,
+        schema: z.object({
+          notifications: z.array(
+            z.object({
+              name: z.string().describe('Name of a fictional person.'),
+              message: z.string().describe('Do not use emojis or links.'),
+              minutesAgo: z.number(),
+            }),
+          ),
+        }),
+      });
+      for await (const partialObject of partialObjectStream) {
+        stream.update(partialObject);
+      }
+      stream.done();
+    })();
+  
+    return { object: stream.value };
+  }
