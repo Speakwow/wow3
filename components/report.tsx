@@ -11,9 +11,6 @@ export function RepeatReport({ score, length, duration }: { score: number, lengt
   return (
     <Card className="p-4">
       <CardHeader className="flex justify-center items-center">
-        <div className='flex justify-center'>
-          <img src='/report-bravo.gif' className='w-1/5'></img>
-        </div>
         <div className='text-center text-xl'>
           You did it！本次得分：
         </div>
@@ -60,11 +57,12 @@ export function RepeatReport({ score, length, duration }: { score: number, lengt
         </div>
       </CardContent>
       <CardFooter className="flex justify-center border-t py-4">
-        <Link href="/">
-          <Button size="lg" className="py-6 px-16 bg-[#42C83C] text-xl rounded-full">
+         <Button onClick={()=>router.push('/')} size="lg" className="py-6 px-10 bg-[#42C83C] text-xl rounded-full">
             完成练习
           </Button>
-        </Link>
+          <Button onClick={()=>router.refresh()} size="lg" variant="secondary" className="py-6 px-10 bg-[#42C83C] text-xl rounded-full">
+            再次挑战
+          </Button>
       </CardFooter>
     </Card>
   )
@@ -133,10 +131,12 @@ export function LessonReport({ score, detail }: { score: number, detail: any }) 
       </div> */}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center border-t py-4">
-
-          <Button onClick={()=>router.push('/')} size="lg" className="py-6 px-16 bg-[#42C83C] text-xl rounded-full">
+      <CardFooter className="flex justify-center border-t py-4 flex-fow gap-4">
+          <Button onClick={()=>router.push('/')} size="lg" className="py-6 px-10 bg-[#42C83C] text-xl rounded-full">
             完成练习
+          </Button>
+          <Button onClick={()=>router.refresh()} size="lg" variant="secondary" className="py-6 px-10 bg-[#42C83C] text-xl rounded-full">
+            再次挑战
           </Button>
       </CardFooter>
     </Card>

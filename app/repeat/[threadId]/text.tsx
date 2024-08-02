@@ -92,7 +92,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 setIsPlaying(true)
             },
             onend: function () {
-                setDisplayText('Take a try!');
+                setDisplayText('Press the button and Repeat');
                 setIsPlaying(false)
                 console.log('Playback finished');
             }
@@ -126,7 +126,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 setIsPlaying(true)
             },
             onend: function () {
-                setDisplayText('Take a try!');
+                setDisplayText('Press the button and Repeat!');
                 setIsPlaying(false)
                 console.log('Playback finished');
             }
@@ -168,7 +168,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                         },
                     },
                 ]);
-                setDisplayText('Good job!');
+                setDisplayText('');
                 setIsRecognizing(false);
                 setRecognitionText(thread[currentIndex]);
                 setIsFinish(true)
