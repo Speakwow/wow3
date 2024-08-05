@@ -25,7 +25,7 @@ export default async function WriteCreator() {
         <div className="relative w-full h-screen bg-muted">
             <ScrollArea className="h-full overflow-hidden">
                 <div className="absolute top-2 left-2">
-                    <Link href={"./"} className="z-10">
+                    <Link href={"/"} className="z-10">
                         <Button size="icon" variant="outline">
                             <ArrowLeftIcon />
                         </Button>
