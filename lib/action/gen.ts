@@ -294,7 +294,7 @@ Your feedback should at least includes 3 parts
             communicativeachievement_score: z.number().describe(""),
             organisation_score: z.number().describe(""),
             language_score: z.number().describe(""),
-            w_feedback:z.string().describe("Generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.")
+            w_feedback: z.string().describe("Generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.")
         })
     );
     const chain = RunnableSequence.from([
@@ -312,12 +312,12 @@ Your feedback should at least includes 3 parts
                 writing_task: task,
                 student_essay: content,
                 Level: level,
-                required_words:word_count,
+                required_words: word_count,
                 format_instructions: parser.getFormatInstructions()
             })
             return {
                 ...res,
-                score: 0.2*res?.communicativeachievement_score + 0.5*res.content_score + 0.2*res.language_score + 0.1*res.organisation_score
+                score: 0.2 * res?.communicativeachievement_score + 0.5 * res.content_score + 0.2 * res.language_score + 0.1 * res.organisation_score
             }
         }
         catch (error) {
@@ -372,10 +372,10 @@ The Earth is a beautiful place. It is our only home. We should take good care of
     while (attempts < maxRetries) {
         try {
             const res = await chain.invoke({
-               task: task,
+                task: task,
                 content: content,
                 level: level,
-                word_count:word_count
+                word_count: word_count
             })
             return res
         }
@@ -397,7 +397,7 @@ export async function genTalkaboutFeedback(
     task: string,
     level: string,
     word_count: string,
-    image_url:string
+    image_url: string
 
 ) {
     const template = `
@@ -452,7 +452,7 @@ Score 59-0(Section F):Very simple and fragmented sentence structures; Persistent
             Vocabulary_Score: z.number().describe("Score number of the vocabulary accuracy,0-100"),
             Theme_Relevance_Score: z.number().describe("Score number of the theme relevance,0-100"),
             Grammar_Syntax_Score: z.number().describe("Score number of Grammatical accuracy,0-100"),
-            feedback:z.string().describe("Generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.")
+            feedback: z.string().describe("Generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.")
         })
     );
     const chain = RunnableSequence.from([
@@ -470,12 +470,12 @@ Score 59-0(Section F):Very simple and fragmented sentence structures; Persistent
                 task: task,
                 content: content,
                 level: level,
-                word_count:word_count,
+                word_count: word_count,
                 format_instructions: parser.getFormatInstructions()
             })
             return {
                 ...res,
-                score: 0.6*res.Theme_Relevance_Score +0.2*res.Grammar_Syntax_Score+0.2*res.Vocabulary_Score
+                score: 0.6 * res.Theme_Relevance_Score + 0.2 * res.Grammar_Syntax_Score + 0.2 * res.Vocabulary_Score
             }
         }
         catch (error) {
@@ -493,25 +493,25 @@ export async function getTalkaboutFeedback(input: string) {
     'use server';
     const stream = createStreamableValue();
     (async () => {
-      const { partialObjectStream } = await streamObject({
-        model: openai('gpt-4-turbo'),
-        system: 'You generate three notifications for a messages app.',
-        prompt: input,
-        schema: z.object({
-          notifications: z.array(
-            z.object({
-              name: z.string().describe('Name of a fictional person.'),
-              message: z.string().describe('Do not use emojis or links.'),
-              minutesAgo: z.number(),
+        const { partialObjectStream } = await streamObject({
+            model: openai('gpt-4-turbo'),
+            system: 'You generate three notifications for a messages app.',
+            prompt: input,
+            schema: z.object({
+                notifications: z.array(
+                    z.object({
+                        name: z.string().describe('Name of a fictional person.'),
+                        message: z.string().describe('Do not use emojis or links.'),
+                        minutesAgo: z.number(),
+                    }),
+                ),
             }),
-          ),
-        }),
-      });
-      for await (const partialObject of partialObjectStream) {
-        stream.update(partialObject);
-      }
-      stream.done();
+        });
+        for await (const partialObject of partialObjectStream) {
+            stream.update(partialObject);
+        }
+        stream.done();
     })();
-  
+
     return { object: stream.value };
-  }
+}

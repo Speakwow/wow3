@@ -18,6 +18,7 @@ export default async function Talkabout({ params }: { params: { id: string } }) 
     //     redirect(`/talkabout/${params.threadId}/${recordId}`)
     // }
     // const recordId = '1'
+    console.log(data.topic)
     return (
         <div className="relative w-full h-screen bg-muted">
             <ScrollArea className="h-full overflow-hidden">
@@ -42,7 +43,7 @@ export default async function Talkabout({ params }: { params: { id: string } }) 
                         <CardDescription>
                                 题目
                             </CardDescription>
-                            <div>
+                            <div className='text-pretty whitespace-pre-line'>
                                 {data.topic}
                             </div>
                         </CardContent>

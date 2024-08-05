@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/table"
 import { Header } from "@/components/dashboard-nav"
 
-export default function Plan({ params }: { params: { class: string } }) {
+export default function Plan() {
     const today = new Date()
     return (
         <div className="flex min-h-screen w-full flex-col">

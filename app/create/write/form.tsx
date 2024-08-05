@@ -224,7 +224,7 @@ export function WriteForm({ userId }: { userId: string }) {
             name="word_count"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="">👋 字数限制</FormLabel>
+                <FormLabel className="">字数要求</FormLabel>
                 <FormControl>
                   <Input  {...field} type="number"/>
                 </FormControl>

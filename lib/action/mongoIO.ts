@@ -3,7 +3,7 @@ import { connect } from '@/lib/mongo'
 import { C_CHARACTERS, C_REPEAT_PAGES, C_REPEAT_THREADS, C_SCENARIOS, DB, lesson_collections } from '@/lib/constant'
 import { ObjectId } from 'mongodb'
 import { unstable_noStore as noStore } from 'next/cache';
-import { collection2type, findCollectionByType, type2tag } from '../db/db';
+import { collection2type, findCollectionByType, type2tag, typeMap } from '../db/db';
 
 export async function updateScenario(name: string, content: any) {
   const mongo = await connect()
@@ -720,4 +720,25 @@ export async function saveRepeatRecord(userId: string,threadId:string,score:numb
       finishAt: now,
     })
   return res.insertedId.toString()
+}
+
+
+export async function getTextbookData(id:string) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('textbooks')
+    .findOne({  
+      _id:new ObjectId(id)
+    })
+  if(!res){
+    return null
+  }
+  for (const unit of res.units) {
+    for (const lesson of unit.lessons) {
+      const collectionName = (typeMap.find(item=>item.type === lesson.type))?.collection
+      const lessonData = await mongo.db(DB).collection(collectionName as string).findOne({_id:new ObjectId(lesson.id as string)})
+      lesson.data = lessonData;
+    }
+  }
+  return JSON.parse(JSON.stringify(res))
 }
