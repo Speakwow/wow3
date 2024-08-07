@@ -117,7 +117,7 @@ export default async function Plan() {
                                                 lesson => {
                                                     if (lesson.data) {
                                                         return (
-                                                            <Suspense fallback={                                                                
+                                                            <Suspense key={lesson.id} fallback={                                                                
                                                             <AssignmentRowLoading
                                                                 unit={unit.unit}
                                                                 name={lesson.data.name}
