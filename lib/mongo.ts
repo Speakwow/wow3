@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb'
 
-// let uri = process.env.MONGODB_URI
-let uri = process.env.MONGODB_URI_TBDS
+let uri = process.env.MONGODB_URI
+// let uri = process.env.MONGODB_URI_TBDS
 
 let mongo: MongoClient | null = null
 
