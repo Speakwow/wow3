@@ -10,6 +10,7 @@ export interface Assignment{
     creatorId:string,
     orgId:string,
     createAt:Date,
+    updateAt:Date,
     startAt:Date,
     endAt:Date
 }

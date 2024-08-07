@@ -670,14 +670,15 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('write_records')
-    .insertOne({ 
-      threadId: writeId, 
-      userId: userId, 
-      content: content, 
-      score:feedback.score,
-      feedback: feedback, 
+    .insertOne({
+      threadId: writeId,
+      userId: userId,
+      content: content,
+      score: feedback.score,
+      feedback: feedback,
       isFinished: true,
-      finishAt: getBeijingTime() })
+      finishAt: getBeijingTime()
+    })
 
   return JSON.parse(JSON.stringify(res))
 }
@@ -763,8 +764,22 @@ export async function createAssignment(assignment: Assignment) {
     .insertOne({
       ...assignment
     })
-  logger.info('New Assignment Created:',assignment)
+  logger.info('New Assignment Created:', assignment)
   return res.insertedId.toString()
+}
+
+export async function updateAssignment(assignment: Assignment) {
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('assignments')
+    .updateOne({ threadId: assignment.threadId },
+      {
+        $set: {
+          ...assignment
+        }
+      })
+  logger.info('Assignment Changed:', assignment)
+  return res
 }
 
 async function getAssignmentById(threadId: string, orgId: string) {
@@ -848,7 +863,7 @@ export async function getOrgAssignments(orgId: string) {
 export async function getRecordsForAssignment(threadId: string, orgId: string) {
   const mongo = await connect()
   const [assignment, userIds] = await Promise.all([getAssignmentById(threadId, orgId), getOrgStudents(orgId)])
-  if(!assignment){
+  if (!assignment) {
     logger.info('Not active assignment')
     return null
   }
@@ -866,7 +881,7 @@ export async function getRecordsForAssignment(threadId: string, orgId: string) {
   ).toArray()
   const infoPromise = mongo.db(DB).collection(findCollectionByType(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);
-  const assignmentData = {  ...assignment,info:info, records: records }
+  const assignmentData = { ...assignment, info: info, records: records }
   return JSON.parse(JSON.stringify(assignmentData))
 }
 
@@ -890,7 +905,7 @@ export async function getBriefForAssignment(threadId: string, orgId: string) {
 
   const infoPromise = mongo.db(DB).collection(findCollectionByType(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);
-  const assignmentData = {assignment,info:info, records: records }
+  const assignmentData = { assignment, info: info, records: records }
   return JSON.parse(JSON.stringify(assignmentData))
 }
 

@@ -96,9 +96,12 @@ export async function AssignmentRow(
                             userId={userId}
                         /> :
                         <ReviewAssignmentButton
-                            assignment={data.assignment}
+                            assignment={data}
+                            info={data.info}
+                            records = {data.records}
                             userId={userId}
                             orgId={orgId}
+                            studentIds = {studentIds}
                         />
                 }
             </TableCell>

@@ -26,14 +26,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { createAssignment } from "@/lib/action/mongoIO"
+import { createAssignment, updateAssignment } from "@/lib/action/mongoIO"
 import { Assignment } from "@/lib/schema/assign"
 import { useState } from "react"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Type2Tag } from "@/lib/db/db"
 import { OrganizationList, OrganizationProfile, OrganizationSwitcher } from "@clerk/nextjs"
+import { calculateAverageScore, findHighestScoreDoc, findLowestScoreDoc } from "@/lib/dashboard"
 
 
 export function NewAssignmentButton(
@@ -87,6 +88,7 @@ export function NewAssignmentButton(
       orgId: orgId,
       creatorId: userId,
       createAt: getBeijingTime(),
+      updateAt: getBeijingTime(),
       startAt: new Date(from.setHours(0, 0, 0, 0)),
       endAt: new Date(to.setHours(23, 59, 59, 999))
     }
@@ -106,6 +108,8 @@ export function NewAssignmentButton(
 
   }, [saveState]);
 
+
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -119,26 +123,26 @@ export function NewAssignmentButton(
             <DialogHeader>
               <DialogTitle>布置新作业</DialogTitle>
               <DialogDescription className="flex flex-col gap-4 py-4">
-              <div className="flex flex-col gap-2">
-              <div className="text-xs font-regular">
-                  当前班级
-                </div>
-                </div>
-                <OrganizationSwitcher/>
                 <div className="flex flex-col gap-2">
-                <div className="text-xs font-regular">
-                  作业信息
+                  <div className="text-xs font-regular">
+                    当前班级
+                  </div>
                 </div>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {name}
-                    </CardTitle>
-                    <CardDescription>
-                      {Type2Tag(type)}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
+                <OrganizationSwitcher />
+                <div className="flex flex-col gap-2">
+                  <div className="text-xs font-regular">
+                    作业信息
+                  </div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        {name}
+                      </CardTitle>
+                      <CardDescription>
+                        {Type2Tag(type)}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
                 </div>
                 <FormField
                   control={form.control}
@@ -216,13 +220,19 @@ export function NewAssignmentButton(
 export function ReviewAssignmentButton(
   {
     assignment,
+    records,
+    info,
     orgId,
-    userId
+    userId,
+    studentIds
   }:
     {
-      assignment:Assignment,
+      assignment: Assignment,
+      info: any,
+      records: any[],
       orgId: string,
-      userId: string
+      userId: string,
+      studentIds: string[]
     }) {
 
   const formSchema = z.object({
@@ -246,25 +256,43 @@ export function ReviewAssignmentButton(
     },
   })
   const router = useRouter()
+  const [canModify, setCanModify] = useState(false)
   const [saveState, setSaveState] = useState('unsaved')
+  function hoursUntil(endAt: Date): number {
+    const now = new Date();
+    const end = new Date(endAt)
+    const differenceInMilliseconds = end.getTime() - now.getTime();
+    const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+    return differenceInHours;
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const from = new Date(values.range.from);
     const to = new Date(values.range.to);
     const assignmentData: Assignment = {
-      type: type,
-      threadId: threadId,
-      textbookId: textbookId,
-      orgId: orgId,
-      creatorId: userId,
-      createAt: getBeijingTime(),
+      type: assignment.type,
+      threadId: assignment.threadId,
+      textbookId: assignment.textbookId,
+      orgId: assignment.orgId,
+      creatorId: assignment.creatorId,
+      createAt: assignment.createAt as Date,
+      updateAt: getBeijingTime(),
       startAt: new Date(from.setHours(0, 0, 0, 0)),
       endAt: new Date(to.setHours(23, 59, 59, 999))
     }
     setSaveState('saving')
-    createAssignment(assignmentData).then(item => {
+    updateAssignment(assignmentData).then(item => {
       item ? setSaveState('saved') : setSaveState('failed')
     })
+  }
+  const averageScore = calculateAverageScore(records);
+  const lowestScoreDoc = findLowestScoreDoc(records);
+  const highestScoreDoc = findHighestScoreDoc(records);
+  let hoursleft = hoursUntil(assignment.endAt)
+  if(hoursleft<0){
+    hoursleft = 0
+  }else{
+    hoursleft = +hoursleft.toFixed(0)
   }
 
   //Welcome Messgae TTS
@@ -278,38 +306,74 @@ export function ReviewAssignmentButton(
   }, [saveState]);
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={() => setCanModify(false)}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="text-muted-foreground">
+        <Button size="sm" variant="default" className="">
           查看
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <DialogHeader>
-              <DialogTitle>布置新作业</DialogTitle>
+              <DialogTitle>作业详情</DialogTitle>
               <DialogDescription className="flex flex-col gap-4 py-4">
-              <div className="flex flex-col gap-2">
-              <div className="text-xs font-regular">
-                  当前班级
-                </div>
-                </div>
-                <OrganizationSwitcher/>
                 <div className="flex flex-col gap-2">
-                <div className="text-xs font-regular">
-                  作业信息
+                  <div className="text-xs font-regular">
+                    当前班级
+                  </div>
                 </div>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {name}
-                    </CardTitle>
-                    <CardDescription>
-                      {Type2Tag(type)}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
+                <OrganizationSwitcher />
+                <div className="flex flex-col gap-2">
+                  <div className="text-xs font-regular">
+                    作业信息
+                  </div>
+                  <Card>
+                    <CardHeader className="flex flex-row justify-between">
+                      
+                      <div className="flex flex-col gap-2">
+                      <CardTitle className="text-lg">
+                        {info.name}
+                      </CardTitle>
+                      <CardDescription>
+                        {Type2Tag(assignment.type)}
+                      </CardDescription>
+                      </div>
+                      <div className="flex flex-col justify-center text-center">
+                        <div className="text-xl font-medium text-primary">
+                        {hoursleft.toFixed(0)} <p className="inline text-xs ">小时</p>
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                        距离截止时间
+                        </div>
+                        
+                      </div>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-2 border-t py-4">
+                      <div className="font-medium flex flex-col justify-center text-center">
+                        <div className="text-xl text-primary">
+                          {`${records.length} / ${studentIds.length}`}
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          已提交
+                        </div>
+                      </div>
+                      <div className="font-medium flex flex-col justify-center text-center">
+                        <div className="text-xl text-primary">
+                          {averageScore}
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          平均分
+                        </div>
+                      </div>
+                    
+                    </CardContent>
+                    <CardFooter  className="flex flex-row justify-end">
+                      <Button size="sm" type="button" variant="outline" onClick={()=>router.push(`/dashboard/assignment/${assignment.threadId}`)}>
+                        作业详情
+                      </Button>
+                    </CardFooter>
+                  </Card>
                 </div>
                 <FormField
                   control={form.control}
@@ -318,7 +382,7 @@ export function ReviewAssignmentButton(
                     <FormItem className="flex flex-col">
                       <FormLabel className="text-xs font-regular">开始与截止日期</FormLabel>
                       <Popover>
-                        <PopoverTrigger asChild>
+                        <PopoverTrigger asChild disabled={!canModify}>
                           <FormControl>
                             <Button
                               id="date"
@@ -361,11 +425,20 @@ export function ReviewAssignmentButton(
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <DialogClose asChild>
-                <Button type="submit" disabled={saveState == 'saving'}>
-                  布置
+
+              {canModify ?
+
+                <Button variant="destructive" type="submit" disabled={saveState == 'saving'}>
+                  提交
                 </Button>
-              </DialogClose>
+
+                :
+                <Button variant="outline" type="button" disabled={saveState == 'saving'} onClick={() => setCanModify(true)}>
+                  修改
+                </Button>
+              }
+
+
               <DialogClose asChild>
                 <Button variant="secondary" disabled={saveState == 'saving'}>
                   取消

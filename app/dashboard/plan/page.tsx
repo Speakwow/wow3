@@ -58,6 +58,7 @@ import { Link1Icon } from "@radix-ui/react-icons"
 import { auth } from "@clerk/nextjs"
 import { AssignmentRow, AssignmentRowLoading } from "./dataRow"
 import { Suspense } from "react"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 
 export default async function Plan() {
@@ -68,11 +69,12 @@ export default async function Plan() {
     const studentIds = await getOrgStudents(orgId as string)
 
     return (
-        <div className="flex min-h-screen w-full flex-col">
+        <div className="flex h-screen w-full flex-col">
+            <ScrollArea className="h-full">
             <Header />
             <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
                 <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-                    <Card className="col-span-4">
+                    <Card className="col-span-4 h-full">
                         <CardHeader className="flex flex-row items-center">
                             <div className="grid gap-2">
                                 <CardTitle>{data.name}</CardTitle>
@@ -110,6 +112,7 @@ export default async function Plan() {
                                         <TableHead className="text-right">操作</TableHead>
                                     </TableRow>
                                 </TableHeader>
+                                
                                 <TableBody>
                                     {
                                         data.units.map((unit: { unit: number, lessons: any[] }) => {
@@ -148,15 +151,19 @@ export default async function Plan() {
                                     }
 
                                 </TableBody>
+                            
                             </Table>
                         </CardContent>
+            
                     </Card>
+                    
 
 
 
 
                 </div>
             </main>
+            </ScrollArea>
         </div>
     )
 }
