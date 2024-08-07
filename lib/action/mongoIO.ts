@@ -8,6 +8,7 @@ import { Assignment } from '../schema/assign';
 import { assign } from 'lodash';
 import { clerkClient } from '@clerk/nextjs/server';
 import { logger } from '../logger';
+import { getBeijingTime } from '../utils';
 
 export async function updateScenario(name: string, content: any) {
   const mongo = await connect()
@@ -326,7 +327,7 @@ export async function finishRepeatRecord(recordId: string) {
       {
         $set: {
           isFinished: true,
-          finishAt: now,
+          finishAt: getBeijingTime(),
           score: final_score,
         }
       });
@@ -388,7 +389,6 @@ export async function getTalkaboutById(threadId: string) {
 }
 
 export async function createTalkaboutRecord(threadId: string, userId: string) {
-  const now = Date.now(); // 获取当前时间的时间戳
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('talkabout_records')
@@ -396,19 +396,17 @@ export async function createTalkaboutRecord(threadId: string, userId: string) {
       threadId: threadId,
       userId: userId,
       isFinished: false,
-      createAt: now,
+      createAt: getBeijingTime(),
       score: 0,
     });
   return res.insertedId.toString()
 }
 
 export async function finishTalkaboutRecord(recordId: string, score: number, feedback: string) {
-  const now = Date.now(); // 获取当前时间的时间戳
   const mongo = await connect()
   const current = await mongo.db(DB)
     .collection('talkabout_records')
     .findOne({ _id: new ObjectId(recordId) })
-  const duration = (now - current?.createAt) / 60000
   const res = await mongo.db(DB)
     .collection('word_records')
     .updateOne(
@@ -416,7 +414,7 @@ export async function finishTalkaboutRecord(recordId: string, score: number, fee
       {
         $set: {
           isFinished: true,
-          finishAt: now,
+          finishAt: getBeijingTime(),
           score: score,
           feedback: feedback,
         }
@@ -470,7 +468,7 @@ export async function createWordRecord(threadId: string, userId: string) {
       threadId: threadId,
       userId: userId,
       isFinished: false,
-      createAt: now,
+      createAt: getBeijingTime(),
       score: 0,
       record: []
     });
@@ -492,7 +490,7 @@ export async function finishWordRecord(recordId: string) {
       {
         $set: {
           isFinished: true,
-          finishAt: now,
+          finishAt: getBeijingTime(),
           score: final_score,
         }
       });
@@ -531,7 +529,6 @@ export async function getWordRecordByUserId(userId: string) {
 }
 
 export async function saveWordRecord(userId: string, threadId: string, score: number, report: any, record: any[]) {
-  const now = Date.now(); // 获取当前时间的时间戳
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('word_records')
@@ -542,7 +539,7 @@ export async function saveWordRecord(userId: string, threadId: string, score: nu
       report: report,
       record: record,
       isFinished: true,
-      finishAt: now,
+      finishAt: getBeijingTime(),
     })
   return res.insertedId.toString()
 }
@@ -585,7 +582,7 @@ export async function createImgtalkRecord(userId: string) {
   const res = await mongo.db(DB).collection('imgtalk_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: date.toLocaleString()
+    createAt: getBeijingTime()
   });
   return res.insertedId.toString()
 }
@@ -594,13 +591,12 @@ export async function createImgtalkRecord(userId: string) {
 export async function updateScenarioRecord(chatId: string, report: any) {
   const mongo = await connect()
   const now = Date.now(); // 获取当前时间的时间戳
-  const date = new Date(now); // 将时间戳转换为 Date 对象
   const lesson = mongo.db(DB).collection('scenario_records')
     .updateOne({ _id: new ObjectId(chatId as string) }, {
       $set: {
         ...report,
         isFinished: true,
-        finishAt: date.toLocaleString()
+        finishAt: getBeijingTime()
       }
     })
   return lesson
@@ -674,7 +670,14 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('write_records')
-    .insertOne({ threadId: writeId, userId: userId, content: content, feedback: feedback, isFinished: true })
+    .insertOne({ 
+      threadId: writeId, 
+      userId: userId, 
+      content: content, 
+      score:feedback.score,
+      feedback: feedback, 
+      isFinished: true,
+      finishAt: getBeijingTime() })
 
   return JSON.parse(JSON.stringify(res))
 }
