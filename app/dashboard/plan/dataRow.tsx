@@ -7,8 +7,10 @@ import { Link1Icon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { useState } from "react"
 import { Suspense } from 'react';
-import { NewAssignmentButton } from "./action"
+import { NewAssignmentButton, ReviewAssignmentButton } from "./action"
 import { Loader2Icon, LoaderIcon } from "lucide-react"
+import { getBeijingTime } from "@/lib/utils"
+import { isAfter, isBefore, isWithinInterval } from "date-fns"
 
 
 
@@ -35,17 +37,26 @@ export async function AssignmentRow(
         textbookId: string,
         userId: string
     }) {
-    const today = Date.now()
+    const today = getBeijingTime()
     const countStudents = studentIds.length
+    let state = 'undeployed'
     let countFinished = 0
     let status = '待布置'
+    let assignCount = '-'
     let endDate = '-'
     const data = await getRecordsForAssignment(threadId, orgId)
     if (data) {
-        console.log(data.endAt)
         countFinished = data.records.length
-        status = `进行中:${countFinished}/${countStudents}`
+        assignCount = `${countFinished} / ${countStudents}`
         endDate = data.endAt
+        if (isWithinInterval(today, { start: data.startAt, end: data.endAt })) {
+            status = `进行中`
+            assignCount = `${countFinished} / ${countStudents}`
+        } else if (isBefore(today, data.startAt)) {
+            status = `待开始`
+        } else if (isAfter(today, data.endAt))
+            status = `已结束`
+
     }
 
     return (
@@ -73,14 +84,23 @@ export async function AssignmentRow(
                 {endDate.split('T')[0] as string}
             </TableCell>
             <TableCell className="text-right">
-                <NewAssignmentButton
-                    threadId={threadId}
-                    name={name}
-                    textbookId={textbookId}
-                    type={type}
-                    orgId={orgId}
-                    userId={userId}
-                />
+                {
+                    status == '待布置' ?
+
+                        <NewAssignmentButton
+                            threadId={threadId}
+                            name={name}
+                            textbookId={textbookId}
+                            type={type}
+                            orgId={orgId}
+                            userId={userId}
+                        /> :
+                        <ReviewAssignmentButton
+                            assignment={data.assignment}
+                            userId={userId}
+                            orgId={orgId}
+                        />
+                }
             </TableCell>
         </TableRow>
     )

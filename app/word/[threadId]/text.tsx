@@ -124,7 +124,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                 setIsPlaying(true)
             },
             onend: function () {
-                setDisplayText('Take a try!');
+                setDisplayText('Press the button and Repeat');
                 setIsPlaying(false)
                 setLoading(false);
                 console.log('Playback finished');

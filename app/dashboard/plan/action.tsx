@@ -210,20 +210,17 @@ export function NewAssignmentButton(
 }
 
 
+
+
+
 export function ReviewAssignmentButton(
   {
-    threadId,
-    name,
-    textbookId,
-    type,
+    assignment,
     orgId,
     userId
   }:
     {
-      threadId: string,
-      name: string,
-      textbookId: string,
-      type: string,
+      assignment:Assignment,
       orgId: string,
       userId: string
     }) {
