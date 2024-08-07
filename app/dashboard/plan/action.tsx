@@ -316,7 +316,7 @@ export function ReviewAssignmentButton(
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <DialogHeader>
-              <DialogTitle>作业详情</DialogTitle>
+              <DialogTitle>作业概览</DialogTitle>
               <DialogDescription className="flex flex-col gap-4 py-4">
                 <div className="flex flex-col gap-2">
                   <div className="text-xs font-regular">
