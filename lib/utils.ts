@@ -61,3 +61,20 @@ export function countWords(input: string): number {
   // 过滤掉空字符串并返回单词数量
   return words.filter(word => word.length > 0).length;
 }
+
+// 获取当前北京时间
+export const getBeijingTime = () => {
+  const now = new Date();
+  const beijingTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));
+  return beijingTime;
+};
+
+export const getBeijingDate = () => {
+  const now = new Date();
+  const beijingTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));
+  
+  // 创建新的 Date 对象并将时间部分设置为 00:00:00.000
+  const beijingDateOnly = new Date(beijingTime.getFullYear(), beijingTime.getMonth(), beijingTime.getDate());
+  
+  return beijingDateOnly;
+};

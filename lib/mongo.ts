@@ -1,10 +1,11 @@
 import { MongoClient } from 'mongodb'
 
-let uri = process.env.MONGODB_URI
+// let uri = process.env.MONGODB_URI
+let uri = process.env.MONGODB_URI_TBDS
 
 let mongo: MongoClient | null = null
 
-if (!uri) throw new Error('Missing environment variable MONGO_URI')
+if (!uri) throw new Error('Missing environment variable MONGODB_URI')
 
 export async function connect() {
   if (mongo) return mongo

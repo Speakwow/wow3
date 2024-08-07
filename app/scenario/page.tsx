@@ -18,7 +18,7 @@ export default async function ChatPage() {
       <div className="mx-auto h-screen m p-8 flex flex-col items-center justify-center">
         <div className="absolute top-2 left-2">
           <Button asChild size="icon" variant="outline">
-            <Link href="./">
+            <Link href="/">
               <ChevronLeft />
             </Link>
           </Button>

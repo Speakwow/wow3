@@ -52,9 +52,21 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Header } from "@/components/dashboard-nav"
+import { getOrgStudents, getTextbookData } from "@/lib/action/mongoIO"
+import { Type2Tag, typeMap } from "@/lib/db/db"
+import { Link1Icon } from "@radix-ui/react-icons"
+import { auth } from "@clerk/nextjs"
+import { AssignmentRow, AssignmentRowLoading } from "./dataRow"
+import { Suspense } from "react"
 
-export default function Plan() {
+
+export default async function Plan() {
     const today = new Date()
+    const { userId, orgId } = auth();
+    const textbookId = "66b0937bfdcc2483666628a5"
+    const data = await getTextbookData(textbookId)
+    const studentIds = await getOrgStudents(orgId as string)
+
     return (
         <div className="flex min-h-screen w-full flex-col">
             <Header />
@@ -63,8 +75,9 @@ export default function Plan() {
                     <Card className="col-span-4">
                         <CardHeader className="flex flex-row items-center">
                             <div className="grid gap-2">
-                                <CardTitle>教学计划</CardTitle>
+                                <CardTitle>{data.name}</CardTitle>
                                 <CardDescription>
+                                    课程导览
                                 </CardDescription>
                             </div>
                             <div className="ml-auto flex flex-row gap-2">
@@ -79,100 +92,61 @@ export default function Plan() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>作业</TableHead>
-                                        <TableHead className="hidden xl:table-column">
-                                            Type
+                                        <TableHead>
+                                            单元
+                                        </TableHead>
+                                        <TableHead>
+                                            作业
+                                        </TableHead>
+                                        <TableHead>
+                                            类型
                                         </TableHead>
                                         <TableHead>
                                             状态
                                         </TableHead>
                                         <TableHead>
-                                            难度
+                                            截止日期
                                         </TableHead>
                                         <TableHead className="text-right">操作</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium"> 模拟对话练习</div>
-                                            <div className="hidden text-sm text-muted-foreground md:inline">
-                                                Unit 1 Teenage Life
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden xl:table-column">
-                                            Sale
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge className="text-xs ">
-                                                今日
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            简单
-                                        </TableCell>
-                                        <TableCell className="text-right"><Button size="sm">布置</Button></TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium"> 发音专项练习</div>
-                                            <div className="hidden text-sm text-muted-foreground md:inline">
-                                                Unit 1 Teenage Life
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden xl:table-column">
-                                            Sale
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge className="text-xs " variant="outline" >
-                                                计划
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            中等
-                                        </TableCell>
-                                        <TableCell className="text-right"><Button size="sm" variant="outline" className="text-muted-foreground">提前</Button></TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium">短语跟读练习</div>
-                                            <div className="hidden text-sm text-muted-foreground md:inline">
-                                                Unit 1 Teenage Life
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden xl:table-column">
-                                            Sale
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge className="text-xs " variant="outline" >
-                                                计划
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            中等
-                                        </TableCell>
-                                        <TableCell className="text-right"><Button size="sm" variant="outline" className="text-muted-foreground">提前</Button></TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            <div className="font-medium"> 清浊音专项练习</div>
-                                            <div className="hidden text-sm text-muted-foreground md:inline">
-                                                Unit 1 Teenage Life
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden xl:table-column">
-                                            Sale
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge className="text-xs " variant="secondary" >
-                                                智能建议
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            中等
-                                        </TableCell>
-                                        <TableCell className="text-right"><Button size="sm" variant="outline" className="text-muted-foreground">提前</Button></TableCell>
-                                    </TableRow>
+                                    {
+                                        data.units.map((unit: { unit: number, lessons: any[] }) => {
+                                            return unit.lessons.map(
+                                                lesson => {
+                                                    if (lesson.data) {
+                                                        return (
+                                                            <Suspense fallback={                                                                
+                                                            <AssignmentRowLoading
+                                                                unit={unit.unit}
+                                                                name={lesson.data.name}
+                                                                type={lesson.type}
+                                                                threadId={lesson.id}
+                                                                orgId={orgId as string}
+                                                                studentIds={studentIds}
+                                                                textbookId={textbookId}
+                                                                userId={userId as string} 
+                                                                />}>
+                                                                <AssignmentRow
+                                                                    unit={unit.unit}
+                                                                    name={lesson.data.name}
+                                                                    type={lesson.type}
+                                                                    threadId={lesson.id}
+                                                                    orgId={orgId as string}
+                                                                    studentIds={studentIds}
+                                                                    textbookId={textbookId}
+                                                                    userId={userId as string} 
+                                                                    />
+                                                            </Suspense>
+                                                        )
+                                                    }
+                                                    return null
+                                                }
+                                            )
+                                        })
+                                    }
+
                                 </TableBody>
                             </Table>
                         </CardContent>
@@ -186,3 +160,5 @@ export default function Plan() {
         </div>
     )
 }
+
+
