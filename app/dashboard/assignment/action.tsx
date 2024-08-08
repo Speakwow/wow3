@@ -94,7 +94,7 @@ export function NewAssignmentButton(
     }
     setSaveState('saving')
     createAssignment(assignmentData).then(item => {
-      item ? setSaveState('saved') : setSaveState('failed')
+      window.location.reload()
     })
   }
 
@@ -194,11 +194,11 @@ export function NewAssignmentButton(
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <DialogClose asChild>
+              
                 <Button type="submit" disabled={saveState == 'saving'}>
                   布置
                 </Button>
-              </DialogClose>
+              
               <DialogClose asChild>
                 <Button variant="secondary" disabled={saveState == 'saving'}>
                   取消
