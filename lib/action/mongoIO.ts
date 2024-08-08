@@ -884,9 +884,10 @@ export async function getOrgAssignments(orgId: string) {
 }
 
 
-export async function getRecordsForAssignment(threadId: string, orgId: string) {
+export async function getRecordsForAssignment(threadId: string, orgId: string,studentIds:string[]) {
   const mongo = await connect()
-  const [assignment, userIds] = await Promise.all([getAssignmentById(threadId, orgId), getOrgStudents(orgId)])
+  const userIds = studentIds
+  const [assignment] = await Promise.all([getAssignmentById(threadId, orgId)])
   if (!assignment) {
     return null
   }

@@ -44,7 +44,7 @@ export async function AssignmentRow(
     let status = '待布置'
     let assignCount = '-'
     let endDate = '-'
-    const data = await getRecordsForAssignment(threadId, orgId)
+    const data = await getRecordsForAssignment(threadId, orgId,studentIds)
     if (data) {
         countFinished = data.records.length
         assignCount = `${countFinished} / ${countStudents}`

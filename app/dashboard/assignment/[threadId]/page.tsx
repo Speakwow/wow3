@@ -35,7 +35,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
         )
     }
     const studentIds = await getOrgStudents(orgId)
-    const assignmentData = await getRecordsForAssignment(params.threadId, orgId)
+    const assignmentData = await getRecordsForAssignment(params.threadId, orgId,studentIds)
     const records = assignmentData.records
     const averageScore = calculateAverageScore(records);
     const lowestScoreDoc = findLowestScoreDoc(records);
