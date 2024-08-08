@@ -141,6 +141,7 @@ export default async function Plan() {
                                                                 textbookId={textbookId}
                                                                 userId={userId as string} 
                                                                 />}>
+                                                                {/* @ts-ignore */}
                                                                 <AssignmentRow
                                                                     unit={unit.unit}
                                                                     name={lesson.data.name}

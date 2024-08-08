@@ -3,7 +3,7 @@ import { connect } from '@/lib/mongo'
 import { C_CHARACTERS, C_REPEAT_PAGES, C_REPEAT_THREADS, C_SCENARIOS, DB, lesson_collections } from '@/lib/constant'
 import { ObjectId } from 'mongodb'
 import { unstable_noStore as noStore } from 'next/cache';
-import { collection2type, findCollectionByType, type2tag, typeMap } from '../db/db';
+import { collection2type, Type2Collection, typeMap,Type2Tag } from '../db/db';
 import { Assignment } from '../schema/assign';
 import { assign } from 'lodash';
 import { clerkClient } from '@clerk/nextjs/server';
@@ -94,7 +94,7 @@ export async function delFromUserLessonList(userId: string, lessonId: string) {
 
 export async function deleteLesson(userId: string, lessonId: string, type: string) {
   const mongo = await connect()
-  const collection = findCollectionByType(type)
+  const collection = Type2Collection(type)
   const res = await mongo.db(DB)
     .collection(collection)
     .deleteOne(
@@ -132,7 +132,7 @@ export async function getPublicData() {
       .collection(item)
       .find({ access: 'public' })
       .toArray()
-      .then(result => result.map(lesson => ({ type: collection2type(item), tag: type2tag(collection2type(item)), ...lesson })));
+      .then(result => result.map(lesson => ({ type: collection2type(item), tag: Type2Tag(collection2type(item)), ...lesson })));
   });
 
   // 使用 Promise.all 并行执行所有查询
@@ -151,7 +151,7 @@ export async function getLessonsByCreator(userId: string) {
       .collection(item)
       .find({ creator: userId })
       .toArray()
-      .then(result => result.map(lesson => ({ type: collection2type(item), tag: type2tag(collection2type(item)), ...lesson })));
+      .then(result => result.map(lesson => ({ type: collection2type(item), tag: Type2Tag(collection2type(item)), ...lesson })));
   });
 
   // 使用 Promise.all 并行执行所有查询
@@ -206,9 +206,9 @@ export async function getFavouriteLessons(userId: string) {
   const favouriteList = userData.favourite
   const promises = favouriteList.map((item: any) => {
     return mongo.db(DB)
-      .collection(findCollectionByType(item.type))
+      .collection(Type2Collection(item.type))
       .findOne({ _id: new ObjectId(item.id as string) })
-      .then(lesson => ({ type: item.type, tag: type2tag(item.type), ...lesson }));
+      .then(lesson => ({ type: item.type, tag: Type2Tag(item.type), ...lesson }));
   });
 
   // 使用 Promise.all 并行执行所有查询
@@ -760,13 +760,32 @@ export async function getTextbookData(id: string) {
 
 export async function createAssignment(assignment: Assignment) {
   const mongo = await connect()
+
+  // 尝试更新一个文档，如果不存在则插入新文档
   const res = await mongo.db(DB)
     .collection('assignments')
-    .insertOne({
-      ...assignment
-    })
-  logger.info('New Assignment Created:', assignment.threadId,assignment.orgId)
-  return res.insertedId.toString()
+    .updateOne(
+      {
+        threadId: assignment.threadId,
+        orgId: assignment.orgId
+      },
+      {
+        $setOnInsert: {
+          ...assignment
+        }
+      },
+      {
+        upsert: true
+      }
+    )
+
+  if (res.matchedCount > 0) {
+    logger.info('Assignment already exists:', assignment.threadId, assignment.orgId)
+    return null
+  } else {
+    logger.info('New Assignment Created:', assignment.threadId, assignment.orgId)
+    return res.upsertedId?.toString()
+  }
 }
 
 export async function updateAssignment(assignment: Assignment) {
@@ -828,25 +847,29 @@ export async function getMyAssignments(orgId: string, userId: string) {
     })
     .toArray()
 
-  allAssignments.map(async (assignment) => {
-    const collectionName = findCollectionByType(assignment.type)
-    const lesson_promise = mongo.db(DB).collection(collectionName).findOne({ _id: new ObjectId(assignment.threadId as string) })
-    const record_promise = mongo.db(DB).collection(assignment.type + '_records').findOne(
-      {
-        threadId: assignment.threadId,
-        userId: userId,
-        finishAt: { $gte: assignment.startAt, $lte: assignment.endAt }
-      },
-      {
-        sort: { score: -1 },
-      }
-    );
-    const [lesson, record] = await Promise.all([lesson_promise, record_promise])
-    assignment.info = lesson
-    assignment.record = record
-    return assignment;
-  })
-  return allAssignments
+    const assignmentsWithDetails = await Promise.all(
+      allAssignments.map(async (assignment) => {
+        const collectionName = Type2Collection(assignment.type)
+        const lesson_promise = mongo.db(DB).collection(collectionName).findOne({ _id: new ObjectId(assignment.threadId as string) })
+        const record_promise = mongo.db(DB).collection(assignment.type + '_records').findOne(
+          {
+            threadId: assignment.threadId,
+            userId: userId,
+            finishAt: { $gte: assignment.startAt, $lte: assignment.endAt }
+          },
+          {
+            sort: { score: -1 },
+          }
+        );
+        const [lesson, record] = await Promise.all([lesson_promise, record_promise])
+        assignment.info = lesson
+        assignment.record = record
+        return assignment;
+      })
+    )
+  
+    console.log(assignmentsWithDetails)
+    return assignmentsWithDetails
 }
 
 export async function getOrgAssignments(orgId: string) {
@@ -879,7 +902,7 @@ export async function getRecordsForAssignment(threadId: string, orgId: string) {
       sort: { score: -1 },
     }
   ).toArray()
-  const infoPromise = mongo.db(DB).collection(findCollectionByType(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
+  const infoPromise = mongo.db(DB).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);
   const assignmentData = { ...assignment, info: info, records: records }
   return JSON.parse(JSON.stringify(assignmentData))
@@ -903,7 +926,7 @@ export async function getBriefForAssignment(threadId: string, orgId: string) {
     }
   ).toArray()
 
-  const infoPromise = mongo.db(DB).collection(findCollectionByType(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
+  const infoPromise = mongo.db(DB).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);
   const assignmentData = { assignment, info: info, records: records }
   return JSON.parse(JSON.stringify(assignmentData))

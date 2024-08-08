@@ -87,8 +87,8 @@ export function NewAssignmentButton(
       textbookId: textbookId,
       orgId: orgId,
       creatorId: userId,
-      createAt: getBeijingTime(),
-      updateAt: getBeijingTime(),
+      createAt: getBeijingTime() as Date,
+      updateAt: getBeijingTime() as Date,
       startAt: new Date(from.setHours(0, 0, 0, 0)),
       endAt: new Date(to.setHours(23, 59, 59, 999))
     }
@@ -327,7 +327,7 @@ export function ReviewAssignmentButton(
                       
                       <div className="flex flex-col gap-2">
                       <CardTitle className="text-lg">
-                        {info.name}
+                        {info.name??''}
                       </CardTitle>
                       <CardDescription>
                         {Type2Tag(assignment.type)}
