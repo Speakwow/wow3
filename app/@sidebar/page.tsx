@@ -12,26 +12,26 @@ import { GraduationCapIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function SideBar() {
-    const { userId, orgId } = auth();
+    const { userId, orgId,has } = auth();
     const data = await getUserData(userId as any)
     //@ts-ignore
     const lessonList = data.lessonList.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
-
+    const canAccessDashboard = has({ permission: "org:admin" });
     return (
         <div className="h-screen p-4 flex flex-col justify-between">
             <div className="flex flex-col gap-6 ">
                 <div className="w-full text-xl font-semibold" >
                     <Link href="/">
-                    <div className="flex flex-row items-center gap-2">
-                    <Avatar className="h-9 p-0.5">
-                        <AvatarImage
-                            src={`/logo.png`}
-                            alt={'speakwow'}
-                        />
-                        <AvatarFallback>🐸</AvatarFallback>
-                    </Avatar>
-                    <span className="inline text-xl">Speakwow.ai</span>
-                    </div>
+                        <div className="flex flex-row items-center gap-2">
+                            <Avatar className="h-9 p-0.5">
+                                <AvatarImage
+                                    src={`/logo.png`}
+                                    alt={'speakwow'}
+                                />
+                                <AvatarFallback>🐸</AvatarFallback>
+                            </Avatar>
+                            <span className="inline text-xl">Speakwow.ai</span>
+                        </div>
                     </Link>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -47,26 +47,32 @@ export default async function SideBar() {
             <div className="bottom-4 w-full flex flex-col gap-4">
 
                 <Card className="p-2 w-full flex flex-col gap-2">
-                    <div className="w-full flex flex-row justify-center mt-2">
-                    <OrganizationSwitcher />
+                    <div className="w-full flex flex-row justify-center p-2 ">
+                        <OrganizationSwitcher />
                     </div>
-                    <Button variant="outline" className="" asChild>
-                        <Link href="/dashboard">
-                            <GraduationCapIcon className="mr-2 h-4 w-4" /> 班级管理
-                        </Link>
-                    </Button>
+                    {
+                        orgId ?
+                            canAccessDashboard&&
+                            <Button variant="outline" className="" asChild>
+                                <Link href="/dashboard">
+                                    <GraduationCapIcon className="mr-2 h-4 w-4" /> 班级管理
+                                </Link>
+                            </Button>
+                            :
+                            <Card className="p-2 w-full flex flex-row justify-between items-center">
+                            <SignedIn>
+                                <UserButton />
+                            </SignedIn>
+                            <Button variant="outline" className="" asChild>
+                                <Link href="/usercenter">
+                                    <IconProfile className="mr-2 h-4 w-4" /> 个人中心
+                                </Link>
+                            </Button>
+                        </Card>
+                    }
+
                 </Card>
-                
-                <Card className="p-2 w-full flex flex-row justify-between items-center">
-                    <SignedIn>
-                        <UserButton />
-                    </SignedIn>
-                    <Button variant="outline" className="" asChild>
-                        <Link href="/usercenter">
-                            <IconProfile className="mr-2 h-4 w-4" /> 个人中心
-                        </Link>
-                    </Button>
-                </Card>
+
             </div>
         </div>
     )

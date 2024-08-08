@@ -2,8 +2,9 @@ import { redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs"
 
 export default function Dashboard() {
-  const { userId, orgId } = auth();
-  if(orgId&&userId){
+  const { userId, orgId,has } = auth();
+  const canAccessDashboard = has({ permission: "org:admin" });
+  if(orgId&&userId&&canAccessDashboard){
   redirect('./dashboard/assignment')
   }else{
     return(

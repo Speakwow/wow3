@@ -867,8 +867,6 @@ export async function getMyAssignments(orgId: string, userId: string) {
         return assignment;
       })
     )
-  
-    console.log(assignmentsWithDetails)
     return assignmentsWithDetails
 }
 
