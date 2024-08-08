@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { auth, clerkClient, currentUser } from "@clerk/nextjs";
 import { MyLessons } from "./myLessons";
 import { getUserData } from "@/lib/action/mongoIO";
 import { OrganizationProfile, OrganizationSwitcher, SignedIn, UserButton } from "@clerk/nextjs";
@@ -10,13 +10,14 @@ import { IconProfile } from "@/components/ui/icons";
 import { GroupIcon } from "@radix-ui/react-icons";
 import { GraduationCapIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Protect } from "@clerk/nextjs";
 
 export default async function SideBar() {
-    const { userId, orgId,has } = auth();
+    const { userId, orgId, has } = auth();
     const data = await getUserData(userId as any)
     //@ts-ignore
     const lessonList = data.lessonList.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
-    const canAccessDashboard = has({ permission: "org:admin" });
+    const canAccessDashboard = has({ role: "org:admin" });
     return (
         <div className="h-screen p-4 flex flex-col justify-between">
             <div className="flex flex-col gap-6 ">
@@ -52,23 +53,25 @@ export default async function SideBar() {
                     </div>
                     {
                         orgId ?
-                            canAccessDashboard&&
-                            <Button variant="outline" className="" asChild>
-                                <Link href="/dashboard">
-                                    <GraduationCapIcon className="mr-2 h-4 w-4" /> 班级管理
-                                </Link>
-                            </Button>
+                            has({ role: "org:admin" }) &&
+                                <Button variant="outline" className="" asChild>
+                                    <Link href="/dashboard">
+                                        <GraduationCapIcon className="mr-2 h-4 w-4" /> 班级管理
+                                    </Link>
+                                </Button>
+                            
+
                             :
                             <Card className="p-2 w-full flex flex-row justify-between items-center">
-                            <SignedIn>
-                                <UserButton />
-                            </SignedIn>
-                            <Button variant="outline" className="" asChild>
-                                <Link href="/usercenter">
-                                    <IconProfile className="mr-2 h-4 w-4" /> 个人中心
-                                </Link>
-                            </Button>
-                        </Card>
+                                <SignedIn>
+                                    <UserButton />
+                                </SignedIn>
+                                <Button variant="outline" className="" asChild>
+                                    <Link href="/usercenter">
+                                        <IconProfile className="mr-2 h-4 w-4" /> 个人中心
+                                    </Link>
+                                </Button>
+                            </Card>
                     }
 
                 </Card>
