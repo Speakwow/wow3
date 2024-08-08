@@ -30,9 +30,51 @@ import { LessonCard } from "../components/lessonInfo";
 
 export default async function Home() {
     const { userId, orgId } = auth();
-    const publicLessonListId = "666009c2fc4cf7e1bbd4629b"
+   
 
+    if(orgId){
     const myAssignments = await getMyAssignments(userId,orgId)
+
+    return (
+        <div className="h-screen flex flex-col gap-4 lg:p-8 md:p-6 p-6 bg-[#F5F5F5]">
+            
+        <div className="grid grid-cols-2">
+            <div className=" w-full text-xl text-primary">
+            博学笃志，行稳致远
+            </div>
+            {/* <Input className=" w-full text-xl bg-white" placeholder="..." /> */}
+        </div>
+        <div>
+            我的练习
+        </div>
+        <ScrollArea className="w-full h-full">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+
+                {
+                    //@ts-ignore
+                    publicLessonList.map(item => (
+                        <LessonCard
+                            userId={userId as string}
+                            userData={userData}
+                            name={item.name}
+                            type={item.type}
+                            tag={item.tag}
+                            id={item._id}
+                            intro={item.intro}
+                            key={item._id}
+                            cover='' />
+                    )
+                    )
+                }
+
+            </div>
+        </ScrollArea>
+    </div>
+
+    )
+
+    }
+     const publicLessonListId = "666009c2fc4cf7e1bbd4629b"
     // const publicLessonList = await getAllLessonsByLessonId(publicLessonListId)
     const [publicLessonList ,userData]= await Promise.all([getPublicData(), getUserData(userId as string)])
     // console.log(publicLessonList)
