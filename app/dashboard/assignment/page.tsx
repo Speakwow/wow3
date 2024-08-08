@@ -59,6 +59,7 @@ import { auth } from "@clerk/nextjs"
 import { AssignmentRow, AssignmentRowLoading } from "./dataRow"
 import { Suspense } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 
 
 export default async function Plan() {
@@ -71,8 +72,17 @@ export default async function Plan() {
     return (
         <div className="flex h-screen w-full flex-col">
             <ScrollArea className="h-full">
-            <Header />
+            <Header activePage="assignment"/>
             <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+            <Breadcrumb>
+                    <BreadcrumbList>
+                    <BreadcrumbSeparator/>
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>概览</BreadcrumbPage>
+                        </BreadcrumbItem>
+                        
+                    </BreadcrumbList>
+                </Breadcrumb>
                 <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
                     <Card className="col-span-4 h-full">
                         <CardHeader className="flex flex-row items-center">
@@ -83,11 +93,11 @@ export default async function Plan() {
                                 </CardDescription>
                             </div>
                             <div className="ml-auto flex flex-row gap-2">
-                                <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
+                                {/* <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
                                     <Link href="#">
                                         查看全部
                                     </Link>
-                                </Button>
+                                </Button> */}
                             </div>
                         </CardHeader>
                         <CardContent>

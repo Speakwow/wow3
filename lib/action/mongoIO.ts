@@ -748,7 +748,8 @@ export async function getTextbookData(id: string) {
         const lessonData = await mongo.db(DB).collection(collectionName as string).findOne({ _id: new ObjectId(lesson.id as string) })
         lesson.data = lessonData;
       } catch (error) {
-
+        logger.info(`Get lesson data error,${lesson.type}:${lesson.id}`)
+        throw(error)
       }
     }
   }
@@ -764,7 +765,7 @@ export async function createAssignment(assignment: Assignment) {
     .insertOne({
       ...assignment
     })
-  logger.info('New Assignment Created:', assignment)
+  logger.info('New Assignment Created:', assignment.threadId,assignment.orgId)
   return res.insertedId.toString()
 }
 
@@ -778,7 +779,7 @@ export async function updateAssignment(assignment: Assignment) {
           ...assignment
         }
       })
-  logger.info('Assignment Changed:', assignment)
+  logger.info('Assignment Changed:', assignment.threadId,assignment.orgId)
   return res
 }
 
@@ -864,7 +865,6 @@ export async function getRecordsForAssignment(threadId: string, orgId: string) {
   const mongo = await connect()
   const [assignment, userIds] = await Promise.all([getAssignmentById(threadId, orgId), getOrgStudents(orgId)])
   if (!assignment) {
-    logger.info('Not active assignment')
     return null
   }
   const recordPromise = mongo.db(DB).collection(assignment?.type + '_records').find(
@@ -912,14 +912,9 @@ export async function getBriefForAssignment(threadId: string, orgId: string) {
 
 
 export async function getOrgStudents(organizationId: string) {
-  try {
     const res = await clerkClient.organizations.getOrganizationMembershipList({ organizationId, limit: 100 });
     const newUserIds = res
       .filter(orgMem => orgMem.role === 'org:member' && orgMem.publicUserData?.userId)
       .map(orgMem => orgMem.publicUserData!.userId);
     return newUserIds
-  } catch (error) {
-    logger.error('Error retrieving organization members', { organizationId, error });
-    throw error;
-  }
 }

@@ -34,7 +34,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Type2Tag } from "@/lib/db/db"
 import { OrganizationList, OrganizationProfile, OrganizationSwitcher } from "@clerk/nextjs"
-import { calculateAverageScore, findHighestScoreDoc, findLowestScoreDoc } from "@/lib/dashboard"
+import { calculateAverageScore, findHighestScoreDoc, findLowestScoreDoc, hoursUntil } from "@/lib/dashboard"
 
 
 export function NewAssignmentButton(
@@ -258,13 +258,7 @@ export function ReviewAssignmentButton(
   const router = useRouter()
   const [canModify, setCanModify] = useState(false)
   const [saveState, setSaveState] = useState('unsaved')
-  function hoursUntil(endAt: Date): number {
-    const now = new Date();
-    const end = new Date(endAt)
-    const differenceInMilliseconds = end.getTime() - now.getTime();
-    const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
-    return differenceInHours;
-  }
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const from = new Date(values.range.from);
