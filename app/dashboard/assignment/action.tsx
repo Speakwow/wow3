@@ -180,7 +180,7 @@ export function NewAssignmentButton(
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 z-20" align="start">
                         <Calendar
                           initialFocus
                           mode="range"
