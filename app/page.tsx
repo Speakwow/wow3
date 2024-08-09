@@ -48,7 +48,7 @@ export default async function Home() {
                 </div>
                 <ScrollArea className="w-full h-full">
                     <div className="flex flex-col gap-6">
-                    <Separator/>
+                        <Separator />
                         <div className="flex flex-col gap-2">
                             <div>
                                 <Badge>
@@ -75,7 +75,7 @@ export default async function Home() {
                                 }
                             </div>
                         </div>
-                        <Separator/>
+                        <Separator />
                         <div className="flex flex-col gap-2">
                             <div>
                                 <Badge variant="outline">
@@ -102,7 +102,7 @@ export default async function Home() {
                                 }
                             </div>
                         </div>
-                        <Separator/>
+                        <Separator />
                         <div className="flex flex-col gap-2">
                             <div>
                                 <Badge variant="outline" className=" text-muted-foreground">
@@ -129,7 +129,7 @@ export default async function Home() {
                                 }
                             </div>
                         </div>
-                        <Separator/>
+                        <Separator />
                     </div>
                 </ScrollArea>
             </div>
