@@ -71,8 +71,8 @@ export default async function SideBar() {
                     </Card>
                 }
 
-                <Card className="p-2 w-full flex flex-col gap-2">
-                    <div className="w-full flex flex-row justify-center ">
+                <Card className="p-2 w-full flex flex-col gap-2 bg-muted">
+                    <div className="w-full flex flex-row justify-center">
                         <OrganizationSwitcher />
                     </div>
                     {
