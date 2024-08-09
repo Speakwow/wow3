@@ -118,90 +118,87 @@ export function NewAssignmentButton(
         </Button>
       </DialogTrigger>
       <DialogContent>
+        <DialogHeader>
+          <DialogTitle>布置新作业</DialogTitle>
+          <DialogDescription className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <div className="text-xs font-regular">
+                当前班级
+              </div>
+            </div>
+            <OrganizationSwitcher />
+            <div className="flex flex-col gap-2">
+              <div className="text-xs font-regular">
+                作业信息
+              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {name}
+                  </CardTitle>
+                  <CardDescription>
+                    {Type2Tag(type)}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <DialogHeader>
-              <DialogTitle>布置新作业</DialogTitle>
-              <DialogDescription className="flex flex-col gap-4 py-4">
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs font-regular">
-                    当前班级
-                  </div>
-                </div>
-                <OrganizationSwitcher />
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs font-regular">
-                    作业信息
-                  </div>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {name}
-                      </CardTitle>
-                      <CardDescription>
-                        {Type2Tag(type)}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                </div>
-                </DialogDescription>
-                <div className="z-10">
-                <FormField
-                  control={form.control}
-                  name="range"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel className="text-xs font-regular">开始与截止日期</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              id="date"
-                              variant={"outline"}
-                              className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value?.from ? (
-                                field.value.to ? (
-                                  <>
-                                    {format(field.value.from, "LLL dd, y")} -{" "}
-                                    {format(field.value.to, "LLL dd, y")}
-                                  </>
-                                ) : (
-                                  format(field.value.from, "LLL dd, y")
-                                )
+            <div className="z-10">
+              <FormField
+                control={form.control}
+                name="range"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-xs font-regular">开始与截止日期</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            id="date"
+                            variant={"outline"}
+                            className={cn(
+                              "w-[300px] justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value?.from ? (
+                              field.value.to ? (
+                                <>
+                                  {format(field.value.from, "LLL dd, y")} -{" "}
+                                  {format(field.value.to, "LLL dd, y")}
+                                </>
                               ) : (
-                                <span>Pick a date</span>
-                              )}
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={field.value?.from}
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            numberOfMonths={2}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </FormItem>
-                  )}
-                />
-                </div>
-              
-            </DialogHeader>
+                                format(field.value.from, "LLL dd, y")
+                              )
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          initialFocus
+                          mode="range"
+                          defaultMonth={field.value?.from}
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          numberOfMonths={2}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </FormItem>
+                )}
+              />
+            </div>
             <DialogFooter>
-              
-                <Button type="submit" disabled={saveState == 'saving'}>
-                  布置
-                </Button>
-              
+              <Button type="submit" disabled={saveState == 'saving'}>
+                布置
+              </Button>
               <DialogClose asChild>
                 <Button variant="secondary" disabled={saveState == 'saving'}>
                   取消
@@ -286,9 +283,9 @@ export function ReviewAssignmentButton(
   const lowestScoreDoc = findLowestScoreDoc(records);
   const highestScoreDoc = findHighestScoreDoc(records);
   let hoursleft = hoursUntil(assignment.endAt)
-  if(hoursleft<0){
+  if (hoursleft < 0) {
     hoursleft = 0
-  }else{
+  } else {
     hoursleft = +hoursleft.toFixed(0)
   }
 
@@ -327,23 +324,23 @@ export function ReviewAssignmentButton(
                   </div>
                   <Card>
                     <CardHeader className="flex flex-row justify-between">
-                      
+
                       <div className="flex flex-col gap-2">
-                      <CardTitle className="text-lg">
-                        {info.name??''}
-                      </CardTitle>
-                      <CardDescription>
-                        {Type2Tag(assignment.type)}
-                      </CardDescription>
+                        <CardTitle className="text-lg">
+                          {info.name ?? ''}
+                        </CardTitle>
+                        <CardDescription>
+                          {Type2Tag(assignment.type)}
+                        </CardDescription>
                       </div>
                       <div className="flex flex-col justify-center text-center">
                         <div className="text-xl font-medium text-primary">
-                        {hoursleft.toFixed(0)} <p className="inline text-xs ">小时</p>
+                          {hoursleft.toFixed(0)} <p className="inline text-xs ">小时</p>
                         </div>
                         <div className="text-muted-foreground text-xs">
-                        距离截止时间
+                          距离截止时间
                         </div>
-                        
+
                       </div>
                     </CardHeader>
                     <CardContent className="grid grid-cols-2 border-t py-4">
@@ -363,10 +360,10 @@ export function ReviewAssignmentButton(
                           平均分
                         </div>
                       </div>
-                    
+
                     </CardContent>
-                    <CardFooter  className="flex flex-row justify-end">
-                      <Button size="sm" type="button" variant="outline" onClick={()=>router.push(`/dashboard/assignment/${assignment.threadId}`)}>
+                    <CardFooter className="flex flex-row justify-end">
+                      <Button size="sm" type="button" variant="outline" onClick={() => router.push(`/dashboard/assignment/${assignment.threadId}`)}>
                         作业详情
                       </Button>
                     </CardFooter>
