@@ -219,15 +219,6 @@ export async function getFavouriteLessons(userId: string) {
   return JSON.parse(JSON.stringify(resultLessons))
 }
 
-// export async function addToFavourite(userId: string, content: any, type: string) {
-//   console.log('saving')
-//   const mongo = await connect()
-//   const res = await mongo.db(DB)
-//     .collection(C_SCENARIOS)
-//     .insertOne({ creator: userId, ...content });
-//   console.log('saved ok')
-//   return res.insertedId.toString()
-// }
 
 
 export async function deleteScenario(name: string) {
@@ -538,7 +529,7 @@ export async function saveWordRecord(userId: string, threadId: string, score: nu
     .insertOne({
       userId: userId,
       threadId: threadId,
-      score: score.toFixed(0),
+      score: +score.toFixed(0),
       report: report,
       record: record,
       isFinished: true,
@@ -585,7 +576,7 @@ export async function createImgtalkRecord(userId: string) {
   const res = await mongo.db(DB).collection('imgtalk_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: new Date(getBeijingTime())
+    createAt: getBeijingTime()
   });
   return res.insertedId.toString()
 }
@@ -597,10 +588,10 @@ export async function updateScenarioRecord(chatId: string, report: any) {
   const lesson = mongo.db(DB).collection('scenario_records')
     .updateOne({ _id: new ObjectId(chatId as string) }, {
       $set: {
-        score: report.score,
+        score: +report.score??0,
         report: report,
         isFinished: true,
-        finishAt: new Date(getBeijingTime())
+        finishAt: getBeijingTime()
       }
     })
   return lesson
@@ -614,7 +605,7 @@ export async function createScenarioRecord(userId: string) {
   const res = await mongo.db(DB).collection('scenario_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: new Date(getBeijingTime())
+    createAt: getBeijingTime()
   });
   return res.insertedId.toString()
 }
@@ -654,7 +645,9 @@ export async function createWriteRecord(userId: string, writeId: string) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('write_records')
-    .insertOne({ writeId: writeId, userId: userId })
+    .insertOne({ 
+      writeId: writeId, 
+      userId: userId })
 
   return res.insertedId.toString()
 }
@@ -679,9 +672,9 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
       userId: userId,
       content: content,
       score: +feedback.score,
-      feedback: feedback,
+      report: feedback,
       isFinished: true,
-      finishAt: new Date(getBeijingTime())
+      finishAt: getBeijingTime()
     })
 
   return JSON.parse(JSON.stringify(res))

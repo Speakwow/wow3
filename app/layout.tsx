@@ -29,14 +29,14 @@ export default function RootLayout({
     <ClerkProvider localization={zhCN}>
       <html lang="zh-cn">
         <body className={baloo2.className}>
-          {/* <header className="fixed p-6 bottom-0">
+          <header className="fixed p-6 bottom-0 sr-only">
             <SignedOut>
               <SignInButton />
             </SignedOut>
             <SignedIn>
               <UserButton/>
             </SignedIn>
-          </header> */}
+          </header>
           <main>
           <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={20} className="border-r min-w-[150px]" collapsible={true}>
