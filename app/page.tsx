@@ -6,6 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { LessonCard } from "../components/lessonInfo";
 import { Type2Tag } from "@/lib/db/db";
 import { Separator } from "@/components/ui/separator";
+import { getBeijingTime } from "@/lib/tools";
+import { isAfter, isBefore, isWithinInterval } from "date-fns";
 
 
 export default async function Home() {
@@ -15,22 +17,23 @@ export default async function Home() {
     if (orgId) {
         const [myAssignments, userData] = await Promise.all([getMyAssignments(orgId, userId), getUserData(userId as string)])
         // 获取当前时间
-        const currentTime = new Date();
+        const today = getBeijingTime()
         const notStarted: any[] = [];
         const ongoing: any[] = [];
         const ended: any[] = [];
         // 分组逻辑
         for (const assignment of myAssignments) {
-            const startAt = new Date(assignment.startAt);
-            const endAt = new Date(assignment.endAt);
+            const startAt = assignment.startAt;
+            const endAt = assignment.endAt;
 
-            if (currentTime < startAt) {
-                notStarted.push(assignment);
-            } else if (currentTime >= startAt && currentTime <= endAt) {
+            if (isWithinInterval(today, { start: startAt, end: endAt })) {
                 ongoing.push(assignment);
-            } else {
+            } else if (isBefore(today, startAt)) {
+                notStarted.push(assignment);
+            } else if (isAfter(today, endAt))
                 ended.push(assignment);
-            }
+
+
         }
 
 
