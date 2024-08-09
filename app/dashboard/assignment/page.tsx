@@ -60,11 +60,15 @@ import { AssignmentRow, AssignmentRowLoading } from "./dataRow"
 import { Suspense } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
+import { redirect } from "next/navigation"
 
 
 export default async function Plan() {
     const today = new Date()
-    const { userId, orgId } = auth();
+    const { userId, orgId,has  } = auth();
+    if(!has({ role: "org:admin" })){
+        redirect('/404/unauthoried')
+    }
     const textbookId = "66b0937bfdcc2483666628a5"
     const data = await getTextbookData(textbookId)
     const studentIds = await getOrgStudents(orgId as string)
@@ -73,7 +77,7 @@ export default async function Plan() {
         <div className="flex h-screen w-full flex-col">
             <ScrollArea className="h-full">
             <Header activePage="assignment"/>
-            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+            <main className="flex flex-1 flex-col gap-2 p-4 md:gap-8 md:p-8">
             <Breadcrumb>
                     <BreadcrumbList>
                     <BreadcrumbSeparator/>

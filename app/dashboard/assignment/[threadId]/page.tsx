@@ -59,7 +59,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
     return (
         <div className="flex min-h-screen w-full flex-col">
             <Header activePage="assignment" />
-            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+            <main className="flex flex-1 flex-col gap-2 p-4 md:gap-8 md:p-8">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>

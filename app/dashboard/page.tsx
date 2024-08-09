@@ -7,6 +7,6 @@ export default function Dashboard() {
   if(orgId&&userId&&canAccessDashboard){
   redirect('./dashboard/assignment')
   }else{
-    redirect('/404')
+    redirect('/404/unauthoried')
   }
 }
