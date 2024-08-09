@@ -11,6 +11,7 @@ import { NewAssignmentButton, ReviewAssignmentButton } from "./action"
 import { Loader2Icon, LoaderIcon } from "lucide-react"
 import { getBeijingTime } from "@/lib/utils"
 import { isAfter, isBefore, isWithinInterval } from "date-fns"
+import { TestAssignmentButton } from "./action_test"
 
 
 
@@ -87,7 +88,7 @@ export async function AssignmentRow(
                 {
                     status == '待布置' ?
 
-                        <NewAssignmentButton
+                        <TestAssignmentButton
                             threadId={threadId}
                             name={name}
                             textbookId={textbookId}

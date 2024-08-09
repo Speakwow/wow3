@@ -146,7 +146,7 @@ export function NewAssignmentButton(
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="z-10">
+            <div className="">
               <FormField
                 control={form.control}
                 name="range"
@@ -180,7 +180,7 @@ export function NewAssignmentButton(
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-20" align="start">
+                      <PopoverContent className="w-auto p-0 z-10" align="start">
                         <Calendar
                           initialFocus
                           mode="range"
