@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import * as React from "react"
 import { addDays, format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { CalendarDaysIcon, Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 
 import { cn, getBeijingDate, getBeijingTime } from "@/lib/utils"
@@ -100,66 +100,40 @@ export function TestAssignmentButton(
   }
 
   //Welcome Messgae TTS
-  useEffect(() => {
-    if (saveState == 'saved') {
-      router.refresh()
-    } else if (saveState == 'failed') {
-
-    }
-
-  }, [saveState]);
 
 
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">测试</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Select Date Range</h3>
-            <p className="text-muted-foreground">Choose the start and end dates for your event.</p>
+    <DialogTrigger asChild>
+      <Button variant="outline">Test</Button>
+    </DialogTrigger>
+    <DialogContent className="sm:max-w-[500px]">
+      <DialogHeader>
+        <DialogTitle>Select a date range</DialogTitle>
+        <DialogDescription>Choose your travel dates to check availability.</DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-6 py-4">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="w-full justify-start text-left font-normal">
+              <CalendarDaysIcon className="mr-2 h-4 w-4" />
+              Pick a date range
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="range" numberOfMonths={2} />
+          </PopoverContent>
+        </Popover>
+        <div className="flex justify-end gap-2">
+          <div>
+            <Button variant="outline">Cancel</Button>
           </div>
-          <form className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="end-date">End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                  <Button
-                            id="date"
-                            variant={"outline"}
-                            className={cn(
-                              "w-[300px] justify-start text-left font-normal",
-                              "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                              <span>Pick a date</span>
-                            
-                          </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                          initialFocus
-                          mode="range"
-
-                          numberOfMonths={2}
-                        />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">Cancel</Button>
-              <Button type="submit">Save</Button>
-            </div>
-          </form>
+          <Button>Apply</Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </DialogContent>
+  </Dialog>
   )
 
 }
