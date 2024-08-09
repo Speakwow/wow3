@@ -409,7 +409,7 @@ export async function finishTalkaboutRecord(recordId: string, score: number, res
           isFinished: true,
           finishAt: new Date(getBeijingTime()),
           score: score,
-          report:result
+          report: result
         }
       });
   return res.upsertedId?.toString()
@@ -588,7 +588,7 @@ export async function updateScenarioRecord(chatId: string, report: any) {
   const lesson = mongo.db(DB).collection('scenario_records')
     .updateOne({ _id: new ObjectId(chatId as string) }, {
       $set: {
-        score: +report.score??0,
+        score: +report.score ?? 0,
         report: report,
         isFinished: true,
         finishAt: getBeijingTime()
@@ -645,9 +645,10 @@ export async function createWriteRecord(userId: string, writeId: string) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('write_records')
-    .insertOne({ 
-      writeId: writeId, 
-      userId: userId })
+    .insertOne({
+      writeId: writeId,
+      userId: userId
+    })
 
   return res.insertedId.toString()
 }
@@ -789,14 +790,16 @@ export async function updateAssignment(assignment: Assignment) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('assignments')
-    .updateOne({ threadId: assignment.threadId },
+    .updateOne({ threadId: assignment.threadId,orgId:assignment.orgId },
       {
         $set: {
-          ...assignment
+          ...assignment,
+          updateAt:getBeijingTime()
         }
       })
-  logger.info('Assignment Changed:', assignment.threadId, assignment.orgId)
-  return res
+      console.log(res)
+    
+  return res.acknowledged
 }
 
 async function getAssignmentById(threadId: string, orgId: string) {
@@ -886,18 +889,29 @@ export async function getRecordsForAssignment(threadId: string, orgId: string, s
   if (!assignment) {
     return null
   }
-  const recordPromise = mongo.db(DB).collection(assignment?.type + '_records').find(
+  const recordPromise = mongo.db(DB).collection(assignment?.type + '_records').aggregate([
     {
-      threadId: threadId,
-      userId: { $in: userIds },
-      isFinished: true,
-      finishAt: { $gte: assignment?.startAt, $lte: assignment?.endAt }
-    }
-    ,
+      $match: {
+        threadId: threadId,
+        userId: { $in: userIds },
+        isFinished: true,
+        finishAt: { $gte: assignment?.startAt, $lte: assignment?.endAt }
+      }
+    },
     {
-      sort: { score: -1 },
+      $sort: { score: -1 } // 按照 score 降序排列
+    },
+    {
+      $group: {
+        _id: "$userId", // 以 userId 分组
+        record: { $first: "$$ROOT" } // 选择每组中第一个记录（即得分最高的记录）
+      }
+    },
+    {
+      $replaceRoot: { newRoot: "$record" } // 替换根为记录内容
     }
-  ).toArray()
+  ]).toArray();
+
   const infoPromise = mongo.db(DB).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);
   const assignmentData = { ...assignment, info: info, records: records }
@@ -909,18 +923,29 @@ export async function getBriefForAssignment(threadId: string, orgId: string) {
   const mongo = await connect()
   const [assignment, userIds] = await Promise.all([getAssignmentById(threadId, orgId), getOrgStudents(orgId)])
 
-  const recordPromise = mongo.db(DB).collection(assignment?.type + '_records').find(
+  const recordPromise = mongo.db(DB).collection(assignment?.type + '_records').aggregate([
     {
-      threadId: threadId,
-      userId: { $in: userIds },
-      isFinished: true,
-      finishAt: { $gte: assignment?.startAt, $lte: assignment?.endAt }
-    }
-    ,
+      $match: {
+        threadId: threadId,
+        userId: { $in: userIds },
+        isFinished: true,
+        finishAt: { $gte: assignment?.startAt, $lte: assignment?.endAt }
+      }
+    },
     {
-      sort: { score: -1 },
+      $sort: { score: -1 } // 按照 score 降序排列
+    },
+    {
+      $group: {
+        _id: "$userId", // 以 userId 分组
+        record: { $first: "$$ROOT" } // 选择每组中第一个记录（即得分最高的记录）
+      }
+    },
+    {
+      $replaceRoot: { newRoot: "$record" } // 替换根为记录内容
     }
-  ).toArray()
+  ]).toArray();
+
 
   const infoPromise = mongo.db(DB).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);

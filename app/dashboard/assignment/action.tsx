@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import * as React from "react"
 import { addDays, format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon, LoaderIcon } from "lucide-react"
 import { getBeijingDate, getBeijingTime } from "@/lib/tools"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -249,8 +249,8 @@ export function ReviewAssignmentButton(
     resolver: zodResolver(formSchema),
     defaultValues: {
       range: {
-        from: today,
-        to: addDays(today, 3),
+        from: assignment.startAt,
+        to: assignment.endAt,
       },
     },
   })
@@ -275,7 +275,7 @@ export function ReviewAssignmentButton(
     }
     setSaveState('saving')
     updateAssignment(assignmentData).then(item => {
-      item ? setSaveState('saved') : setSaveState('failed')
+      if(item)  window.location.reload(); else setSaveState('failed')
     })
   }
   const averageScore = calculateAverageScore(records);
@@ -290,8 +290,9 @@ export function ReviewAssignmentButton(
 
   //Welcome Messgae TTS
   useEffect(() => {
+    console.log(saveState)
     if (saveState == 'saved') {
-      router.refresh()
+     ;
     } else if (saveState == 'failed') {
 
     }
@@ -420,10 +421,23 @@ export function ReviewAssignmentButton(
             <DialogFooter>
 
               {canModify ?
-
-                <Button variant="destructive" type="submit" disabled={saveState == 'saving'}>
-                  提交
+                saveState == 'saving' ?
+                  <Button variant="destructive" type="button" disabled={saveState == 'saving'}>
+                    <LoaderIcon className="animate-spin"/>
+                  </Button>
+                  :
+                  saveState == 'saved'?
+                  <DialogClose asChild>
+                  <Button variant="default" type="button">
+                  完成
                 </Button>
+                </DialogClose>
+                :
+
+                  <Button variant="destructive" type="submit" disabled={saveState == 'saving'}>
+                    提交
+                  </Button>
+
 
                 :
                 <Button variant="outline" type="button" disabled={saveState == 'saving'} onClick={() => setCanModify(true)}>
