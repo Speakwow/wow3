@@ -144,6 +144,8 @@ export function NewAssignmentButton(
                     </CardHeader>
                   </Card>
                 </div>
+                </DialogDescription>
+                <div className="z-10">
                 <FormField
                   control={form.control}
                   name="range"
@@ -191,7 +193,8 @@ export function NewAssignmentButton(
                     </FormItem>
                   )}
                 />
-              </DialogDescription>
+                </div>
+              
             </DialogHeader>
             <DialogFooter>
               
