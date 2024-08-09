@@ -1,11 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { clerkClient } from '@clerk/nextjs';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { kv } from '@vercel/kv';
 import { ArrowLeftIcon } from 'lucide-react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation'
 
         
 export default async function Page() {

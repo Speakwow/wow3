@@ -14,7 +14,7 @@ async function CharacterCard({ character }: { character:any }) {
     // const character = await getCharacterById(id) as any
     let userName = ''
     try{
-    const user = await clerkClient.users.getUser(character.creator);
+    const user = await clerkClient().users.getUser(character.creator);
     userName = user.username??'Speakwow'
     }catch(error){
       console.log(error)

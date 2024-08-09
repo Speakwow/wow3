@@ -1,6 +1,6 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { kv } from "@vercel/kv"
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { auth, clerkClient} from "@clerk/nextjs/server";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -12,7 +12,7 @@ async function ScenarioCard({id}:{id: string}) {
     const character = await kv.hgetall('character@' + info.character) as any
     let userName = ''
     try{
-    const user = await clerkClient.users.getUser(info.creator);
+    const user = await clerkClient().users.getUser(info.creator);
     userName = user.username??'Speakwow'
     }catch(error){
       console.log(error)

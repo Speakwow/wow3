@@ -16,9 +16,8 @@ import { z } from "zod"
 import * as React from "react"
 import { addDays, format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
-import { DateRange } from "react-day-picker"
-
-import { cn, getBeijingDate, getBeijingTime } from "@/lib/utils"
+import { getBeijingDate, getBeijingTime } from "@/lib/tools"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -33,8 +32,8 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Type2Tag } from "@/lib/db/db"
-import { OrganizationList, OrganizationProfile, OrganizationSwitcher } from "@clerk/nextjs"
-import { calculateAverageScore, findHighestScoreDoc, findLowestScoreDoc, hoursUntil } from "@/lib/dashboard"
+import { OrganizationSwitcher } from "@clerk/nextjs"
+import { calculateAverageScore, findHighestScoreDoc, findLowestScoreDoc, hoursUntil } from "@/lib/tools"
 
 
 export function NewAssignmentButton(
@@ -180,7 +179,7 @@ export function NewAssignmentButton(
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 z-10" align="start">
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           initialFocus
                           mode="range"

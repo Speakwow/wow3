@@ -9,7 +9,7 @@ import { useState } from "react"
 import { Suspense } from 'react';
 import { NewAssignmentButton, ReviewAssignmentButton } from "./action"
 import { Loader2Icon, LoaderIcon } from "lucide-react"
-import { getBeijingTime } from "@/lib/utils"
+import { getBeijingTime } from "@/lib/tools"
 import { isAfter, isBefore, isWithinInterval } from "date-fns"
 import { TestAssignmentButton } from "./action_test"
 
@@ -88,7 +88,7 @@ export async function AssignmentRow(
                 {
                     status == '待布置' ?
 
-                        <TestAssignmentButton
+                        <NewAssignmentButton
                             threadId={threadId}
                             name={name}
                             textbookId={textbookId}

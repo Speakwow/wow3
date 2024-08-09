@@ -1,22 +1,17 @@
 'use client'
 import { Button } from "@/components/ui/button"
-import { Card, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { IconRightArrow } from "@/components/ui/icons"
-import { sttFromMic, sttFromMicWithAssess } from "@/lib/speech/asr";
+import { sttFromMic } from "@/lib/speech/asr";
 import { EvalResult, evalSpeechFromFile } from "@/lib/speech/eval";
 import { synthesizeSpeech } from "@/lib/speech/tts";
 import { webm2Wav } from "@/lib/speech/wav";
-import { AudioWaveformIcon, Mic, Recycle, Redo, Redo2, Redo2Icon, RedoDotIcon, RedoIcon, RefreshCcw, RefreshCwIcon, RefreshCwOffIcon, ReplyAllIcon, Volume1Icon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Mic,  RefreshCwIcon,  Volume1Icon } from "lucide-react";
 import React, { useState, useEffect, useRef } from 'react';
-import { Howl, Howler } from 'howler';
-import TextWithHighlights from "./correct";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { Howl } from 'howler';
 import { Bravo } from "@/components/bravo";
-import { saveWordRecord, updateRepeatRecord } from "@/lib/action/mongoIO";
+import { saveWordRecord } from "@/lib/action/mongoIO";
 import { LessonReport } from "@/components/report";
-import { threadId } from "worker_threads";
 
 
 function calculateAverages(data: any[]): any {

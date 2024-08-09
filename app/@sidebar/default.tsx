@@ -1,12 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
-import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
-import { MyLessons } from "./myLessons";
+import { auth } from "@clerk/nextjs/server";
 import { getUserData } from "@/lib/action/mongoIO";
-import { SignedIn, UserButton } from "@clerk/nextjs";
-import { IconProfile } from "@/components/ui/icons";
 import SideBar from "./page";
 
 export default async function SideBarDefault() {

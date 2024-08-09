@@ -3,13 +3,10 @@ import { Header } from "@/components/dashboard-nav";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { TableHeader, TableRow, TableHead, TableBody, Table } from "@/components/ui/table";
 import { getOrgStudents, getRecordsForAssignment } from "@/lib/action/mongoIO";
-import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil, reformatRecords } from "@/lib/dashboard";
+import { reformatRecords } from "@/lib/dashboard";
+import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil } from "@/lib/tools";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { DollarSign, Users, CreditCard, ChevronLeft } from "lucide-react";
-import { Suspense } from "react";
-import { AssignmentRowLoading, AssignmentRow } from "../dataRow";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { AssignmentRecord, columns } from "./columns"
 import { DataTable } from "./date-table";
 import {
@@ -42,8 +39,8 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
     const highestScoreDoc = findHighestScoreDoc(records);
     let bestUser, worstUser
     if (records.length > 0) {
-        bestUser = await clerkClient.users.getUser(highestScoreDoc?.userId as string);
-        worstUser = await clerkClient.users.getUser(lowestScoreDoc?.userId as string);
+        bestUser = await clerkClient().users.getUser(highestScoreDoc?.userId as string);
+        worstUser = await clerkClient().users.getUser(lowestScoreDoc?.userId as string);
     } else {
         bestUser = { username: '-' }
         worstUser = { username: '-' }

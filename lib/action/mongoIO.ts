@@ -8,7 +8,7 @@ import { Assignment } from '../schema/assign';
 import { assign } from 'lodash';
 import { clerkClient } from '@clerk/nextjs/server';
 import { logger } from '../logger';
-import { getBeijingTime } from '../utils';
+import { getBeijingTime } from '../tools';
 
 export async function updateScenario(name: string, content: any) {
   const mongo = await connect()
@@ -934,9 +934,11 @@ export async function getBriefForAssignment(threadId: string, orgId: string) {
 
 
 export async function getOrgStudents(organizationId: string) {
-    const res = await clerkClient.organizations.getOrganizationMembershipList({ organizationId, limit: 100 });
-    const newUserIds = res
+    const res = await clerkClient().organizations.getOrganizationMembershipList({ organizationId, limit: 100 });
+    const newUserIds = res.data
       .filter(orgMem => orgMem.role === 'org:member' && orgMem.publicUserData?.userId)
       .map(orgMem => orgMem.publicUserData!.userId);
     return newUserIds
 }
+
+

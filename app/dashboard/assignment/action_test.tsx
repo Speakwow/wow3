@@ -18,7 +18,7 @@ import { addDays, format } from "date-fns"
 import { CalendarDaysIcon, Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 
-import { cn, getBeijingDate, getBeijingTime } from "@/lib/utils"
+import { getBeijingDate, getBeijingTime } from "@/lib/tools"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -34,7 +34,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Type2Tag } from "@/lib/db/db"
 import { OrganizationList, OrganizationProfile, OrganizationSwitcher } from "@clerk/nextjs"
-import { calculateAverageScore, findHighestScoreDoc, findLowestScoreDoc, hoursUntil } from "@/lib/dashboard"
+import { calculateAverageScore, findHighestScoreDoc, findLowestScoreDoc, hoursUntil } from "@/lib/tools"
 import { Label } from "@/components/ui/label"
 
 

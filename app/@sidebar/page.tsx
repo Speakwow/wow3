@@ -1,16 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { MyLessons } from "./myLessons";
 import { getUserData } from "@/lib/action/mongoIO";
-import { OrganizationProfile, OrganizationSwitcher, SignedIn, UserButton } from "@clerk/nextjs";
+import { OrganizationSwitcher, SignedIn, UserButton } from "@clerk/nextjs";
 import { IconProfile } from "@/components/ui/icons";
-import { GroupIcon } from "@radix-ui/react-icons";
 import { GraduationCapIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Protect } from "@clerk/nextjs";
 
 export default async function SideBar() {
     const { userId, orgId, has } = auth();

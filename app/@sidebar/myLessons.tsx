@@ -1,17 +1,12 @@
 'use client'
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
-import { delFromUserLessonList, getMyLessons, getUserData } from "@/lib/action/mongoIO"
-import { MenuIcon, MenuSquareIcon, MoreHorizontalIcon } from "lucide-react";
+import { delFromUserLessonList } from "@/lib/action/mongoIO"
+import { MoreHorizontalIcon } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useState } from "react";

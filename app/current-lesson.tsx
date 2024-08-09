@@ -1,18 +1,15 @@
 'use client'
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
-import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
-import { kv } from "@vercel/kv";
-import { ArrowLeftIcon, RefreshCcwIcon } from "lucide-react";
-import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { RefreshCcwIcon } from "lucide-react";
+import React, { useState, useEffect } from 'react';
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getCharacterById, getAnyRecord, getAnyLesson } from "@/lib/action/mongoIO-client";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
-import { getCurrentLesson } from "@/lib/action/learn";
-import { threadId } from "worker_threads";
+
+
 
 
 export default function CurrentLessonCard({ userId }: { userId: string }) {

@@ -1,19 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { currentUser } from "@clerk/nextjs/server";
 
-import { Input } from "@/components/ui/input";
-import { getAllLessons, getFavouriteLessons, getLessonsByCreator, getPublicData, getUserData } from "@/lib/action/mongoIO";
-import { getAllLessonsByLessonId } from "@/lib/action/mongoIO-client";
-import { Badge } from "@/components/ui/badge";
-import SideBar from "@/components/side-bar";
+import { getFavouriteLessons, getLessonsByCreator, getUserData } from "@/lib/action/mongoIO";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LessonCard } from "@/components/lessonInfo";
 import { ChevronLeft } from "lucide-react";

@@ -1,16 +1,13 @@
 'use server'
 
-// @ts-ignore
+
 import { PromptTemplate } from "@langchain/core/prompts";
 import { generateObject, streamObject } from 'ai';
 import { z } from 'zod';
 import { openai } from '@ai-sdk/openai';
 import { ChatOpenAI } from "@langchain/openai";
-// @ts-ignore
 import { RunnableSequence } from "@langchain/core/runnables";
-// @ts-ignore
 import { StructuredOutputParser, CustomListOutputParser } from "langchain/output_parsers";
-// @ts-ignore
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { createStreamableValue } from "ai/rsc";
 

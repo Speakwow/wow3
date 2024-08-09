@@ -3,7 +3,6 @@
 import { createAI, getMutableAIState, streamUI } from 'ai/rsc';
 import { CoreMessage, streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
-import { StreamingTextResponse, generateText, tool } from 'ai';
 import { z } from 'zod';
 import OpenAI from "openai";
 import { ReactNode } from 'react';

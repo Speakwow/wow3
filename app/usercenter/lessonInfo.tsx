@@ -3,22 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
-import { kv } from "@vercel/kv";
-import { ArrowLeftIcon, EditIcon, MoreHorizontalIcon } from "lucide-react";
+import { MoreHorizontalIcon } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { deleteLesson, getCharacterById, getRepeatThreadById, getScenarioById } from "@/lib/action/mongoIO";
-import { Label } from "@radix-ui/react-label";
+import { deleteLesson } from "@/lib/action/mongoIO";
+import { Label } from "@/components/ui/label";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { EnterIcon } from "@radix-ui/react-icons";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
