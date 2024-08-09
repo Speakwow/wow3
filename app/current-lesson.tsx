@@ -5,7 +5,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 import { RefreshCcwIcon } from "lucide-react";
 import React, { useState, useEffect } from 'react';
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { getCharacterById, getAnyRecord, getAnyLesson } from "@/lib/action/mongoIO-client";
+import { getCharacterById, getAnyRecord, getAnyLesson } from "@/lib/action/mongoIO";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 

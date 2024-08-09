@@ -14,7 +14,7 @@ import { Howl } from 'howler';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { webm2Wav } from '@/lib/speech/wav';
 import { evalSpeechFromFile } from '@/lib/speech/eval';
-import { updateScenarioRecord } from '@/lib/action/mongoIO-client';
+import { updateScenarioRecord } from '@/lib/action/mongoIO';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 

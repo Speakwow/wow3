@@ -1,14 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { kv } from "@vercel/kv";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, Edit2Icon, SwitchCameraIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { WriteForm } from "./form";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getAllCharacters } from "@/lib/action/mongoIO";
 
 export default async function WriteCreator() {
     const { userId } = auth();

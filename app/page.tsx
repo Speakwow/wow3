@@ -1,30 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
-import Link from "next/link";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { auth } from "@clerk/nextjs/server";
 
-import CurrentLessonCard from "./current-lesson";
-import { Input } from "@/components/ui/input";
-import { getAllLessons, getMyAssignments, getPublicData, getUserData } from "@/lib/action/mongoIO";
-import { getAllLessonsByLessonId } from "@/lib/action/mongoIO-client";
+import { getMyAssignments, getPublicData, getUserData } from "@/lib/action/mongoIO";
 import { Badge } from "@/components/ui/badge";
-import SideBar from "@/components/side-bar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { HeartIcon, MoreHorizontalIcon } from "lucide-react";
 import { LessonCard } from "../components/lessonInfo";
 import { Type2Tag } from "@/lib/db/db";
 import { Separator } from "@/components/ui/separator";

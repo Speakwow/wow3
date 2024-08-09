@@ -2,15 +2,11 @@
 import { Button } from "@/components/ui/button"
 // import Chat from "./chat"
 import Link from "next/link"
-import { ChevronLeft, Edit2Icon, MoreVerticalIcon, OptionIcon } from "lucide-react"
-import { kv } from "@vercel/kv"
-import { nanoid } from "ai"
+import { ChevronLeft, MoreVerticalIcon } from "lucide-react"
 import Initial from "./start"
-import { createScenarioRecord, getImgtalkById, createImgtalkRecord, getCharacterById, getScenarioById, getScenarioByName } from "@/lib/action/mongoIO"
-import Chat from "@/components/chat"
+import { getImgtalkById, createImgtalkRecord, getCharacterById } from "@/lib/action/mongoIO"
 import { auth } from "@clerk/nextjs/server"
 import { Card } from "@/components/ui/card"
-import Image from "next/image"
 
 export default async function ChatPage({ params }: { params: { scenarioId: string } }) {
   const { userId, orgId } = auth();

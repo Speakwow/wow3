@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import { Badge } from "@/components/ui/badge";
-import { finishTalkaboutRecord } from "@/lib/action/mongoIO-client";
+import { finishTalkaboutRecord } from "@/lib/action/mongoIO";
 import Image from 'next/image'
 
 // function HighlightWords({ story }: { story: any }) {

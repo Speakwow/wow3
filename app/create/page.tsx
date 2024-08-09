@@ -1,20 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { auth,  currentUser } from "@clerk/nextjs/server";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable"
 
-import { Input } from "@/components/ui/input";
-import { getAllLessons } from "@/lib/action/mongoIO";
-import { getAllLessonsByLessonId } from "@/lib/action/mongoIO-client";
-import { Badge } from "@/components/ui/badge";
-import SideBar from "@/components/side-bar";
-import { Container } from "lucide-react";
 
 
 

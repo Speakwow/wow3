@@ -3,7 +3,7 @@ import { connect } from '@/lib/mongo'
 import { C_CHARACTERS, C_REPEAT_PAGES, C_REPEAT_THREADS, C_SCENARIOS, DB, lesson_collections } from '@/lib/constant'
 import { ObjectId } from 'mongodb'
 import { unstable_noStore as noStore } from 'next/cache';
-import { collection2type, Type2Collection, typeMap,Type2Tag } from '../db/db';
+import { collection2type, Type2Collection, typeMap, Type2Tag } from '../db/db';
 import { Assignment } from '../schema/assign';
 import { assign } from 'lodash';
 import { clerkClient } from '@clerk/nextjs/server';
@@ -402,43 +402,46 @@ export async function createTalkaboutRecord(threadId: string, userId: string) {
   return res.insertedId.toString()
 }
 
-export async function finishTalkaboutRecord(recordId: string, score: number, feedback: string) {
+export async function finishTalkaboutRecord(recordId: string, score: number, result: any) {
+  const now = Date.now(); // 获取当前时间的时间戳
   const mongo = await connect()
   const current = await mongo.db(DB)
     .collection('talkabout_records')
     .findOne({ _id: new ObjectId(recordId) })
+  const duration = (now - current?.createAt) / 60000
   const res = await mongo.db(DB)
-    .collection('word_records')
+    .collection('talkabout_records')
     .updateOne(
       { _id: new ObjectId(recordId) },
       {
         $set: {
           isFinished: true,
-          finishAt: getBeijingTime(),
+          finishAt: new Date(getBeijingTime()),
           score: score,
-          feedback: feedback,
+          report:result
         }
       });
+  return res.upsertedId?.toString()
 }
 
-export async function getTalkaboutRecordByUserId(userId: string) {
+export async function getTalkaboutRecordByUserId(userId: string, threadId: string) {
   noStore()
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('talkabout_records')
-    .find({ userId: userId })
+    .find({ userId: userId, threadId: threadId })
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
-  return res[0]
+  return JSON.parse(JSON.stringify(res[0]))
 }
 
 
-//Word
+
 export async function getWordThreadById(threadId: string) {
   const mongo = await connect()
   const repeatThread = await mongo.db(DB).collection("word_threads").findOne({ _id: new ObjectId(threadId as string) })
-  return repeatThread
+  return JSON.parse(JSON.stringify(repeatThread))
 }
 
 
@@ -460,7 +463,6 @@ export async function getWordById(threadId: string) {
 
 
 export async function createWordRecord(threadId: string, userId: string) {
-  const now = Date.now(); // 获取当前时间的时间戳
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('word_records')
@@ -468,7 +470,7 @@ export async function createWordRecord(threadId: string, userId: string) {
       threadId: threadId,
       userId: userId,
       isFinished: false,
-      createAt: getBeijingTime(),
+      createAt: new Date(getBeijingTime()),
       score: 0,
       record: []
     });
@@ -516,6 +518,7 @@ export async function updateWordRecord(recordId: string, index: number, score: n
       })
   return res
 }
+
 export async function getWordRecordByUserId(userId: string) {
   noStore()
   const mongo = await connect()
@@ -582,7 +585,7 @@ export async function createImgtalkRecord(userId: string) {
   const res = await mongo.db(DB).collection('imgtalk_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: getBeijingTime()
+    createAt: new Date(getBeijingTime())
   });
   return res.insertedId.toString()
 }
@@ -594,9 +597,10 @@ export async function updateScenarioRecord(chatId: string, report: any) {
   const lesson = mongo.db(DB).collection('scenario_records')
     .updateOne({ _id: new ObjectId(chatId as string) }, {
       $set: {
-        ...report,
+        score: report.score,
+        report: report,
         isFinished: true,
-        finishAt: getBeijingTime()
+        finishAt: new Date(getBeijingTime())
       }
     })
   return lesson
@@ -610,7 +614,7 @@ export async function createScenarioRecord(userId: string) {
   const res = await mongo.db(DB).collection('scenario_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: date.toLocaleString()
+    createAt: new Date(getBeijingTime())
   });
   return res.insertedId.toString()
 }
@@ -674,10 +678,10 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
       threadId: writeId,
       userId: userId,
       content: content,
-      score: feedback.score,
+      score: +feedback.score,
       feedback: feedback,
       isFinished: true,
-      finishAt: getBeijingTime()
+      finishAt: new Date(getBeijingTime())
     })
 
   return JSON.parse(JSON.stringify(res))
@@ -721,11 +725,11 @@ export async function saveRepeatRecord(userId: string, threadId: string, score: 
     .insertOne({
       userId: userId,
       threadId: threadId,
-      score: score.toFixed(0),
+      score: +score.toFixed(0),
       report: report,
       record: record,
       isFinished: true,
-      finishAt: now,
+      finishAt: new Date(getBeijingTime()),
     })
   return res.insertedId.toString()
 }
@@ -749,7 +753,7 @@ export async function getTextbookData(id: string) {
         lesson.data = lessonData;
       } catch (error) {
         logger.info(`Get lesson data error,${lesson.type}:${lesson.id}`)
-        throw(error)
+        throw (error)
       }
     }
   }
@@ -798,7 +802,7 @@ export async function updateAssignment(assignment: Assignment) {
           ...assignment
         }
       })
-  logger.info('Assignment Changed:', assignment.threadId,assignment.orgId)
+  logger.info('Assignment Changed:', assignment.threadId, assignment.orgId)
   return res
 }
 
@@ -847,27 +851,27 @@ export async function getMyAssignments(orgId: string, userId: string) {
     })
     .toArray()
 
-    const assignmentsWithDetails = await Promise.all(
-      allAssignments.map(async (assignment) => {
-        const collectionName = Type2Collection(assignment.type)
-        const lesson_promise = mongo.db(DB).collection(collectionName).findOne({ _id: new ObjectId(assignment.threadId as string) })
-        const record_promise = mongo.db(DB).collection(assignment.type + '_records').findOne(
-          {
-            threadId: assignment.threadId,
-            userId: userId,
-            finishAt: { $gte: assignment.startAt, $lte: assignment.endAt }
-          },
-          {
-            sort: { score: -1 },
-          }
-        );
-        const [lesson, record] = await Promise.all([lesson_promise, record_promise])
-        assignment.info = lesson
-        assignment.record = record
-        return assignment;
-      })
-    )
-    return assignmentsWithDetails
+  const assignmentsWithDetails = await Promise.all(
+    allAssignments.map(async (assignment) => {
+      const collectionName = Type2Collection(assignment.type)
+      const lesson_promise = mongo.db(DB).collection(collectionName).findOne({ _id: new ObjectId(assignment.threadId as string) })
+      const record_promise = mongo.db(DB).collection(assignment.type + '_records').findOne(
+        {
+          threadId: assignment.threadId,
+          userId: userId,
+          finishAt: { $gte: assignment.startAt, $lte: assignment.endAt }
+        },
+        {
+          sort: { score: -1 },
+        }
+      );
+      const [lesson, record] = await Promise.all([lesson_promise, record_promise])
+      assignment.info = lesson
+      assignment.record = record
+      return assignment;
+    })
+  )
+  return assignmentsWithDetails
 }
 
 export async function getOrgAssignments(orgId: string) {
@@ -882,7 +886,7 @@ export async function getOrgAssignments(orgId: string) {
 }
 
 
-export async function getRecordsForAssignment(threadId: string, orgId: string,studentIds:string[]) {
+export async function getRecordsForAssignment(threadId: string, orgId: string, studentIds: string[]) {
   const mongo = await connect()
   const userIds = studentIds
   const [assignment] = await Promise.all([getAssignmentById(threadId, orgId)])
@@ -934,11 +938,58 @@ export async function getBriefForAssignment(threadId: string, orgId: string) {
 
 
 export async function getOrgStudents(organizationId: string) {
-    const res = await clerkClient().organizations.getOrganizationMembershipList({ organizationId, limit: 100 });
-    const newUserIds = res.data
-      .filter(orgMem => orgMem.role === 'org:member' && orgMem.publicUserData?.userId)
-      .map(orgMem => orgMem.publicUserData!.userId);
-    return newUserIds
+  const res = await clerkClient().organizations.getOrganizationMembershipList({ organizationId, limit: 100 });
+  const newUserIds = res.data
+    .filter(orgMem => orgMem.role === 'org:member' && orgMem.publicUserData?.userId)
+    .map(orgMem => orgMem.publicUserData!.userId);
+  return newUserIds
+}
+
+
+
+export async function getAnyRecord(userId: string, threadId: string, type: string) {
+  noStore()
+  console.log(userId)
+  const collectionName = Type2Collection(type)
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection(collectionName)
+    .find({ userId: userId, threadId: threadId })
+    .sort({ score: -1 }) // 按 createAt 字段降序排序
+    .limit(1) // 只获取一条记录
+    .toArray();
+  console.log('Find result:')
+  console.log(res[0])
+  if (res[0]) {
+    return JSON.parse(JSON.stringify(res[0]))
+  } else {
+    return null
+  }
+}
+
+export async function getAnyLesson(threadId: string, type: string) {
+  const collectionName = Type2Collection(type)
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection(collectionName)
+    .findOne({ _id: new ObjectId(threadId) })
+  if (res) {
+    return JSON.parse(JSON.stringify({ type: type, ...res }))
+  } else {
+    return null
+  }
+}
+
+export async function getAllLessonsByLessonId(lessonId: string) {
+  const mongo = await connect()
+  const lessonList = await mongo.db(DB).collection('lessons').findOne({ _id: new ObjectId(lessonId as string) })
+  if (!lessonList) {
+    return null
+  }
+  //@ts-ignore
+  const promises = lessonList.chapters.map(items => getAnyLesson(items.id, items.type));
+  const results = await Promise.all(promises);
+  return JSON.parse(JSON.stringify(results));
 }
 
 
