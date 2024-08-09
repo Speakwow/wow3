@@ -1,9 +1,6 @@
 'use client'
-import OpenAI from "openai";
 import { useEffect, useState } from "react";
 import { Card } from "./ui/card";
-import { dalleGen } from "@/lib/action/ai";
-import Replicate from "replicate";
 import { SDlighting } from "@/lib/action/ai";
 
 export function ShowImage({ description }: { description: string }) {

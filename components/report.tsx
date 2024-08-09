@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { useRouter } from "next/navigation";
-import { Score2Grade, adjustScore } from "@/lib/utils";
+import { Score2Grade, adjustScore } from "@/lib/tools";
 
 
 export function RepeatReport({ score, length, duration }: { score: number, length: number, duration: number }) {

@@ -1,20 +1,19 @@
 
 'use client';
 
-import { Message, useChat } from 'ai/react';
+import { useChat } from 'ai/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
 import React, { useState, useEffect, useRef } from 'react';
 import { Keyboard, Mic, PlayIcon, SendIcon } from 'lucide-react';
 import { Avatar, AvatarImage, } from "@/components/ui/avatar"
-import { synthesizeSpeech, synthesizeSpeechWithVoice } from '@/lib/speech/tts';
+import { synthesizeSpeechWithVoice } from '@/lib/speech/tts';
 import { sttFromMic } from '@/lib/speech/asr';
 import { Howl } from 'howler';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { webm2Wav } from '@/lib/speech/wav';
-import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
-import Link from 'next/link';
+import { evalSpeechFromFile } from '@/lib/speech/eval';
 import { updateScenarioRecord } from '@/lib/action/mongoIO-client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';

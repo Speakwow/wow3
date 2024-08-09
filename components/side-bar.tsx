@@ -1,17 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { auth } from "@clerk/nextjs/server";
 
-import { Badge } from "@/components/ui/badge";
-import { PlusIcon } from "@radix-ui/react-icons";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 
 export default async function SideBar() {
