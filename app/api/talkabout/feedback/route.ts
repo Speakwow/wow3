@@ -9,7 +9,7 @@ import { talkaboutReportSchema } from "@/lib/schema/talkabout";
 import {connect} from "@/lib/mongo"
 import { DB } from "@/lib/constant";
 import { ObjectId } from "mongodb";
-import { calculateTalkaboutSpeedScore, countWords } from "@/lib/utils";
+import { calculateTalkaboutSpeedScore, countWords } from "@/lib/tools";
 
 
 const template = `
