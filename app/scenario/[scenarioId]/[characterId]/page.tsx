@@ -11,7 +11,11 @@ import Chat from "@/components/chat"
 import { auth } from "@clerk/nextjs/server"
 
 export default async function ChatPage({ params }: { params: { scenarioId: string ,characterId:string} }) {
-  const { userId, orgId } = auth();
+  const { userId, orgId,redirectToSignIn } = auth();
+  if(!userId){
+    redirectToSignIn()
+    return null
+  }
   const scenarioDoc = await getScenarioById(params.scenarioId) as any
   const characterDoc = await getCharacterById(scenarioDoc) as any
 
@@ -27,7 +31,7 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
       // backgroundSize: 'cover'
     }
 
-  const chatid = await createScenarioRecord(userId as string)
+  const chatid = await createScenarioRecord(userId,params.scenarioId)
 
   return (
     <div style={bgImage} className="h-screen bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%" >

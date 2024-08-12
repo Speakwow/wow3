@@ -598,30 +598,35 @@ export async function updateScenarioRecord(chatId: string, report: any) {
 }
 
 
-export async function createScenarioRecord(userId: string) {
+export async function createScenarioRecord(userId: string,threadId:string) {
   const mongo = await connect()
   const now = Date.now(); // 获取当前时间的时间戳
   const date = new Date(now); // 将时间戳转换为 Date 对象
   const res = await mongo.db(DB).collection('scenario_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: getBeijingTime()
+    createAt: getBeijingTime(),
+    threadId:threadId
   });
   return res.insertedId.toString()
 }
 
 
-export async function getScenarioRecordByUserId(userId: string) {
+export async function getScenarioRecordByUserId(userId: string, threadId: string) {
   noStore()
+  console.log(userId)
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('scenario_records')
-    .find({ userId: userId })
+    .find({ userId: userId, threadId: threadId })
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
-  return res[0]
+  console.log('Find result:')
+  console.log(res[0])
+  return JSON.parse(JSON.stringify(res[0]))
 }
+
 
 
 export async function createWrite(userId: string, values: any) {

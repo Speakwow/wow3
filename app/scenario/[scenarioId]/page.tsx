@@ -12,7 +12,11 @@ import { auth } from "@clerk/nextjs/server"
 import { Card } from "@/components/ui/card"
 
 export default async function ChatPage({ params }: { params: { scenarioId: string } }) {
-  const { userId, orgId } = auth();
+  const { userId, orgId,redirectToSignIn } = auth();
+  if(!userId){
+    redirectToSignIn()
+    return null
+  }
   const scenarioDoc = await getScenarioById(params.scenarioId) as any
   let characterId = "6650346b4b838ac30d19694c"
   if (scenarioDoc.character) {
@@ -34,7 +38,7 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
 
 
 
-  const chatid = await createScenarioRecord(userId as string)
+  const chatid = await createScenarioRecord(userId,params.scenarioId)
 
   return (
     <div className="h-screen bg-muted p-4">
