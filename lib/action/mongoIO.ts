@@ -598,7 +598,7 @@ export async function updateScenarioRecord(chatId: string, report: any) {
 }
 
 
-export async function createScenarioRecord(userId: string,threadId:string) {
+export async function createScenarioRecord(userId: string, threadId: string) {
   const mongo = await connect()
   const now = Date.now(); // 获取当前时间的时间戳
   const date = new Date(now); // 将时间戳转换为 Date 对象
@@ -606,7 +606,7 @@ export async function createScenarioRecord(userId: string,threadId:string) {
     userId: userId,
     isFinished: false,
     createAt: getBeijingTime(),
-    threadId:threadId
+    threadId: threadId
   });
   return res.insertedId.toString()
 }
@@ -795,18 +795,13 @@ export async function updateAssignment(assignment: Assignment) {
   const mongo = await connect()
   const res = await mongo.db(DB)
     .collection('assignments')
-    .updateOne({ threadId: assignment.threadId,orgId:assignment.orgId },
+    .updateOne({ threadId: assignment.threadId, orgId: assignment.orgId },
       {
         $set: {
           ...assignment,
-          updateAt:getBeijingTime()
-        },
-        $sort:{
-          createAt:-1
+          updateAt: getBeijingTime()
         }
       })
-      console.log(res)
-    
   return res.acknowledged
 }
 
@@ -819,7 +814,7 @@ async function getAssignmentById(threadId: string, orgId: string) {
       orgId: orgId
     },
       {
-        sort: {createAt: -1 },
+        sort: { createAt: -1 },
       })
   return res
 }

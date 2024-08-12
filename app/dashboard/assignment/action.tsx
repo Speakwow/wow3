@@ -280,9 +280,11 @@ export function ReviewAssignmentButton(
       if (item) window.location.reload(); else setSaveState('failed')
     })
   }
+
   const averageScore = calculateAverageScore(records);
   const lowestScoreDoc = findLowestScoreDoc(records);
   const highestScoreDoc = findHighestScoreDoc(records);
+
   let hoursleft = hoursUntil(assignment.endAt)
   if (hoursleft < 0) {
     hoursleft = 0
@@ -422,6 +424,9 @@ export function ReviewAssignmentButton(
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
+              <Button variant="destructive" type="submit" disabled={saveState == 'saving'} className={!canModify ||saveState=='saving'?'sr-only':''}>
+                提交
+              </Button>
 
 
               {canModify ?
@@ -437,10 +442,7 @@ export function ReviewAssignmentButton(
                       </Button>
                     </DialogClose>
                     :
-
-                    <Button variant="destructive" type="submit" disabled={saveState == 'saving'}>
-                      提交
-                    </Button>
+                    null
                 :
                 <Button variant="outline" type="button" disabled={saveState == 'saving'} onClick={() => setCanModify(true)}>
                   修改
