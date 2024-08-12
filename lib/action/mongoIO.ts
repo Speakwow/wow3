@@ -795,6 +795,9 @@ export async function updateAssignment(assignment: Assignment) {
         $set: {
           ...assignment,
           updateAt:getBeijingTime()
+        },
+        $sort:{
+          createAt:-1
         }
       })
       console.log(res)
@@ -811,7 +814,7 @@ async function getAssignmentById(threadId: string, orgId: string) {
       orgId: orgId
     },
       {
-        sort: { createAt: -1 },
+        sort: {createAt: -1 },
       })
   return res
 }
