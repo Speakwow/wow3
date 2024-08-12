@@ -274,9 +274,10 @@ export function ReviewAssignmentButton(
       startAt: new Date(from.setHours(0, 0, 0, 0)),
       endAt: new Date(to.setHours(23, 59, 59, 999))
     }
+    console.log('submitting')
     setSaveState('saving')
     updateAssignment(assignmentData).then(item => {
-      if(item)  window.location.reload(); else setSaveState('failed')
+      if (item) window.location.reload(); else setSaveState('failed')
     })
   }
   const averageScore = calculateAverageScore(records);
@@ -293,7 +294,7 @@ export function ReviewAssignmentButton(
   useEffect(() => {
     console.log(saveState)
     if (saveState == 'saved') {
-     ;
+      ;
     } else if (saveState == 'failed') {
 
     }
@@ -409,7 +410,7 @@ export function ReviewAssignmentButton(
                             mode="range"
                             defaultMonth={field.value?.from}
                             selected={field.value}
-                        
+
                             onSelect={field.onChange}
                             numberOfMonths={2}
                           />
@@ -422,25 +423,24 @@ export function ReviewAssignmentButton(
             </DialogHeader>
             <DialogFooter>
 
+
               {canModify ?
-                saveState == 'saving' ?
+                saveState === 'saving' ?
                   <Button variant="destructive" type="button" disabled={saveState == 'saving'}>
-                    <LoaderIcon className="animate-spin"/>
+                    <LoaderIcon className="animate-spin" />
                   </Button>
                   :
-                  saveState == 'saved'?
-                  <DialogClose asChild>
-                  <Button variant="default" type="button">
-                  完成
-                </Button>
-                </DialogClose>
-                :
+                  saveState === 'saved' ?
+                    <DialogClose asChild>
+                      <Button variant="default" type="button">
+                        完成
+                      </Button>
+                    </DialogClose>
+                    :
 
-                  <Button variant="destructive" type="submit" disabled={saveState == 'saving'}>
-                    提交
-                  </Button>
-
-
+                    <Button variant="destructive" type="submit" disabled={saveState == 'saving'}>
+                      提交
+                    </Button>
                 :
                 <Button variant="outline" type="button" disabled={saveState == 'saving'} onClick={() => setCanModify(true)}>
                   修改
