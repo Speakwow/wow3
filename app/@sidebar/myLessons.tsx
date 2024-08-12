@@ -14,7 +14,6 @@ import { useState } from "react";
 
 export function MyLessons({ lessonList, userId }: { lessonList: any[], userId: string }) {
     const [listData, setListData] = useState(lessonList)
-    console.log(listData)
 
     function deleteLessonFromList(userId: string, lessonId: string) {
         delFromUserLessonList(userId, lessonId)

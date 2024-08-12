@@ -967,7 +967,6 @@ export async function getOrgStudents(organizationId: string) {
 
 export async function getAnyRecord(userId: string, threadId: string, type: string) {
   noStore()
-  console.log(userId)
   const collectionName = Type2Collection(type)
   const mongo = await connect()
   const res = await mongo.db(DB)
@@ -976,8 +975,6 @@ export async function getAnyRecord(userId: string, threadId: string, type: strin
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
     .toArray();
-  console.log('Find result:')
-  console.log(res[0])
   if (res[0]) {
     return JSON.parse(JSON.stringify(res[0]))
   } else {

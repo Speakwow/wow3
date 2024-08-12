@@ -64,7 +64,6 @@ export function LessonCard({ userId, userData, name, type, id, intro, cover, tag
         coverImg = cover
     }
     const inFavourite = (lessonId: string, userData: any): boolean => {
-        console.log(userData)
         return userData.favourite.some((lesson: any) => lesson.id === lessonId);
     }
 
