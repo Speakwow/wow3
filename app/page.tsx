@@ -11,11 +11,14 @@ import { isAfter, isBefore, isWithinInterval } from "date-fns";
 
 
 export default async function Home() {
-    const { userId, orgId } = auth();
-
+    const { userId, orgId,redirectToSignIn } = auth();
+    if(!userId){
+        redirectToSignIn()
+        return null
+    }
 
     if (orgId) {
-        const [myAssignments, userData] = await Promise.all([getMyAssignments(orgId, userId), getUserData(userId as string)])
+        const [myAssignments, userData] = await Promise.all([getMyAssignments(orgId, userId), getUserData(userId)])
         // 获取当前时间
         const today = getBeijingTime()
         const notStarted: any[] = [];

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser,auth } from "@clerk/nextjs/server";
 
 import { getFavouriteLessons, getLessonsByCreator, getUserData } from "@/lib/action/mongoIO";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 export default async function UserCenter() {
+    const { userId } = auth();
     const user = await currentUser();
 
     // const publicLessonList = await getAllLessonsByLessonId(publicLessonListId)

@@ -21,7 +21,7 @@ export function MyLessons({ lessonList, userId }: { lessonList: any[], userId: s
     }
 
     return (
-        <div>
+        <div className="max-h-48 overflow-y-auto">
             <div className="text-muted-foreground text-xs font-medium py-2 px-2">
                 最近使用
             </div>
