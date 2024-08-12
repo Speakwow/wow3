@@ -244,13 +244,14 @@ export function ReviewAssignmentButton(
       }),
     })
   })
-  const today = getBeijingDate()
+  const originStartAt = assignment.startAt
+  const originEndAt = assignment.endAt
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       range: {
-        from: assignment.startAt,
-        to: assignment.endAt,
+        from: new Date(originStartAt),
+        to: new Date(originEndAt),
       },
     },
   })
@@ -268,7 +269,7 @@ export function ReviewAssignmentButton(
       textbookId: assignment.textbookId,
       orgId: assignment.orgId,
       creatorId: assignment.creatorId,
-      createAt: assignment.createAt as Date,
+      createAt: new Date(assignment.createAt),
       updateAt: getBeijingTime(),
       startAt: new Date(from.setHours(0, 0, 0, 0)),
       endAt: new Date(to.setHours(23, 59, 59, 999))
@@ -408,6 +409,7 @@ export function ReviewAssignmentButton(
                             mode="range"
                             defaultMonth={field.value?.from}
                             selected={field.value}
+                        
                             onSelect={field.onChange}
                             numberOfMonths={2}
                           />
