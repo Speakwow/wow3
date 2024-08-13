@@ -18,36 +18,36 @@ export default async function Talkabout({ params }: { params: { id: string } }) 
     //     redirect(`/talkabout/${params.threadId}/${recordId}`)
     // }
     // const recordId = '1'
-    console.log(data.topic)
     return (
-        <div className="relative w-full h-screen bg-muted">
-            <ScrollArea className="h-full overflow-hidden">
-                <div className="absolute top-2 left-2">
-                    <Link href={"/"} className="z-10">
-                        <Button size="icon" variant="outline">
-                            <ArrowLeftIcon />
-                        </Button>
-                    </Link>
-                </div>
-                <div className="py-2 px-16 flex flex-col gap-4">
-                    <Card className="p-6 h-fit relative">
-                        <CardHeader className="text-2xl text-primary">
-                            <CardTitle className=''>
-                                写作练习
-                            </CardTitle>
-                            <CardDescription className=''>
-                                <div>单词数：<div className='inline'>{data.word_count}</div> 词</div>
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className='flex flex-col gap-2'>
-                        <CardDescription>
-                                题目
-                            </CardDescription>
-                            <div className='text-pretty whitespace-pre-line'>
-                                {data.topic}
-                            </div>
-                        </CardContent>
-                        {/* <div className='flex flex-col gap-2 text-left px-6'>
+        <div className="relative w-full h-screen bg-muted p-2">
+            <ScrollArea className="h-full overflow-hidden w-full">
+                <div className='flex flex-col md:flex-row gap-2 w-full'>
+                    <div className=" ">
+                        <Link href={"/"} className="z-10">
+                            <Button size="icon" variant="outline">
+                                <ArrowLeftIcon />
+                            </Button>
+                        </Link>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Card className=" h-fit relative">
+                            <CardHeader className="text-2xl text-primary">
+                                <CardTitle className=''>
+                                    写作练习
+                                </CardTitle>
+                                <CardDescription className=''>
+                                    <div>单词数：<div className='inline'>{data.word_count}</div> 词</div>
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className='flex flex-col gap-2'>
+                                <CardDescription>
+                                    题目
+                                </CardDescription>
+                                <div className='text-pretty whitespace-pre-line text-sm'>
+                                    {data.topic}
+                                </div>
+                            </CardContent>
+                            {/* <div className='flex flex-col gap-2 text-left px-6'>
                             <CardDescription>
                                 注意事项
                             </CardDescription>
@@ -55,10 +55,11 @@ export default async function Talkabout({ params }: { params: { id: string } }) 
                                 {data.rule}
                             </div>
                         </div> */}
-                    </Card>
-                    <Card className="p-6 h-fit relative">
-                        <WriteForm userId={userId as string} write={data} />
-                    </Card>
+                        </Card>
+                        <Card className="p-6 h-fit relative">
+                            <WriteForm userId={userId as string} write={data} />
+                        </Card>
+                    </div>
                 </div>
             </ScrollArea>
         </div>
