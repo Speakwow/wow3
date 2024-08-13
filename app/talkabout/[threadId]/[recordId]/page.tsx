@@ -42,7 +42,7 @@ export default async function Page({ params }: { params: { threadId: string,reco
     const data = await getTalkaboutById(params.threadId) as any
 
     return (
-        <div className='relative flex w-full h-screen justify-center relative gap-6 bg-muted'>
+        <div className='relative flex w-full h-full justify-center relative gap-6 bg-muted'>
             <div className="absolute top-2 left-2">
                 <Button asChild size="icon" variant="outline">
                     <Link href="/">
@@ -50,7 +50,7 @@ export default async function Page({ params }: { params: { threadId: string,reco
                     </Link>
                 </Button>
             </div>
-            <ScrollArea className='h-full w-full p-6'>
+            <ScrollArea className='h-full w-full p-2'>
             <Talkabout threadId={params.threadId} examplar={data.examplar} image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} instruction={data.instruction} topic={data.topic}/>
             </ScrollArea>
         </div>

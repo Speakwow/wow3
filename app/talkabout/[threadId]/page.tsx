@@ -27,7 +27,7 @@ export default async function Talkabout({ params }: { params: { threadId: string
     // }
     // const recordId = '1'
     return (
-        <div className='relative h-screen flex items-center justify-center p-10 bg-muted'>
+        <div className='relative h-full flex items-center justify-center p-4 bg-muted'>
             <div className="absolute top-2 left-2">
                 <Button asChild size="icon" variant="outline">
                     <Link href="/">
@@ -35,19 +35,19 @@ export default async function Talkabout({ params }: { params: { threadId: string
                     </Link>
                 </Button>
             </div>
-            <Card className='md:w-1/2 xs:w-full p-4'>
+            <Card className='w-fit  p-2'>
                 <CardHeader>
                     <CardTitle className='text-center text-2xl p-2 font-bold text-[#42C83C]'>
                         看图说话
                     </CardTitle>
-                    <CardDescription className='text-center  flex flex-row justify-center gap-8'>
+                    <CardDescription className='text-center  flex flex-col md:flex-row justify-center gap-2 md:gap-8'>
                         <div>准备时间：<span className='text-[#42C83C] text-2xl'>{data?.prepare_time}</span> 秒</div>   <div>练习时间：<span className='text-[#42C83C] text-2xl'>{data?.answer_time}</span> 秒</div>
                     </CardDescription>
                 </CardHeader>
                 <CardContent className=''>
                     {data?.rule}
                 </CardContent>
-                <CardFooter className='p-6 flex justify-center'>
+                <CardFooter className='p-4 flex justify-center'>
                     <Link href={`/talkabout/${params.threadId}/${recordId}`}>
                         <Button size="lg" className='px-12 py-6 rounded-full text-xl bg-[#42C83C]'>
                             开始练习
