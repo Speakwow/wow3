@@ -44,7 +44,7 @@ export default function RootLayout({
           </header>
           <main>
             <ResizablePanelGroup direction="horizontal" className="" >
-              <ResizablePanel defaultSize={20} className="border-r min-w-[150px] max-lg:hidden" collapsible={true}>
+              <ResizablePanel defaultSize={20} className="border-r h-screen min-w-[150px] max-lg:hidden" collapsible={true}>
                 {sidebar}
               </ResizablePanel>
               <ResizableHandle withHandle  className="max-lg:hidden"/>
