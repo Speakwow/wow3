@@ -53,7 +53,7 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
           </div>
           <div className="absolute items-center justify-center w-full flex p-4 ">
             <code className="relative rounded bg-muted px-[0.3rem] py-[0.10rem] font-mono text-sm font-semibold">
-              📚上课中：{scenario.name}
+              {scenario.name}
               </code>
           </div>
           {scenario.welcomeMessage ?
