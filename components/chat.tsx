@@ -300,9 +300,9 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
     <div className='relative h-full bg-transparent rounded-10 min-w-full'>
 
-      <CardHeader className='h-screen w-full relative'>
+      <div className='h-full w-full relative'>
         <div className='flex justify-center'>
-          <div>
+          <div className='mt-20 p-2'>
             <div className='relative md:top-4 top-2 flex justify-center'>
               <div className='h-fit cursor-default rounded-full bg-[#42C83C] text-white  px-8 w-fit font-bold text-xl border-4 border-white'>
                 {params.character.name}
@@ -331,12 +331,12 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           </div>
 
         </div>
-        <div className='relative flex justify-center mb-10  p-4'>
+        <div className='relative flex justify-center mb-2  p-4'>
           <Avatar className={`w-[200px] h-[200px] ${isPlaying == true ? 'animate-custom-bounce' : ''}`}>
             <AvatarImage src={params.character.avatar} alt={params.character.name} />
           </Avatar>
         </div>
-        <div className='absolute inset-x-0 py-12 w-full flex flex-col gap-4 items-center bottom-16 landscape:bottom-16 z-10'>
+        <div className='absolute inset-x-0  w-full flex flex-col gap-4 items-center bottom-4 landscape:bottom-4 z-10'>
           {isVoiceInput ?
             <form onSubmit={handleSubmit}>
               <div className='w-full flex flex-col-reverse gap-4'>
@@ -408,7 +408,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
             </form>
           }
         </div>
-      </CardHeader>
+      </div>
       <AlertDialog>
         <AlertDialogTrigger ref={reportTriggerRef} className='sr-only'>.</AlertDialogTrigger>
         <AlertDialogContent>
@@ -479,7 +479,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className='fixed right-6 top-6'>
+      <div className='absolute right-2 top-2'>
         <AlertDialog>
           <AlertDialogTrigger >
             <Button size="icon" variant="destructive">

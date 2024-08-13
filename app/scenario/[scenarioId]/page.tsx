@@ -12,8 +12,8 @@ import { auth } from "@clerk/nextjs/server"
 import { Card } from "@/components/ui/card"
 
 export default async function ChatPage({ params }: { params: { scenarioId: string } }) {
-  const { userId, orgId,redirectToSignIn } = auth();
-  if(!userId){
+  const { userId, orgId, redirectToSignIn } = auth();
+  if (!userId) {
     redirectToSignIn()
     return null
   }
@@ -21,7 +21,7 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
   let characterId = "6650346b4b838ac30d19694c"
   if (scenarioDoc.character) {
     characterId = scenarioDoc.character
-  } 
+  }
 
   const characterDoc = await getCharacterById(characterId)
   const scenario = JSON.parse(JSON.stringify(scenarioDoc));
@@ -38,37 +38,33 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
 
 
 
-  const chatid = await createScenarioRecord(userId,params.scenarioId)
+  const chatid = await createScenarioRecord(userId, params.scenarioId)
 
   return (
-    <div className="h-screen bg-muted p-4">
-    <Card style={bgImage} className="relative w-full h-full rounded-[20px]" >
-      <div className="mx-auto h-full w-full m p-8 flex flex-col items-center justify-center">
-        <div className="absolute top-2 left-2">
-          <Button asChild size="icon" variant="outline">
-            <Link href="/">
-              <ChevronLeft />
-            </Link>
-          </Button>
-        </div>
-        {/* <div className="absolute top-2 right-2">
-          <Button size="icon" variant="secondary">
-            
-              <MoreVerticalIcon />
-          </Button>
-        </div> */}
-        <div className="items-center justify-center p-2">
-          <code className="relative rounded bg-muted px-[0.3rem] py-[0.10rem] font-mono text-sm font-semibold">📚上课中：{scenario.name}</code>
-        </div>
-        {scenario.welcomeMessage ?
-          <Initial chatid={chatid} scenarioId={params.scenarioId} characterId={characterId} scenario={scenario} character={character} />
-          :
-          <div>
-            No Scenario
+    <div className="h-full bg-muted p-2">
+      <Card style={bgImage} className="relative w-full h-full rounded-[20px]" >
+        <div className="mx-auto h-full w-full   items-center justify-center">
+          <div className="absolute top-2 left-2">
+            <Button asChild size="icon" variant="outline">
+              <Link href="/">
+                <ChevronLeft />
+              </Link>
+            </Button>
           </div>
-        }
-      </div>
-    </Card>
+          <div className="absolute items-center justify-center w-full flex p-4 ">
+            <code className="relative rounded bg-muted px-[0.3rem] py-[0.10rem] font-mono text-sm font-semibold">
+              📚上课中：{scenario.name}
+              </code>
+          </div>
+          {scenario.welcomeMessage ?
+            <Initial chatid={chatid} scenarioId={params.scenarioId} characterId={characterId} scenario={scenario} character={character} />
+            :
+            <div>
+              No Scenario
+            </div>
+          }
+        </div>
+      </Card>
     </div>
   )
 }
