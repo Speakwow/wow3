@@ -24,7 +24,7 @@ export default async function SideBar() {
     //@ts-ignore
     const lessonList = data.lessonList.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
     return (
-        <div className="h-screen p-4 flex flex-col justify-between">
+        <div className="h-full p-4 flex flex-col justify-between">
             <div className="flex flex-col gap-6 ">
                 <div className="w-full text-xl font-semibold" >
                     <Link href="/">
@@ -36,7 +36,7 @@ export default async function SideBar() {
                                 />
                                 <AvatarFallback>🐸</AvatarFallback>
                             </Avatar>
-                            <span className="inline text-xl">Speakwow.ai</span>
+                            <span className="inline text-xl">开口蛙</span>
                         </div>
                     </Link>
                 </div>

@@ -9,6 +9,11 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { AI } from '@/lib/action/ai';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const inter = Inter({ subsets: ["latin"] });
 const baloo2 = Baloo_2({ subsets: ["latin"] })
@@ -23,7 +28,7 @@ export default function RootLayout({
   sidebar
 }: Readonly<{
   children: React.ReactNode;
-  sidebar:React.ReactNode
+  sidebar: React.ReactNode
 }>) {
   return (
     <ClerkProvider localization={zhCN}>
@@ -34,17 +39,54 @@ export default function RootLayout({
               <SignInButton />
             </SignedOut>
             <SignedIn>
-              <UserButton/>
+              <UserButton />
             </SignedIn>
           </header>
           <main>
-          <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel defaultSize={20} className="border-r min-w-[150px]" collapsible={true}>
+            <ResizablePanelGroup direction="horizontal" className="" >
+              <ResizablePanel defaultSize={20} className="border-r min-w-[150px] max-lg:hidden" collapsible={true}>
                 {sidebar}
               </ResizablePanel>
-              <ResizableHandle withHandle />
+              <ResizableHandle withHandle  className="max-lg:hidden"/>
               <ResizablePanel defaultSize={80}  >
-              <AI>{children}</AI>
+                <div className="bg-muted-background p-2 flex sticky flex-row justify-between  lg:hidden items-center border-b">
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0 "
+                      >
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle navigation menu</span>
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left">
+                      {sidebar}
+                    </SheetContent>
+                  </Sheet>
+                  <Link href="/">
+                        <div className="flex flex-row items-center gap-2">
+                            <Avatar className="h-9 p-0.5">
+                                <AvatarImage
+                                    src={`/logo.png`}
+                                    alt={'speakwow'}
+                                />
+                                <AvatarFallback>🐸</AvatarFallback>
+                            </Avatar>
+                            <span className="inline text-xl font-semibold">开口蛙</span>
+                        </div>
+                    </Link>
+                  <div className="mt-1 px-1">
+                    <SignedOut>
+                      <SignInButton />
+                    </SignedOut>
+                    <SignedIn>
+                      <UserButton />
+                    </SignedIn>
+                  </div>
+                </div>
+                <AI>{children}</AI>
               </ResizablePanel>
             </ResizablePanelGroup>
           </main>
