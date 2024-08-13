@@ -27,7 +27,7 @@ export default async function WordRepeat({ params }: { params: { threadId: strin
 
     if (!thread || !thread.content) {
         return (
-            <div className='flex w-full h-screen relative p-4 gap-12 bg-muted'>
+            <div className='flex w-full h-full relative p-4 gap-12 bg-muted'>
                 <div className="absolute top-2 left-2">
                     <Button asChild size="icon" variant="outline">
                         <Link href="/">
@@ -52,8 +52,8 @@ export default async function WordRepeat({ params }: { params: { threadId: strin
         )
     }
     return (
-        <div className='flex w-full h-screen relative p-4 gap-12 bg-muted'>
-            <Card style={bgImage} className="relative w-full flex w-full h-full rounded-[20px]" >
+        <div className='flex w-full h-full relative p-4 gap-12 bg-muted'>
+            <Card style={bgImage} className="relative w-full flex  h-full rounded-[20px]" >
                 <div className="absolute top-2 left-2">
                     <Button asChild size="icon" variant="outline">
                         <Link href="/">

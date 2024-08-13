@@ -47,8 +47,8 @@ export default function RootLayout({
               <ResizablePanel defaultSize={20} className="border-r h-screen min-w-[150px] max-lg:hidden" collapsible={true}>
                 {sidebar}
               </ResizablePanel>
-              <ResizableHandle withHandle  className="max-lg:hidden"/>
-              <ResizablePanel defaultSize={80}  >
+              <ResizableHandle withHandle className="max-lg:hidden" />
+              <ResizablePanel defaultSize={80} className="h-screen flex flex-col">
                 <div className="bg-muted-background p-2 flex sticky flex-row justify-between  lg:hidden items-center border-b">
                   <Sheet>
                     <SheetTrigger asChild>
@@ -66,17 +66,17 @@ export default function RootLayout({
                     </SheetContent>
                   </Sheet>
                   <Link href="/">
-                        <div className="flex flex-row items-center gap-2">
-                            <Avatar className="h-9 p-0.5">
-                                <AvatarImage
-                                    src={`/logo.png`}
-                                    alt={'speakwow'}
-                                />
-                                <AvatarFallback>🐸</AvatarFallback>
-                            </Avatar>
-                            <span className="inline text-xl font-semibold">开口蛙</span>
-                        </div>
-                    </Link>
+                    <div className="flex flex-row items-center gap-2">
+                      <Avatar className="h-9 p-0.5">
+                        <AvatarImage
+                          src={`/logo.png`}
+                          alt={'speakwow'}
+                        />
+                        <AvatarFallback>🐸</AvatarFallback>
+                      </Avatar>
+                      <span className="inline text-xl font-semibold">开口蛙</span>
+                    </div>
+                  </Link>
                   <div className="mt-1 px-1">
                     <SignedOut>
                       <SignInButton />
@@ -86,7 +86,9 @@ export default function RootLayout({
                     </SignedIn>
                   </div>
                 </div>
-                <AI>{children}</AI>
+                <div className="h-full">
+                  <AI>{children}</AI>
+                </div>
               </ResizablePanel>
             </ResizablePanelGroup>
           </main>
