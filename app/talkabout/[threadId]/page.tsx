@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { createTalkaboutRecord, getRepeatPageByIndex, getTalkaboutById } from '@/lib/action/mongoIO'
 import { auth } from '@clerk/nextjs/server'
+import { connect } from '@/lib/mongo'
+import { DB } from '@/lib/constant'
 
 // const data = {
 //     image_url:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/8947d447-2d0d-48c9-afa9-39b6c2884500/public",
@@ -17,6 +19,20 @@ import { auth } from '@clerk/nextjs/server'
 //     prepare_time:180000,
 //     answer_time:30000    
 // }
+// export async function generateStaticParams() {
+//     const mongo = await connect()
+//     const [datas, ] = await Promise.all([
+//       mongo.db(DB).collection('talkabouts').find().toArray(),
+  
+//     ])
+//     return datas.map((data) => (
+//         {
+//           threadId: data._id.toString(),
+//         }
+//       ))
+//   }
+  
+
 
 export default async function Talkabout({ params }: { params: { threadId: string } }) {
     const { userId, orgId } = auth();

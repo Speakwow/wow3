@@ -10,6 +10,23 @@ import { createScenarioRecord, getCharacterById, getScenarioById, getScenarioByN
 import Chat from "@/components/chat"
 import { auth } from "@clerk/nextjs/server"
 import { Card } from "@/components/ui/card"
+import { connect } from "@/lib/mongo"
+import { DB } from "@/lib/constant"
+
+
+// export async function generateStaticParams() {
+//   const mongo = await connect()
+//   const [sceanrios, ] = await Promise.all([
+//     mongo.db(DB).collection('scenarios').find().toArray(),
+
+//   ])
+//   return sceanrios.map((sceanrio) => (
+//       {
+//         scenarioId: sceanrio._id.toString(),
+//       }
+//     ))
+// }
+
 
 export default async function ChatPage({ params }: { params: { scenarioId: string } }) {
   const { userId, orgId, redirectToSignIn } = auth();
@@ -44,7 +61,7 @@ export default async function ChatPage({ params }: { params: { scenarioId: strin
     <div className="h-full bg-muted p-2">
       <Card style={bgImage} className="relative w-full h-full rounded-[20px]" >
         <div className="mx-auto h-full w-full   items-center justify-center">
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 left-2 z-20">
             <Button asChild size="icon" variant="outline">
               <Link href="/">
                 <ChevronLeft />

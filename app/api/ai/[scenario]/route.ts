@@ -2,6 +2,21 @@ import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { kv } from '@vercel/kv';
 import { NextRequest,NextResponse } from "next/server";
+import { connect } from "@/lib/mongo";
+import { DB } from "@/lib/constant";
+
+export async function generateStaticParams() {
+    const mongo = await connect()
+    const [sceanrios, ] = await Promise.all([
+      mongo.db(DB).collection('scenarios').find().toArray(),
+  
+    ])
+    return sceanrios.map((sceanrio) => (
+        {
+          scenario: sceanrio._id.toString(),
+        }
+      ))
+  }
 
 export async function POST(req: NextRequest,{ params }: { params: { scenario: string}}) {
     const data = await req.json()

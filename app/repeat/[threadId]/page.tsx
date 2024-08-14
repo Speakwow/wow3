@@ -7,7 +7,22 @@ import { getRepeatById } from '@/lib/action/mongoIO'
 import { auth } from '@clerk/nextjs/server'
 import RepeatText from './text'
 import { Badge } from '@/components/ui/badge'
+import { connect } from '@/lib/mongo'
+import { DB } from '@/lib/constant'
 
+
+export async function generateStaticParams() {
+    const mongo = await connect()
+    const [repeats, ] = await Promise.all([
+      mongo.db(DB).collection('repeats').find().toArray(),
+  
+    ])
+    return repeats.map((repeat) => (
+        {
+          threadId: repeat._id.toString(),
+        }
+      ))
+  }
 
 export default async function Repeat({ params }: { params: { threadId: string } }) {
     const { userId, orgId } = auth();

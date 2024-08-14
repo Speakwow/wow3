@@ -8,8 +8,26 @@ import { auth } from '@clerk/nextjs/server'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Textarea } from '@/components/ui/textarea';
 import { WriteForm } from './write';
+import { connect } from '@/lib/mongo';
+import { DB } from '@/lib/constant';
 
-export default async function Talkabout({ params }: { params: { id: string } }) {
+
+export async function generateStaticParams() {
+    const mongo = await connect()
+    const [writes, ] = await Promise.all([
+      mongo.db(DB).collection('writes').find().toArray(),
+  
+    ])
+    return writes.map((write) => (
+        {
+          id: write._id.toString(),
+        }
+      ))
+  }
+  
+
+
+export default async function Write({ params }: { params: { id: string } }) {
     const { userId, orgId } = auth();
 
     const data = await getWriteById(params.id) as any

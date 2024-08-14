@@ -6,8 +6,9 @@ import { StreamingTextResponse, streamText,tool } from 'ai'
 import { convertToCoreMessages } from 'ai';;
 import { z } from 'zod';
 import OpenAI from "openai";
+import { connect } from "@/lib/mongo";
+import { DB } from "@/lib/constant";
 
-export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const class_template = `
@@ -64,6 +65,21 @@ const profile = `
 - Level: CEFR A2, Can understand sentences and frequently used expressions related to areas of most immediate relevance (e.g. very basic personal and family information, shopping, local geography, employment). Can communicate in simple and routine tasks requiring a simple and direct exchange of information on familiar and routine matters.  Can describe in simple terms aspects of his/her background, immediate environment and matters in areas of immediate need.
 `
 
+export async function generateStaticParams() {
+  const mongo = await connect()
+  const [scenarios, characters] = await Promise.all([
+    mongo.db(DB).collection('scenarios').find().toArray(),
+    mongo.db(DB).collection('characters').find().toArray(),
+  ])
+  const params = scenarios.flatMap((scenario) => 
+    characters.map((character) => ({
+      scenarioId: scenario._id.toString(),
+      characterId: character._id.toString(),
+    }))
+  );
+
+  return params
+}
 
 export async function POST(req: NextRequest) {
   let { messages, scenario, character } = await req.json();

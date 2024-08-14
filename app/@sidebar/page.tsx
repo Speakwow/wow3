@@ -14,8 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { redirect } from "next/dist/server/api-utils";
 
 export default async function SideBar() {
-    const { userId, orgId, has,redirectToSignIn } = auth();
-    if(!userId){
+    const { userId, orgId, has, redirectToSignIn } = auth();
+    if (!userId) {
         redirectToSignIn()
         return null
     }
@@ -56,7 +56,14 @@ export default async function SideBar() {
                     <div className="flex flex-row gap-2 py-2 justify-between w-full">
                         <div className="flex flex-row gap-2 px-2">
                             <SignedIn>
-                                <UserButton />
+                                <UserButton appearance={{
+                                    elements: {
+                                        userButtonPopoverCard: {
+                                            pointerEvents: "all"
+                                        },
+                                        // add your other custom props
+                                    },
+                                }} />
                             </SignedIn>
                             <div className="text-lg text-muted-foreground font-medium">
                                 {user.username}
@@ -80,8 +87,15 @@ export default async function SideBar() {
 
 
                 <Card className="p-2 w-full flex flex-col gap-2 bg-muted">
-                    <div className="w-full flex flex-row justify-center">
-                        <OrganizationSwitcher />
+                    <div className="w-full flex flex-row justify-center z-10">
+                        <OrganizationSwitcher appearance={{
+                            elements: {
+                                organizationSwitcherPopoverCard: {
+                                    pointerEvents: 'initial',
+                                },
+                                // add your other custom props
+                            },
+                        }} />
                     </div>
                     {
                         orgId ?

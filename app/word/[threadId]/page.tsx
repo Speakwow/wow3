@@ -7,6 +7,23 @@ import {  getWordById } from '@/lib/action/mongoIO'
 import { auth } from '@clerk/nextjs/server'
 import RepeatText from './text'
 import { Badge } from '@/components/ui/badge'
+import { connect } from '@/lib/mongo'
+import { DB } from '@/lib/constant'
+
+
+export async function generateStaticParams() {
+    const mongo = await connect()
+    const [words, ] = await Promise.all([
+      mongo.db(DB).collection('word_threads').find().toArray(),
+  
+    ])
+    return words.map((write) => (
+        {
+          threadId: write._id.toString(),
+        }
+      ))
+  }
+  
 
 
 export default async function WordRepeat({ params }: { params: { threadId: string } }) {

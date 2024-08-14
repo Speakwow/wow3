@@ -22,7 +22,11 @@ interface RepeatPage {
     image_url: string,
 }
 
+// }
+// export async function generateStaticParams() {
 
+//     return [{threadId:'',recordId:""}]
+// }
 // const data = {
 //     image_url:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/45500db1-cda0-4933-f9c3-b339edab4a00/public",
 //     rule:"在接下来的环节中，你将看到一张图片，你需要使用连续不间断的英语描述图片中发生了什么，你可以描述图片中出现的人物、时间、地点、事件、物品。",
@@ -37,7 +41,7 @@ interface RepeatPage {
 // The next day, she went to an orphanage and distributed her old toys to the children there. It‘s kind/compassionate/caring of the girl to donate her old toys to the children in the orphanage. The toys also found a better home.`    
 // }
 
-export default async function Page({ params }: { params: { threadId: string,recordId:string} }) {
+export default async function Page({ params }: { params: { threadId: string, recordId: string } }) {
 
     const data = await getTalkaboutById(params.threadId) as any
 
@@ -51,7 +55,7 @@ export default async function Page({ params }: { params: { threadId: string,reco
                 </Button>
             </div>
             <ScrollArea className='h-full w-full p-2'>
-            <Talkabout threadId={params.threadId} examplar={data.examplar} image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} instruction={data.instruction} topic={data.topic}/>
+                <Talkabout threadId={params.threadId} examplar={data.examplar} image_url={data.image_url} recordId={params.recordId} prepare_time={data.prepare_time} answer_time={data.answer_time} instruction={data.instruction} topic={data.topic} />
             </ScrollArea>
         </div>
 

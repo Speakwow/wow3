@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { kv } from '@vercel/kv';
+import { connect } from '@/lib/mongo';
+import { DB } from '@/lib/constant';
 
 
 // Create an OpenAI API client
@@ -8,8 +10,21 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
  
-// Set the runtime to edge for best performance
-export const runtime = 'edge';
+
+
+
+export async function generateStaticParams() {
+  const mongo = await connect()
+  const [sceanrios, ] = await Promise.all([
+    mongo.db(DB).collection('scenarios').find().toArray(),
+
+  ])
+  return sceanrios.map((sceanrio) => (
+      {
+        scenario: sceanrio._id.toString(),
+      }
+    ))
+}
  
 export async function POST(req: Request,{ params }:{ params: { scenario:string }}) {
 

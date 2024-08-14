@@ -14,9 +14,9 @@ const types = [
     }
     ,
     {
-        'type': 'vocab',
-        'name': '词句练习',
-        'intro': '与 AI 一同复习目标词汇与句型',
+        'type': 'word',
+        'name': '单词跟读',
+        'intro': '与 AI 一同复习目标词汇',
         'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/4592e163-cf97-4cf4-5c41-9a55dedf5100/avatar'
     }
     ,

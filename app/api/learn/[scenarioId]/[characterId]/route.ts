@@ -3,6 +3,8 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from '@ai-sdk/openai';
 import { StreamingTextResponse, streamText } from 'ai';
+import { connect } from "@/lib/mongo"
+import { DB } from "@/lib/constant";
 
 
 
@@ -60,6 +62,22 @@ const profile = `
 - Level: CEFR A2, Can understand sentences and frequently used expressions related to areas of most immediate relevance (e.g. very basic personal and family information, shopping, local geography, employment). Can communicate in simple and routine tasks requiring a simple and direct exchange of information on familiar and routine matters.  Can describe in simple terms aspects of his/her background, immediate environment and matters in areas of immediate need.
 `
 
+// Return a list of `params` to populate the [slug] dynamic segment
+export async function generateStaticParams() {
+  const mongo = await connect()
+  const [scenarios, characters] = await Promise.all([
+    mongo.db(DB).collection('scenarios').find().toArray(),
+    mongo.db(DB).collection('characters').find().toArray(),
+  ])
+  const params = scenarios.flatMap((scenario) => 
+    characters.map((character) => ({
+      scenarioId: scenario._id.toString(),
+      characterId: character._id.toString(),
+    }))
+  );
+
+  return params
+}
 
 export async function POST(req: NextRequest) {
   let { messages, scenario, character } = await req.json();
@@ -71,28 +89,28 @@ export async function POST(req: NextRequest) {
     {
       profile: profile,
       persona: character.brief,
-      topic:scenario.topic??'',
-      ai_role: scenario.ai_role??'',
-      setup: scenario.setup??'',
-      target_words: scenario.target_words??'',
-      target_sentences: scenario.target_sentences??'',
-      additional_target:scenario.additional_target ??'',
-      keypoints: scenario.keypoints??'',
+      topic: scenario.topic ?? '',
+      ai_role: scenario.ai_role ?? '',
+      setup: scenario.setup ?? '',
+      target_words: scenario.target_words ?? '',
+      target_sentences: scenario.target_sentences ?? '',
+      additional_target: scenario.additional_target ?? '',
+      keypoints: scenario.keypoints ?? '',
       length: scenario.length as string,
-      level: scenario.level??'CEFR A1',
+      level: scenario.level ?? 'CEFR A1',
       flow: scenario.flow as string,
     }
   )
 
   const welcomeMessage = {
-    role:"assistant",
-    content:scenario.welcomeMessage
+    role: "assistant",
+    content: scenario.welcomeMessage
   }
-   
+
   messages.unshift(welcomeMessage);
   const result = await streamText({
     model: openai('gpt-4o'),
-    system:systemPrompt.toString(),
+    system: systemPrompt.toString(),
     messages,
   });
   return new StreamingTextResponse(result.toAIStream());

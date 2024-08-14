@@ -17,10 +17,22 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { connect } from "@/lib/mongo";
+import { DB } from "@/lib/constant";
 
 
-
-
+export async function generateStaticParams() {
+    const mongo = await connect()
+    const [assignments, ] = await Promise.all([
+      mongo.db(DB).collection('assignments').find().toArray(),
+  
+    ])
+    return assignments.map((assignment) => (
+        {
+          threadId: assignment._id.toString(),
+        }
+      ))
+  }
 
 export default async function AssginmentInfo({ params }: { params: { threadId: string } }) {
     const { userId, orgId } = auth();
