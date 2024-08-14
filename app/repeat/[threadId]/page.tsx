@@ -71,8 +71,8 @@ export default async function Repeat({ params }: { params: { threadId: string } 
         )
     }
     return (
-        <div className='flex w-full h-full relative p-4 gap-12 bg-muted'>
-            <Card style={bgImage} className="relative w-full flex h-full rounded-[20px]" >
+        <div className='flex w-full h-full relative p-2  gap-12 bg-muted'>
+            <Card style={bgImage} className="relative w-full flex rounded-[20px]" >
                 <div className="absolute top-2 left-2">
                     <Button asChild size="icon" variant="outline">
                         <Link href="/">
@@ -80,7 +80,7 @@ export default async function Repeat({ params }: { params: { threadId: string } 
                         </Link>
                     </Button>
                 </div>
-                <div className='w-full flex flex-col gap-4 items-center justify-center mt-4'>
+                <div className='w-full h-full flex flex-col gap-4 items-center justify-center mt-4'>
                     <Badge className='font-medium text-lg rounded-full px-8' variant="secondary"> 跟读练习</Badge >
                     <div className='z-50  h-full w-full '>
                         <RepeatText thread={repeat_data.content} userId={userId as string} threadId={params.threadId} />

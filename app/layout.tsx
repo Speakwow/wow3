@@ -81,12 +81,7 @@ export default function RootLayout({
                   <div className="mt-1 px-1 flex flex-row gap-2 items-center">
                   <OrganizationSwitcher/>
                   
-                    <SignedOut>
-                      <SignInButton />
-                    </SignedOut>
-                    <SignedIn>
-                      <UserButton />
-                    </SignedIn>
+
                   </div>
                 </div>
                 <div className="h-full">

@@ -135,6 +135,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
         setLoading(true)
         setRecognitionText('');
         setIsRecognizing(true)
+    
         try {
             // 使用 MediaRecorder API 进行录音
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -181,6 +182,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
             setDisplayText('Not Hearing...Try again');
             setLoading(false)
             setIsRecognizing(false)
+            
         }
     };
     const nextPage = () => {
@@ -228,7 +230,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                             <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
-                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying}>
+                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying||isRecognizing}>
                                     <Volume1Icon color="#42C83C" className="w-8 h-8"></Volume1Icon>
                                 </Button>
                             </div>

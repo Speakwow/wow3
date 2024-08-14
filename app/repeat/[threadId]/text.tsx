@@ -145,35 +145,40 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                 stream.getTracks().forEach(track => track.stop());
-                try{
-                const wavBlob = await webm2Wav(audioBlob);
-                const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as any;
-                setThreadRecord(prev => [
-                    ...prev,
-                    {
-                        index: currentIndex,
-                        text: thread[currentIndex],
-                        score: evalResult.pronunciation,
-                        detail_score: {
-                            accuracy: evalResult.accuracy,
-                            fluency: evalResult.fluency,
-                            completeness: evalResult.completeness,
-                            prosody: evalResult.prosody,
+                try {
+                    console.log('Start Webm2Wav')
+                    const wavBlob = await webm2Wav(audioBlob);
+                    console.log('Start Eval Speech')
+                    const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as any;
+                    console.log('Done Eval Speech')
+                    setThreadRecord(prev => [
+                        ...prev,
+                        {
+                            index: currentIndex,
+                            text: thread[currentIndex],
+                            score: evalResult.pronunciation,
+                            detail_score: {
+                                accuracy: evalResult.accuracy,
+                                fluency: evalResult.fluency,
+                                completeness: evalResult.completeness,
+                                prosody: evalResult.prosody,
+                            },
                         },
-                    },
-                ]);
-                setDisplayText('');
-                setIsRecognizing(false);
-                setRecognitionText(thread[currentIndex]);
-                setIsFinish(true)
-                setIsReviewing(false)
-                console.log(evalResult);
-                audioChunksRef.current = []; // Clear array to release memory
-            } catch (error){
-                console.error('Error ASR:', error);
-                setDisplayText('Not Hearing...Try again');
-                setIsRecognizing(false);
-            }
+                    ]);
+                    setDisplayText('');
+                    setIsRecognizing(false);
+                    setRecognitionText(thread[currentIndex]);
+                    setIsFinish(true)
+                    setIsReviewing(false)
+                    console.log(evalResult);
+                    audioChunksRef.current = []; // Clear array to release memory
+                } catch (error) {
+                    console.error('Error ASR:', error);
+                    setDisplayText('Not Hearing...Try again');
+                    setIsRecognizing(false)
+                    setIsReviewing(false)
+                    setIsReviewing(false);
+                }
             };
 
             mediaRecorder.start();
@@ -235,25 +240,25 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     if (saveState == 'saved' && report.score) {
         return (
-            <div className=' h-screen flex flex-col justify-center items-center '>
+            <div className=' h-full flex flex-col justify-center items-center '>
                 <LessonReport score={report.score} detail={report.detailScore} />
             </div>
         )
     }
 
     return (
-        <div className="w-full flex flex-col items-center justify-center h-full">
-            <div className="w-full text-2xl  mx-6 flex  flex-col h-full justify-center items-center">
+        <div className="w-full flex flex-col items-center justify-center h-full p-2">
+            <div className="w-full text-xl  mx-6 flex  flex-col h-full justify-center items-center">
                 <audio ref={audioRef} className="sr-only">
                 </audio>
 
-                <Card className="w-5/6 z-50 p-4 pb-8 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
+                <Card className="w-full md:w-3/4 z-50 p-2 pb-4 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full">
                         {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex].score ?
                             <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
-                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying}>
+                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying||isRecognizing}>
                                     <Volume1Icon color="#42C83C" className="w-8 h-8"></Volume1Icon>
                                 </Button>
                             </div>
@@ -262,7 +267,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                     </div>
 
                     {!recognitionText ?
-                        <div className="text-xl w-full text-pretty text-ellipsis overflow-hidden">
+                        <div className="text-lg md:text-xl  w-full text-pretty text-ellipsis overflow-hidden">
                             {thread[currentIndex]}
                         </div>
                         :
@@ -282,7 +287,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                                 size={'icon'}
                                 className={`h-fit p-6 bg-[#42C83C] w-fit rounded-full border-8 border-white }`}
                                 onClick={handleStartRecording}
-                                disabled={isPlaying||isReviewing}
+                                disabled={isPlaying || isReviewing}
                             >
                                 {
                                     !isFinish ?
@@ -298,7 +303,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                                 size={'icon'}
                                 className={`h-fit p-6 bg-red-500 hover:bg-red-900 w-fit rounded-full border-8 border-white animate-bounce`}
                                 onClick={handleStopRecording}
-                                disabled={isPlaying||isReviewing}
+                                disabled={isPlaying || isReviewing}
                             >
                                 <StopIcon width="60" height="60" />
                             </Button>
@@ -313,9 +318,8 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 </div>
 
                 <div className=
-                    {`
-                 ${displayText == 'Repeat After Me...' ? 'animate-bounce text-3xl' : 'text-2xl'} 
-                 ${displayText == 'Great!' ? 'text-4xl' : ''} 
+                    {` text-xl md:text-2xl
+                 ${displayText == 'Repeat After Me...' ? 'animate-bounce ' : ''} 
                 w-full text-center text-white`
                     } style={{ textShadow: '2px 2px 2px #333' }}>
                     {displayText}
