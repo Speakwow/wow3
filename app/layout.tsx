@@ -9,7 +9,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { AI } from '@/lib/action/ai';
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import Link from "next/link";
@@ -62,6 +62,8 @@ export default function RootLayout({
                         <span className="sr-only">Toggle navigation menu</span>
                       </Button>
                     </SheetTrigger>
+                    <SheetTitle className="hidden"></SheetTitle>
+                    <SheetDescription className="hidden"></SheetDescription>
                     <SheetContent side="left">
                       {sidebar}
                     </SheetContent>
