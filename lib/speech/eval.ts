@@ -87,26 +87,29 @@ export async function evalSpeechFromFile(referenceText: string, audioBlob: Blob)
     pronunciationAssessmentConfig.enableProsodyAssessment = true;
     pronunciationAssessmentConfig.applyTo(reco);
     console.log(`Reference: ` + referenceText)
-    reco.recognizeOnceAsync(result => {
-      console.log(`RECOGNIZED: Text=${result.text}`);
-      var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
-      console.log(pronunciation_result)
-      var evalResult = {
-        text: result.text,
-        pronunciation: pronunciation_result.pronunciationScore,
-        accuracy: pronunciation_result.accuracyScore,
-        fluency: pronunciation_result.fluencyScore,
-        completeness: pronunciation_result.completenessScore,
-        prosody: pronunciation_result.prosodyScore,
-        length: pronunciation_result.detailResult.Words.length,
-      }
-      resolve(evalResult);
-      reco.close();
-    }, err => {
 
-      reject(err);  // Reject the promise if there's an error
+    try {
+      reco.recognizeOnceAsync(result => {
+        console.log(`RECOGNIZED: Text=${result.text}`);
+        const pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
+        const evalResult = {
+          text: result.text,
+          pronunciation: pronunciation_result.pronunciationScore,
+          accuracy: pronunciation_result.accuracyScore,
+          fluency: pronunciation_result.fluencyScore,
+          completeness: pronunciation_result.completenessScore,
+          prosody: pronunciation_result.prosodyScore,
+          length: pronunciation_result.detailResult.Words.length,
+        };
+        resolve(evalResult);
+      }, err => {
+        reject(err);
+      });
+    } finally {
       reco.close();
-    });
+      // 如果 audioConfig 有关闭方法，可以在这里调用
+      // audioConfig.close();
+    }
   })
 }
 
