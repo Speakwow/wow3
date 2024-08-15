@@ -126,10 +126,9 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
       sdk.PronunciationAssessmentGranularity.Phoneme,
       false
     );
-    pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
-    pronunciationAssessmentConfig.enableProsodyAssessment = true;
+    pronunciationAssessmentConfig.enableProsodyAssessment = false;
     pronunciationAssessmentConfig.applyTo(reco);
-    // console.log(`Topic: `+topic)
+
     reco.recognizeOnceAsync(result => {
       console.log(`RECOGNIZED: Text=${result.text}`);
       var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);

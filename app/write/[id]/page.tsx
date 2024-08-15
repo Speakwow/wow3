@@ -38,8 +38,8 @@ export default async function Write({ params }: { params: { id: string } }) {
     // const recordId = '1'
     return (
         <div className="relative w-full h-screen bg-muted p-2">
-            <ScrollArea className="h-full overflow-hidden w-full">
-                <div className='flex flex-col md:flex-row gap-2 w-full'>
+            <ScrollArea className="h-full overflow-hidden w-full  pb-12">
+                <div className='flex flex-col md:flex-row gap-2 w-full mb-24'>
                     <div className=" ">
                         <Link href={"/"} className="z-10">
                             <Button size="icon" variant="outline">

@@ -31,7 +31,7 @@ export default async function RepeatCreator() {
                         </Button>
                     </Link>
                 </div>
-                <div className="py-2 px-16">
+                <div className="py-2 px-16 mb-24">
                     <Card className="p-6 h-fit relative">
                         <CardHeader className="flex flex-row justify-between">
                             <div>
