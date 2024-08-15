@@ -256,7 +256,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
 
     if (saveState == 'saved' && report.score) {
         return (
-            <div className=' h-screen flex flex-col justify-center items-center '>
+            <div className=' h-full flex flex-col justify-center items-center '>
                 <LessonReport score={report.score} detail={report.detailScore} />
             </div>
         )
