@@ -73,11 +73,26 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     const [isFinish, setIsFinish] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null);
 
+    const howlRef = useRef<Howl | null>(null);
+    const audioUrlRef = useRef<string | null>(null);
+
+
+
+
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
+        if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+        }
         const audioBlob = new Blob([audioData], { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
         setAudioFile(audioUrl)
+
+        // 卸载之前的 Howl 实例
+        if (howlRef.current) {
+            howlRef.current.unload();
+            howlRef.current = null;
+        }
         var sound = new Howl({
             src: [audioUrl],
             format: ['wav'],
@@ -91,6 +106,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 console.log('Playback finished');
             }
         });
+        howlRef.current = sound;
         sound.play();
     }
 
@@ -130,8 +146,15 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
+    var asrOn = new Howl({
+        src: ['/sound/asr-on.wav'],
+        format: ['wav'],
+        autoplay: false,
+    });
 
     const handleStartRecording = async () => {
+
+        asrOn.play()
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const mediaRecorder = new MediaRecorder(stream);
@@ -209,6 +232,14 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
 
     const nextPage = () => {
+
+        if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+        }
+        if (howlRef.current) {
+            howlRef.current.unload();
+        }
+
         if (currentIndex + 1 <= thread.length - 1) {
             setIsRecognizing(false);
             setIsFinish(false);
@@ -258,7 +289,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                             <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
-                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying||isRecognizing}>
+                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying || isRecognizing}>
                                     <Volume1Icon color="#42C83C" className="w-8 h-8"></Volume1Icon>
                                 </Button>
                             </div>

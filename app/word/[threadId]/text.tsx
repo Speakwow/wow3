@@ -72,6 +72,12 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
 
     const howlRef = useRef<Howl | null>(null);
     const audioUrlRef = useRef<string | null>(null);
+
+    var asrOn = new Howl({
+        src: ['/sound/asr-on.wav'],
+        format: ['wav'],
+        autoplay: false,
+    });
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
         if (audioUrlRef.current) {
@@ -101,14 +107,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                 setIsPlaying(false)
                 console.log('Playback finished');
                 handleSpeechToText()
-                // 释放音频 URL
-                if (audioUrlRef.current) {
-                    URL.revokeObjectURL(audioUrlRef.current);
-                    audioUrlRef.current = null;
-                }
-                // 卸载 Howl 实例
-                sound.unload();
-                howlRef.current = null;
+
             }
         });
         howlRef.current = sound;
@@ -169,6 +168,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
         setLoading(true)
         setRecognitionText('');
         setIsRecognizing(true)
+        asrOn.play()
     
         try {
             // 使用 MediaRecorder API 进行录音
@@ -219,19 +219,17 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
         }
     };
 
-    // 清理资源，防止内存泄漏
-    useEffect(() => {
-        return () => {
-            if (audioUrlRef.current) {
-                URL.revokeObjectURL(audioUrlRef.current);
-            }
-            if (howlRef.current) {
-                howlRef.current.unload();
-            }
-        };
-    }, []);
+
 
     const nextPage = () => {
+
+        if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+        }
+        if (howlRef.current) {
+            howlRef.current.unload();
+        }
+        
         if (currentIndex + 1 <= thread.length - 1) {
             setLoading(true)
             setAudioFile("")
