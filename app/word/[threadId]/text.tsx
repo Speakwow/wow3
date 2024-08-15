@@ -70,11 +70,25 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
     const [isRecognizing, setIsRecognizing] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null);
 
+    const howlRef = useRef<Howl | null>(null);
+    const audioUrlRef = useRef<string | null>(null);
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
+        if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+        }
         const audioBlob = new Blob([audioData], { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
+        audioUrlRef.current = audioUrl;
         setAudioFile(audioUrl)
+
+
+        // 卸载之前的 Howl 实例
+        if (howlRef.current) {
+            howlRef.current.unload();
+            howlRef.current = null;
+        }
+        
         var sound = new Howl({
             src: [audioUrl],
             format: ['wav'],
@@ -87,8 +101,17 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                 setIsPlaying(false)
                 console.log('Playback finished');
                 handleSpeechToText()
+                // 释放音频 URL
+                if (audioUrlRef.current) {
+                    URL.revokeObjectURL(audioUrlRef.current);
+                    audioUrlRef.current = null;
+                }
+                // 卸载 Howl 实例
+                sound.unload();
+                howlRef.current = null;
             }
         });
+        howlRef.current = sound;
         sound.play();
     }
 
@@ -110,6 +133,12 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
     const handleReplay = async () => {
         setDisplayText('Replaying...');
         setRecognitionText('')
+
+        // 卸载之前的 Howl 实例
+        if (howlRef.current) {
+            howlRef.current.unload();
+            howlRef.current = null;
+        }
         var sound = new Howl({
             src: [audioFile],
             format: ['wav'],
@@ -123,8 +152,13 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                 setIsPlaying(false)
                 setLoading(false);
                 console.log('Playback finished');
+
+                // 卸载 Howl 实例
+                sound.unload();
+                howlRef.current = null;
             }
         });
+        howlRef.current = sound;
         sound.play();
     }
 
@@ -171,7 +205,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                         }
                     }])
                 setDisplayText('');
-                console.log(evalResult)
                 // URL.revokeObjectURL(audioUrl);
                 audioChunks = []; // 清空数组以释放内存」
                 setLoading(false)
@@ -185,6 +218,19 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
             
         }
     };
+
+    // 清理资源，防止内存泄漏
+    useEffect(() => {
+        return () => {
+            if (audioUrlRef.current) {
+                URL.revokeObjectURL(audioUrlRef.current);
+            }
+            if (howlRef.current) {
+                howlRef.current.unload();
+            }
+        };
+    }, []);
+
     const nextPage = () => {
         if (currentIndex + 1 <= thread.length - 1) {
             setLoading(true)
