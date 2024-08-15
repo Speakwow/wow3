@@ -60,7 +60,7 @@ export function RepeatReport({ score, length, duration }: { score: number, lengt
          <Button onClick={()=>router.push('/')} size="lg" className="py-6 px-10 bg-[#42C83C] text-xl rounded-full">
             完成练习
           </Button>
-          <Button onClick={()=>router.refresh()} size="lg" variant="secondary" className="py-6 px-10 text-xl rounded-full">
+          <Button onClick={()=>window.location.reload()} size="lg" variant="secondary" className="py-6 px-10 text-xl rounded-full">
             再次挑战
           </Button>
       </CardFooter>
@@ -135,7 +135,7 @@ export function LessonReport({ score, detail }: { score: number, detail: any }) 
           <Button onClick={()=>router.push('/')} size="lg" className="py-6 px-10 bg-[#42C83C] text-xl rounded-full">
             完成练习
           </Button>
-          <Button onClick={()=>router.refresh()} size="lg" variant="secondary" className="py-6 px-10 text-xl rounded-full">
+          <Button onClick={()=>window.location.reload()} size="lg" variant="secondary" className="py-6 px-10 text-xl rounded-full">
             再次挑战
           </Button>
       </CardFooter>
