@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import {  getWordById } from '@/lib/action/mongoIO'
+import { getWordById } from '@/lib/action/mongoIO'
 import { auth } from '@clerk/nextjs/server'
 import RepeatText from './text'
 import { Badge } from '@/components/ui/badge'
@@ -13,17 +13,17 @@ import { DB } from '@/lib/constant'
 
 export async function generateStaticParams() {
     const mongo = await connect()
-    const [words, ] = await Promise.all([
-      mongo.db(DB).collection('word_threads').find().toArray(),
-  
+    const [words,] = await Promise.all([
+        mongo.db(DB).collection('word_threads').find().toArray(),
+
     ])
     return words.map((write) => (
         {
-          threadId: write._id.toString(),
+            threadId: write._id.toString(),
         }
-      ))
-  }
-  
+    ))
+}
+
 
 
 export default async function WordRepeat({ params }: { params: { threadId: string } }) {
@@ -81,7 +81,7 @@ export default async function WordRepeat({ params }: { params: { threadId: strin
                 <div className='w-full flex flex-col items-center justify-center mt-4'>
                     <Badge className='font-medium text-lg rounded-full px-8 ring-white/25 ring-2' variant="default"> 跟读练习</Badge >
                     <div className='z-50  h-full w-full gap-6 '>
-                        <RepeatText thread={thread.content} userId={userId as string} threadId={params.threadId} />
+                        <RepeatText thread={JSON.parse(JSON.stringify(thread.content))} userId={userId as string} threadId={params.threadId} />
                     </div>
                 </div>
             </Card>

@@ -87,29 +87,25 @@ export async function evalSpeechFromFile(referenceText: string, audioBlob: Blob)
     pronunciationAssessmentConfig.enableProsodyAssessment = true;
     pronunciationAssessmentConfig.applyTo(reco);
     console.log(`Reference: ` + referenceText)
-
-    try {
-      reco.recognizeOnceAsync(result => {
-        console.log(`RECOGNIZED: Text=${result.text}`);
-        const pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
-        const evalResult = {
-          text: result.text,
-          pronunciation: pronunciation_result.pronunciationScore,
-          accuracy: pronunciation_result.accuracyScore,
-          fluency: pronunciation_result.fluencyScore,
-          completeness: pronunciation_result.completenessScore,
-          prosody: pronunciation_result.prosodyScore,
-          length: pronunciation_result.detailResult.Words.length,
-        };
-        resolve(evalResult);
-      }, err => {
-        reject(err);
-      });
-    } finally {
+    reco.recognizeOnceAsync(result => {
+      console.log(`RECOGNIZED: Text=${result.text}`);
+      var pronunciation_result = sdk.PronunciationAssessmentResult.fromResult(result);
+      var evalResult = {
+        text: result.text,
+        pronunciation: pronunciation_result.pronunciationScore,
+        accuracy: pronunciation_result.accuracyScore,
+        fluency: pronunciation_result.fluencyScore,
+        completeness: pronunciation_result.completenessScore,
+        prosody: pronunciation_result.prosodyScore,
+        length: pronunciation_result.detailResult.Words.length,
+      }
+      resolve(evalResult);
       reco.close();
-      // 如果 audioConfig 有关闭方法，可以在这里调用
-      // audioConfig.close();
-    }
+    }, err => {
+
+      reject(err);  // Reject the promise if there's an error
+      reco.close();
+    });
   })
 }
 
@@ -122,16 +118,16 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
     const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
     speechConfig.speechRecognitionLanguage = 'en-US';
     const audioFile = new File([audioBlob], "input.wav", { type: "audio/wav" });
-
     var audioConfig = sdk.AudioConfig.fromWavFileInput(audioFile)
     const reco = new sdk.SpeechRecognizer(speechConfig, audioConfig);
     const pronunciationAssessmentConfig = new sdk.PronunciationAssessmentConfig(
-      '',
+      "",
       sdk.PronunciationAssessmentGradingSystem.HundredMark,
-      sdk.PronunciationAssessmentGranularity.FullText,
+      sdk.PronunciationAssessmentGranularity.Phoneme,
       false
     );
-    pronunciationAssessmentConfig.enableProsodyAssessment = false;
+    pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
+    pronunciationAssessmentConfig.enableProsodyAssessment = true;
     pronunciationAssessmentConfig.applyTo(reco);
     // console.log(`Topic: `+topic)
     reco.recognizeOnceAsync(result => {
@@ -145,6 +141,7 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
         completeness: pronunciation_result.completenessScore,
         length: pronunciation_result.detailResult.Words.length,
       }
+      console.log(pronunciation_result)
       resolve(evalResult);
       console.log(`[${new Date().toISOString()}]:`,'[END] Eval Result');
       reco.close();

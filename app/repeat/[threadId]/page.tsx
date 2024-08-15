@@ -83,7 +83,7 @@ export default async function Repeat({ params }: { params: { threadId: string } 
                 <div className='w-full h-full flex flex-col gap-4 items-center justify-center mt-4'>
                     <Badge className='font-medium text-lg rounded-full px-8' variant="secondary"> 跟读练习</Badge >
                     <div className='z-50  h-full w-full '>
-                        <RepeatText thread={repeat_data.content} userId={userId as string} threadId={params.threadId} />
+                        <RepeatText thread={JSON.parse(JSON.stringify(repeat_data.content))} userId={userId as string} threadId={params.threadId} />
                     </div>
                 </div>
             </Card>
