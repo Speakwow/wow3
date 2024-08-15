@@ -73,27 +73,37 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     const [isFinish, setIsFinish] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null);
 
-    const howlRef = useRef<Howl | null>(null);
-    const audioUrlRef = useRef<string | null>(null);
+    const [sound, setSound] = useState<Howl | null>(null);
 
 
 
+    // Cleanup on component unmount or page unload
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+        if (sound) {
+            sound.stop();
+        }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        if (sound) {
+            sound.stop();
+        }
+        };
+    }, [sound]);
 
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
-        if (audioUrlRef.current) {
-            URL.revokeObjectURL(audioUrlRef.current);
-        }
+
         const audioBlob = new Blob([audioData], { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
         setAudioFile(audioUrl)
 
-        // 卸载之前的 Howl 实例
-        if (howlRef.current) {
-            howlRef.current.unload();
-            howlRef.current = null;
-        }
-        var sound = new Howl({
+
+        var newSound = new Howl({
             src: [audioUrl],
             format: ['wav'],
             autoplay: true,
@@ -106,8 +116,8 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 console.log('Playback finished');
             }
         });
-        howlRef.current = sound;
-        sound.play();
+        setSound(newSound);
+        newSound.play();
     }
 
 
@@ -232,13 +242,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
 
     const nextPage = () => {
-
-        if (audioUrlRef.current) {
-            URL.revokeObjectURL(audioUrlRef.current);
-        }
-        if (howlRef.current) {
-            howlRef.current.unload();
-        }
 
         if (currentIndex + 1 <= thread.length - 1) {
             setIsRecognizing(false);
