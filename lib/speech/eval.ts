@@ -145,7 +145,6 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
         completeness: pronunciation_result.completenessScore,
         length: pronunciation_result.detailResult.Words.length,
       }
-      console.log(pronunciation_result)
       resolve(evalResult);
       console.log(`[${new Date().toISOString()}]:`,'[END] Eval Result');
       reco.close();
