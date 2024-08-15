@@ -122,16 +122,16 @@ export async function evalSpeechWithTopicFromFile(topic: string, audioBlob: Blob
     const speechConfig = sdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
     speechConfig.speechRecognitionLanguage = 'en-US';
     const audioFile = new File([audioBlob], "input.wav", { type: "audio/wav" });
+
     var audioConfig = sdk.AudioConfig.fromWavFileInput(audioFile)
     const reco = new sdk.SpeechRecognizer(speechConfig, audioConfig);
     const pronunciationAssessmentConfig = new sdk.PronunciationAssessmentConfig(
-      "",
+      '',
       sdk.PronunciationAssessmentGradingSystem.HundredMark,
-      sdk.PronunciationAssessmentGranularity.Phoneme,
+      sdk.PronunciationAssessmentGranularity.FullText,
       false
     );
-    pronunciationAssessmentConfig.enableContentAssessmentWithTopic(topic);
-    pronunciationAssessmentConfig.enableProsodyAssessment = true;
+    pronunciationAssessmentConfig.enableProsodyAssessment = false;
     pronunciationAssessmentConfig.applyTo(reco);
     // console.log(`Topic: `+topic)
     reco.recognizeOnceAsync(result => {
