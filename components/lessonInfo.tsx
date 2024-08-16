@@ -1,13 +1,9 @@
 'use client'
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { kv } from "@vercel/kv";
-import { ArrowLeftIcon } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { addFavourite, deleteFavourite, getCharacterById, getRepeatThreadById, getScenarioById } from "@/lib/action/mongoIO";
+import { addFavourite, deleteFavourite } from "@/lib/action/mongoIO";
 import { Label } from "@radix-ui/react-label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -56,7 +52,8 @@ export async function LessonInfo(params: { type: string, id: string, name: strin
 }
 
 
-export function LessonCard({ userId, userData, name, type, id, intro, cover, tag }: { userId: string, userData: any, name: string, type: string, id: string, intro: string, cover: string, tag: string }) {
+export function LessonCard({ userId, userData, name, type, id, intro, cover, tag }:
+     { userId: string, userData: any, name: string, type: string, id: string, intro: string, cover: string, tag: string}) {
     let coverImg = ''
     if (!cover) {
         coverImg = 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/108cf320-27a7-4110-0312-6f0b32223200/avatar'
@@ -104,7 +101,7 @@ export function LessonCard({ userId, userData, name, type, id, intro, cover, tag
                 </DropdownMenuContent>
             </DropdownMenu>
             <Link href={`/${type}/${id}`}>
-                <Card className="relative flex flex-row bg-white rounded-[10px] border hover:ring hover:ring-[#42C83C] focus:outline-none focus:ring focus:ring-[#42C83C] p-2 gap-3">
+                <Card className={`relative flex flex-row bg-white rounded-[10px] border hover:ring focus:outline-none focus:ring focus:ring-[#42C83C] p-2 gap-3 hover:ring-[#42C83C]`}>
 
                     <div className="h-full w-[100px]">
                         <Image

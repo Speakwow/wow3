@@ -86,8 +86,9 @@ export default async function SideBar() {
                 </Card>
 
 
-                <Card className="p-2 w-full flex flex-col gap-2 bg-muted">
-                    <div className="w-full flex flex-row justify-center z-10">
+                <Card className=" p-2 w-full flex flex-col gap-2 bg-muted">
+
+                    <div className="w-full flex flex-row justify-between z-10 items-center">
                         <OrganizationSwitcher appearance={{
                             elements: {
                                 organizationSwitcherPopoverCard: {
@@ -96,6 +97,14 @@ export default async function SideBar() {
                                 // add your other custom props
                             },
                         }} />
+                                             {
+                        orgId ?
+                            has({ role: "org:admin" }) ?
+                            <Badge className="w-fit h-fit" >老师</Badge>
+                            :
+                            <Badge className="w-fit h-fit" variant="outline">学生</Badge>
+                            :null
+                    }
                     </div>
                     {
                         orgId ?

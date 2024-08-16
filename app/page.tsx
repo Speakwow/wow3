@@ -11,8 +11,8 @@ import { isAfter, isBefore, isWithinInterval } from "date-fns";
 
 
 export default async function Home() {
-    const { userId, orgId,redirectToSignIn } = auth();
-    if(!userId){
+    const { userId, orgId, redirectToSignIn } = auth();
+    if (!userId) {
         redirectToSignIn()
         return null
     }
