@@ -47,7 +47,7 @@ export default async function Page({ params }: { params: { threadId: string, rec
 
     return (
         <div className='relative flex w-full h-full justify-center relative gap-6 bg-muted'>
-            <div className="absolute top-2 left-2">
+            <div className="absolute top-2 left-2 z-10">
                 <Button asChild size="icon" variant="outline">
                     <Link href="/">
                         <ChevronLeft />

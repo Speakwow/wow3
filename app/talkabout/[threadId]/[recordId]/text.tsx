@@ -6,12 +6,16 @@ import { evalSpeechFromFile, evalSpeechWithTopicFromFile } from "@/lib/speech/ev
 import { webm2Wav } from "@/lib/speech/wav";
 import { LoaderIcon, Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useUnmount } from 'usehooks-ts'
 import { Howl } from 'howler';
 import { Badge } from "@/components/ui/badge";
 import { finishTalkaboutRecord } from "@/lib/action/mongoIO";
+import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
 import Image from 'next/image'
 import { error } from "console";
+import AzureConfig from "@/lib/speech/config";
+import _ from "lodash";
 
 // function HighlightWords({ story }: { story: any }) {
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
@@ -23,14 +27,13 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
     const [displayText, setDisplayText] = useState('');
     const [isRecognizing, setIsRecognizing] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null);
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const audioChunksRef = useRef<Blob[]>([]);
     const router = useRouter()
     const [isRecording, setIsRecording] = useState(false);
     const [step, setStep] = useState('prepare');
     const [countdown, setCountdown] = useState<number>(prepare_time); // 3 minutes countdown
 
     const [pronResult, setPronResult] = useState<any>();
+
 
     useEffect(() => {
         let countdownInterval: NodeJS.Timeout;
@@ -41,11 +44,21 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
             }, 1000);
         } else if (countdown === 0 && !isRecording && step == 'prepare') {
             setCountdown(answer_time);
-            startSpeechToText();
+
+            var asrOn = new Howl({
+                src: ['/sound/asr-on.wav'],
+                format: ['wav'],
+                autoplay: false,
+                onend: function () {
+                    startListen()
+                }
+            });
+            asrOn.play()
+
             setStep('practice')
         }
         else if (countdown === 0 && isRecording && step == 'practice') {
-            stopSpeechToText();
+            stopListen();
             setStep('end')
         }
 
@@ -54,8 +67,18 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
 
 
     async function handleSkipPrepare() {
+        var asrOn = new Howl({
+            src: ['/sound/asr-on.wav'],
+            format: ['wav'],
+            autoplay: false,
+            onend: function () {
+                startListen()
+            }
+        });
+
+        asrOn.play()
         setCountdown(answer_time);
-        startSpeechToText();
+        startListen();
         setStep('practice')
     }
 
@@ -67,6 +90,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
     const [grammarScore, setGrammarScore] = useState(0)
     const [contentScore, setContentScore] = useState(0)
     const [saveState, setSaveState] = useState('unsaved')
+
     async function handleFeedback(image_url: string, user_answer: string, pronResult: any) {
         setSaveState('saving')
         const res = await fetch('/api/talkabout/feedback',
@@ -113,81 +137,193 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
     }
 
 
-    useEffect(() => {
-        if (typeof window !== 'undefined' && navigator.mediaDevices) {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    mediaRecorderRef.current = new MediaRecorder(stream);
-                    mediaRecorderRef.current.ondataavailable = (event: BlobEvent) => {
-                        audioChunksRef.current.push(event.data);
-                    };
-                    mediaRecorderRef.current.onstop = () => {
-                        setSaveState('saving')
-                        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-                        stream.getTracks().forEach(track => track.stop());
+    var asrOff = new Howl({
+        src: ['/sound/asr-off.wav'],
+        format: ['wav'],
+        autoplay: false,
+    });
 
-                        console.log(`[${new Date().toISOString()}]:`, '[START] Webm2wav');
-                        webm2Wav(audioBlob).then(wavBlob => {
-                            evalSpeechWithTopicFromFile(examplar, wavBlob).then(result => {
-                                const evalResult = result as any
-                                setPronResult(evalResult)
-                                handleFeedback(image_url, evalResult.text, evalResult)
-                                console.log(evalResult)
 
-                            }).catch(error => {
-                                setSaveState('failed')
-                            })
+    const azureSpeechConfig = useMemo(() => {
+        // const speechConfig = speechsdk.SpeechConfig.fromSubscription('8d0f1ad8db3a41bf91ba8a1e9b44a621', 'westus')
+        const speechConfig = speechsdk.SpeechConfig.fromSubscription('470509c377dd414bb2f3d3d61c314e2c', 'eastasia');
+        speechConfig.speechRecognitionLanguage = 'en-US'
+        // speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs', "12201")
+        // speechConfig.setProperty('SpeechServiceConnection_EndSilenceTimeoutMs', '3201')
+
+        return { speechConfig }
+    }, [])
+
+
+
+
+    const startListen = useCallback(() => {
+        if (azureSpeechConfig === null) return
+        setDisplayText('正在练习中')
+        setIsRecording(true);
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then((stream: MediaStream) => {
+                mediaStreamRef.current = stream
+                const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
+                const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
+                audioConfigRef.current = audioConfig
+                sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
+                const pronunciationAssessmentConfig = new speechsdk.PronunciationAssessmentConfig(
+                    "",
+                    speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+                    speechsdk.PronunciationAssessmentGranularity.Phoneme,
+                    false
+                );
+                pronunciationAssessmentConfig.enableProsodyAssessment = true;
+                pronunciationAssessmentConfig.applyTo(sttRef.current);
+
+                var results: any[] = [];
+                var recognizedText = "";
+
+
+                sttRef.current.recognized = function (s, e) {
+                    var jo = JSON.parse(e.result.properties.getProperty(speechsdk.PropertyId.SpeechServiceResponse_JsonResult));
+                    if (jo.DisplayText != ".") {
+                        console.log(`Recognizing: ${jo.DisplayText}`);
+                        recognizedText += jo.DisplayText + " ";
+                    }
+                    console.log(jo)
+                    results.push(jo);
+                }
+
+                function onRecognizedResult() {
+                    console.log(`Recognized text: ${recognizedText}`);
+                    let word_count = 0
+                    let total_score = {
+                        accuracy: 0,
+                        fluency: 0,
+                        pron: 0,
+                        prosody: 0
+                    }
+                    results.forEach(result => {
+                        if (result.RecognitionStatus == 'Success') {
+                            console.log(result)
+                            word_count += result.NBest[0].Words.length
+                            total_score.accuracy += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.AccuracyScore
+                            total_score.fluency += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.FluencyScore
+                            total_score.prosody += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.ProsodyScore
+                            total_score.pron += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.PronScore
                         }
-                        )
-                        audioChunksRef.current = [];
-                    };
-                })
-                .catch(error => {
-                    setSaveState('failed')
-                    console.error('Error accessing media devices.', error);
-                });
+                    })
+                    const finalResult = {
+                        text: recognizedText,
+                        accuracy: +(total_score.accuracy / word_count).toFixed(0),
+                        fluency: +(total_score.fluency / word_count).toFixed(0),
+                        pron: +(total_score.pron / word_count).toFixed(0),
+                        prosody: +(total_score.prosody / word_count).toFixed(0)
+                    }
+                    console.log(finalResult)
+
+                    handleFeedback(image_url, recognizedText, finalResult)
+                    setPronResult({
+                        text: results[results.length - 1].text,
+                        accuracy: finalResult.accuracy,
+                        fluency: finalResult.fluency,
+                        prosody: finalResult.prosody,
+                        overall_pronunciation: finalResult.pron
+                    })
+                }
+
+                sttRef.current.canceled = function (s, e) {
+                    if (e.reason === speechsdk.CancellationReason.Error) {
+                        var str = "(cancel) Reason: " + speechsdk.CancellationReason[e.reason] + ": " + e.errorDetails;
+                        console.log(str);
+                    }
+                    sttRef.current?.stopContinuousRecognitionAsync();
+                };
+
+                sttRef.current.sessionStopped = function (s, e) {
+                    setIsRecording(false);
+                    setStep('end')
+                    sttRef.current?.stopContinuousRecognitionAsync();
+                    sttRef.current?.close();
+                    onRecognizedResult();
+                };
+                sttRef.current.startContinuousRecognitionAsync();
+
+            })
+            .catch(error => {
+                setSaveState('failed')
+                console.error('Error accessing media devices.', error);
+            });
+    }, [azureSpeechConfig])
+
+
+    const stopListen = useCallback(() => {
+        asrOff.play()
+        if (sttRef.current) {
+            sttRef.current.stopContinuousRecognitionAsync(() => {
+                sttRef.current?.close();
+                sttRef.current = undefined;
+            });
+        }
+        if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(track => track.stop());
+            sttRef.current = undefined;
+        }
+        if (audioConfigRef.current) {
+            sttRef.current = undefined;
         }
     }, []);
 
 
-    //Handle Asr with Eval
-    const startSpeechToText = async () => {
-        var sound = new Howl({
-            src: ['/sound/asr-on.wav'],
-            format: ['wav'],
-            autoplay: true,
-        });
-        sound.play();
-        setDisplayText('正在练习中')
-        setIsRecording(true);
-        mediaRecorderRef.current?.start();
-    }
-    //Handle Asr with Eval
-    const stopSpeechToText = async () => {
-        var sound = new Howl({
-            src: ['/sound/asr-off.wav'],
-            format: ['wav'],
-            autoplay: true,
-        });
-        sound.play();
-        setIsRecording(false);
-        setStep('end')
-        mediaRecorderRef.current?.stop();
-    }
 
     const finishLesson = async () => {
 
         router.push('/')
     }
 
+    const listeningRef = useRef(false)
+    const [listening, setListening] = useState(false)
+    const sttRef = useRef<speechsdk.SpeechRecognizer>()
+    const audioConfigRef = useRef<speechsdk.AudioConfig>()
+    const mediaStreamRef = useRef<MediaStream>()
+    const [enableInput, setEnableInput] = useState(false)
+
+
+    useUnmount(() => {
+        try {
+            listeningRef.current = false
+            setListening(false)
+            if (sttRef.current) sttRef.current.close()
+        } catch { }
+    })
+
+    useEffect(() => {
+        if (enableInput) {
+            startListen()
+        } else {
+            if (!listeningRef.current) return
+            if (audioConfigRef.current) {
+                audioConfigRef.current.close()
+                audioConfigRef.current = undefined
+            }
+            if (mediaStreamRef.current) {
+                mediaStreamRef.current.getAudioTracks().forEach(track => track.stop())
+                mediaStreamRef.current = undefined
+            }
+            if (sttRef.current) {
+                sttRef.current.close()
+                sttRef.current = undefined
+            }
+        }
+    }, [enableInput])
+
+
+
 
 
     return (
         <div className="flex flex-col items-center justify-center h-full gap-4">
             <Card className={`px-4 py-2 text-center text-xm flex flex-row justify-center  items-center  gap-4 whitespace-pre-line ${step == "end" && 'text-white bg-[#42C83C]'} ${step == "practice" && 'border-2 border-[#42C83C]'}`}>
-                {step == "prepare" && <p>准备时间剩余 ： <span className="text-2xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
-                {step == "practice" && <p>作答时间剩余 ： <span className="text-2xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></p>}
-                {step == "end" && <p className="text-xl">🎉 练习已完成</p>}
+                {step == "prepare" && <div>准备时间剩余 ： <span className="text-2xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></div>}
+                {step == "practice" && <div>作答时间剩余 ： <span className="text-2xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></div>}
+                {step == "end" && <div className="text-xl">🎉 练习已完成</div>}
                 {step == "prepare" && <Button variant="secondary" size="sm" onClick={handleSkipPrepare}>跳过</Button>}
             </Card>
             <div className="w-full relative text-3xl   flex justify-center items-center">
@@ -249,7 +385,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
                                     type='button'
                                     size={'icon'}
                                     className={`h-fit p-6 bg-[#3F51B5] w-fit rounded-full border-4 border-white}`}
-                                    onClick={startSpeechToText}
+                                    onClick={startListen}
                                     disabled={isRecording}
                                 >
                                     <Mic width="40" height="40" />
@@ -261,7 +397,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
                                     size={'icon'}
                                     variant="destructive"
                                     className={`h-fit p-6 w-fit rounded-full border-4 border-white ${isRecording === true ? 'animate-bounce' : ''}`}
-                                    onClick={stopSpeechToText}
+                                    onClick={stopListen}
                                     disabled={isRecording}
                                 >
                                     <Mic width="40" height="40" />
@@ -294,7 +430,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
                         </CardHeader>
                         {!finishFeedback ?
                             <CardContent className="animate-pulse text-center w-full gap-4 text-primary">
-                               {saveState=='failed'?'😭 抱歉，Frank 没听清楚': '🐸 Frank 正在写评语...'}
+                                {saveState == 'failed' ? '😭 抱歉，Frank 没听清楚' : '🐸 Frank 正在写评语...'}
                             </CardContent>
                             :
                             <CardContent className="text-center grid grid-cols-4 gap-4">
