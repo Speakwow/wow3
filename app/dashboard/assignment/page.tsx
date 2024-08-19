@@ -30,8 +30,7 @@ export default async function Plan() {
         redirect('/404/unauthoried')
     }
     const textbookId = "66b0937bfdcc2483666628a5"
-    const data = await getTextbookData(textbookId)
-    const studentIds = await getOrgStudents(orgId as string)
+    const [data,studentIds] = await Promise.all([getTextbookData(textbookId),getOrgStudents(orgId as string)])
 
     return (
         <div className="flex h-screen w-full flex-col">
