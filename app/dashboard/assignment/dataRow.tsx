@@ -11,6 +11,7 @@ import { NewAssignmentButton, ReviewAssignmentButton } from "./action"
 import { Loader2Icon, LoaderIcon } from "lucide-react"
 import { getBeijingTime } from "@/lib/tools"
 import { isAfter, isBefore, isWithinInterval } from "date-fns"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 
 
@@ -45,7 +46,7 @@ export async function AssignmentRow(
     let status = '待布置'
     let assignCount = '-'
     let endDate = '-'
-    const data = await getRecordsForAssignment(threadId, orgId,studentIds)
+    const data = await getRecordsForAssignment(threadId, orgId, studentIds)
     if (data) {
         countFinished = data.records.length
         assignCount = `${countFinished} / ${countStudents}`
@@ -69,7 +70,19 @@ export async function AssignmentRow(
             </TableCell>
             <TableCell>
                 <div className="flex flex-row gap-2">
-                    <div className="font-medium"> {name}</div><Link href={`/${type}/${threadId}`}><Link1Icon color="gray" /></Link>
+                    <div className="font-medium"> {name}</div>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link href={`/${type}/${threadId}`}>
+                                    <Link1Icon color="gray" />
+                                </Link></TooltipTrigger>
+                            <TooltipContent >
+                                <p>预览</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
                 </div>
 
             </TableCell>
@@ -78,7 +91,7 @@ export async function AssignmentRow(
                     {Type2Tag(type)}
                 </Badge>
             </TableCell>
-            <TableCell className="font-medium">
+            <TableCell className={`${status == '进行中'?'text-primary':status=='已结束'?'text-destructive':''} font-medium`}>
                 {status}
             </TableCell>
             <TableCell className="font-medium">
@@ -99,10 +112,10 @@ export async function AssignmentRow(
                         <ReviewAssignmentButton
                             assignment={data}
                             info={data.info}
-                            records = {data.records}
+                            records={data.records}
                             userId={userId}
                             orgId={orgId}
-                            studentIds = {studentIds}
+                            studentIds={studentIds}
                         />
                 }
             </TableCell>

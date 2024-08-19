@@ -8,13 +8,17 @@ import { Type2Tag } from "@/lib/db/db";
 import { Separator } from "@/components/ui/separator";
 import { getBeijingTime } from "@/lib/tools";
 import { isAfter, isBefore, isWithinInterval } from "date-fns";
+import { redirect } from "next/navigation";
 
 
 export default async function Home() {
-    const { userId, orgId, redirectToSignIn } = auth();
+    const { userId, orgId, redirectToSignIn,has } = auth();
     if (!userId) {
         redirectToSignIn()
         return null
+    }
+    if(has({ role: "org:admin" })){
+        redirect('/dashboard')
     }
 
     if (orgId) {

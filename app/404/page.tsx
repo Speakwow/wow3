@@ -5,7 +5,7 @@ export default function ErrorPage() {
     return (
         <div className="h-screen w-full flex flex-col gap-4 items-center justify-center text-center">
             <div>
-                🍃 这里空空如也
+            🏗️ 暂未开放
             </div>
             <Button variant="outline" asChild>
                 <Link href='/'>
