@@ -20,7 +20,6 @@ export type AssignmentRecord = {
     finishAt:Date
 }
 
-const router = useRouter()
 export const columns: ColumnDef<AssignmentRecord>[] = [
   {
     accessorKey: "username",
@@ -47,7 +46,6 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
     cell: ({ row }) => {
       const record = row.original
       
- 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -59,9 +57,8 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>操作</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => router.push(`/record/${record.recordId}/${record.type}`)}
-            >
-              查看详情
+            ><a href={`/record/${record.recordId}/${record.type}`}>查看详情</a>
+
             </DropdownMenuItem>
             {/* <DropdownMenuSeparator />
             <DropdownMenuItem>View customer</DropdownMenuItem>
