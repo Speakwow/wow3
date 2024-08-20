@@ -20,7 +20,7 @@ export type AssignmentRecord = {
     finishAt:Date
 }
 
-
+const router = useRouter()
 export const columns: ColumnDef<AssignmentRecord>[] = [
   {
     accessorKey: "username",
@@ -46,7 +46,7 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
     id:"actions",
     cell: ({ row }) => {
       const record = row.original
-      const router = useRouter()
+      
  
       return (
         <DropdownMenu>

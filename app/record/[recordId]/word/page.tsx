@@ -131,58 +131,8 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="w-full h-fit pb-2">
-                            <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">準確度</CardTitle>
-                                <CardDescription className="text-xs">
-                                    Accuracy
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
-                                <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                                    {Math.round(overallScore[1])}
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="w-full h-fit pb-2">
-                            <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">流暢度</CardTitle>
-                                <CardDescription className="text-xs">
-                                    Fluency
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
-                                <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                                    {Math.round(overallScore[2])}
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="w-full h-fit pb-2">
-                            <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">完整度</CardTitle>
-                                <CardDescription className="text-xs">
-                                    Completeness
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
-                                <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                                    {Math.round(overallScore[3])}
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="w-full h-fit pb-2">
-                            <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">韻律</CardTitle>
-                                <CardDescription className="text-xs">
-                                    Prosody
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
-                                <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                                    {Math.round(overallScore[4])}
-                                </div>
-                            </CardContent>
-                        </Card>
+
+
                     </div>
                     <div className="pt-6 h-screen w-full">
                         <Card className="h-fit w-full">
@@ -197,10 +147,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                     <TableRow>
                                         <TableHead>跟讀章節</TableHead>
                                         <TableHead>得分</TableHead>
-                                        <TableHead>準確度</TableHead>
-                                        <TableHead>流暢度</TableHead>
-                                        <TableHead>完整度</TableHead>
-                                        <TableHead>韻律</TableHead>
+
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -208,10 +155,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                         <TableRow key={index}>
                                             <TableCell className="text-md max-w-64 text-muted-foreground">{row[0]}</TableCell>
                                             <TableCell className="text-lg font-bold text-primary">{row[1]}</TableCell>
-                                            <TableCell className="text-lg font-bold">{row[2]}</TableCell>
-                                            <TableCell className="text-lg font-bold">{row[3]}</TableCell>
-                                            <TableCell className="text-lg font-bold">{row[4]}</TableCell>
-                                            <TableCell className="text-lg font-bold">{row[5]}</TableCell>
+
                                         </TableRow>
                                     ))}
                                 </TableBody>
