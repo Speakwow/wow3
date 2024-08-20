@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { getBeijingTime } from "@/lib/tools";
 import { isAfter, isBefore, isWithinInterval } from "date-fns";
 import { redirect } from "next/navigation";
+import { AssignCardServer } from "@/components/assignment-card-server";
 
 
 export default async function Home() {
@@ -39,14 +40,11 @@ export default async function Home() {
                 notStarted.push(assignment);
             } else if (isAfter(today, endAt))
                 ended.push(assignment);
-
-
         }
 
 
         return (
             <div className="h-screen flex flex-col gap-4 lg:p-8 md:p-6 p-6 bg-[#F5F5F5]">
-
                 <div className="grid grid-cols-2">
                     <div className=" w-full text-xl text-primary font-bold">
                         我的练习
@@ -54,7 +52,7 @@ export default async function Home() {
                     {/* <Input className=" w-full text-xl bg-white" placeholder="..." /> */}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                    博学笃志，行稳致远
+                    梦想无限，开口实现
                 </div>
                 <ScrollArea className="w-full h-full">
                     <div className="flex flex-col gap-6">
@@ -69,13 +67,14 @@ export default async function Home() {
                                 {
                                     //@ts-ignore
                                     ongoing.map(assginment => (
-                                        <LessonCard
+                                        <AssignCardServer
                                             userId={userId as string}
+                                            orgId={orgId as string}
                                             userData={userData}
                                             name={assginment.info.name}
                                             type={assginment.type}
                                             tag={Type2Tag(assginment.type) as string}
-                                            id={assginment.threadId}
+                                            threadId={assginment.threadId}
                                             intro={assginment.info.intro}
                                             key={assginment.threadId}
                                             cover=''
@@ -96,13 +95,14 @@ export default async function Home() {
                                 {
                                     //@ts-ignore
                                     notStarted.map(assginment => (
-                                        <LessonCard
+                                        <AssignCardServer
                                             userId={userId as string}
+                                            orgId={orgId as string}
                                             userData={userData}
                                             name={assginment.info.name}
                                             type={assginment.type}
                                             tag={Type2Tag(assginment.type) as string}
-                                            id={assginment.threadId}
+                                            threadId={assginment.threadId}
                                             intro={assginment.info.intro}
                                             key={assginment.threadId}
                                             cover=''
@@ -123,17 +123,18 @@ export default async function Home() {
                                 {
                                     //@ts-ignore
                                     ended.map(assginment => (
-                                        <LessonCard
-                                            userId={userId as string}
-                                            userData={userData}
-                                            name={assginment.info.name}
-                                            type={assginment.type}
-                                            tag={Type2Tag(assginment.type) as string}
-                                            id={assginment.threadId}
-                                            intro={assginment.info.intro}
-                                            key={assginment.threadId}
-                                            cover=''
-                                        />
+                                        <AssignCardServer
+                                        userId={userId as string}
+                                        orgId={orgId as string}
+                                        userData={userData}
+                                        name={assginment.info.name}
+                                        type={assginment.type}
+                                        tag={Type2Tag(assginment.type) as string}
+                                        threadId={assginment.threadId}
+                                        intro={assginment.info.intro}
+                                        key={assginment.threadId}
+                                        cover=''
+                                    />
                                     )
                                     )
                                 }

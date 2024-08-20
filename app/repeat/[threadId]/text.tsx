@@ -286,7 +286,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 <audio ref={audioRef} className="sr-only">
                 </audio>
 
-                <Card className="w-full md:w-3/4 z-50 p-2 pb-4 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
+                <Card className="w-full md:w-3/4 z-50 p-4 pb-6 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full">
                         {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex].score ?
                             <Bravo score={threadRecord[currentIndex].score} />
@@ -301,7 +301,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                     </div>
 
                     {!recognitionText ?
-                        <div className="text-lg md:text-xl  w-full text-pretty text-ellipsis overflow-hidden">
+                        <div className="text-xl md:text-2xl  w-full text-pretty text-ellipsis overflow-hidden">
                             {thread[currentIndex]}
                         </div>
                         :
