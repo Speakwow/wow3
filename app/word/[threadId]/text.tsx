@@ -56,6 +56,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
     const [audioFile, setAudioFile] = useState('')
     const [currentIndex, setCurrentIndex] = useState(0)
     const [threadRecord, setThreadRecord] = useState<any[]>([])
+    const [currentRecord, setCurrentRecord] = useState<any>()
 
     const [report, setReport] = useState<any>()
     const [saveState, setSaveState] = useState('unsaved')
@@ -191,19 +192,30 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                 stream.getTracks().forEach(track => track.stop());
                 const wavBlob = await webm2Wav(audioBlob)
                 const evalResult = await evalSpeechFromFile(thread[currentIndex].text, wavBlob) as EvalResult;
-                setThreadRecord([
-                    ...threadRecord,
-                    {
-                        index: currentIndex,
-                        text: thread[currentIndex].text,
-                        score: evalResult.accuracy,
-                        detail_score: {
-                            accuracy: evalResult.accuracy,
-                            fluency: evalResult.fluency,
-                            completeness: evalResult.completeness,
-                            prosody: evalResult.prosody,
-                        }
-                    }])
+                const recordReport =  {
+                    index: currentIndex,
+                    text: thread[currentIndex],
+                    score: evalResult.pronunciation,
+                    detail_score: {
+                        accuracy: evalResult.accuracy,
+                        fluency: evalResult.fluency,
+                        completeness: evalResult.completeness,
+                        prosody: evalResult.prosody,
+                    },
+                }
+                console.log('Done Eval Speech')
+                if(!currentRecord){
+                setThreadRecord(prev => [
+                    ...prev,
+                    recordReport,
+                ]);
+                }else{
+                    setThreadRecord(prev => [
+                        ...prev.slice(0,-1),
+                        recordReport,
+                    ])
+                }
+                setCurrentRecord(recordReport)
                 setDisplayText('');
                 // URL.revokeObjectURL(audioUrl);
                 audioChunks = []; // 清空数组以释放内存」
@@ -222,7 +234,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
 
 
     const nextPage = () => {
-
+        setCurrentRecord(null)
         if (audioUrlRef.current) {
             URL.revokeObjectURL(audioUrlRef.current);
         }

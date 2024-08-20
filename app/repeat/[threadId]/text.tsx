@@ -55,6 +55,8 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     const [audioFile, setAudioFile] = useState('')
     const [currentIndex, setCurrentIndex] = useState(0)
+    const [currentRecord, setCurrentRecord] = useState<any>()
+
     const [threadRecord, setThreadRecord] = useState<any[]>([])
 
     const [report, setReport] = useState<any>()
@@ -183,21 +185,30 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                     const wavBlob = await webm2Wav(audioBlob);
                     console.log('Start Eval Speech')
                     const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as any;
+                    const recordReport =  {
+                        index: currentIndex,
+                        text: thread[currentIndex],
+                        score: evalResult.pronunciation,
+                        detail_score: {
+                            accuracy: evalResult.accuracy,
+                            fluency: evalResult.fluency,
+                            completeness: evalResult.completeness,
+                            prosody: evalResult.prosody,
+                        },
+                    }
                     console.log('Done Eval Speech')
+                    if(!currentRecord){
                     setThreadRecord(prev => [
                         ...prev,
-                        {
-                            index: currentIndex,
-                            text: thread[currentIndex],
-                            score: evalResult.pronunciation,
-                            detail_score: {
-                                accuracy: evalResult.accuracy,
-                                fluency: evalResult.fluency,
-                                completeness: evalResult.completeness,
-                                prosody: evalResult.prosody,
-                            },
-                        },
+                        recordReport,
                     ]);
+                    }else{
+                        setThreadRecord(prev => [
+                            ...prev.slice(0,-1),
+                            recordReport,
+                        ])
+                    }
+                    setCurrentRecord(recordReport)
                     setDisplayText('');
                     setIsRecognizing(false);
                     setRecognitionText(thread[currentIndex]);
@@ -242,7 +253,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
 
     const nextPage = () => {
-
+        setCurrentRecord(null)
         if (currentIndex + 1 <= thread.length - 1) {
             setIsRecognizing(false);
             setIsFinish(false);

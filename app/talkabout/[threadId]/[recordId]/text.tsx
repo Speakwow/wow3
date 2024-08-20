@@ -16,7 +16,7 @@ import Image from 'next/image'
 import { error } from "console";
 import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
-
+import {Score2Grade} from "@/lib/tools"
 // function HighlightWords({ story }: { story: any }) {
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
 // }
@@ -436,23 +436,23 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
                             <CardContent className="text-center grid grid-cols-4 gap-4">
                                 <div className="col-span-4">
                                     <Badge className="rounded-full px-6  border-[#42C83C]" variant="outline">
-                                        总分：<span className="text-[#42C83C] text-3xl">{(contentScore * 0.6 + pronResult.accuracy * 0.2 + pronResult.fluency * 0.2).toFixed(0)}</span>
+                                        总分：<span className="text-[#42C83C] text-3xl">{Score2Grade((contentScore * 0.6 + pronResult.accuracy * 0.2 + pronResult.fluency * 0.2))}</span>
                                     </Badge>
                                 </div>
                                 <div className="col-span-4 px-6 text-xl text-[#42C83C] mb-4">
                                     {feedback}
                                 </div>
                                 <div>
-                                    内容相关度：<span className="text-[#42C83C] text-3xl">{contentScore}</span>
+                                    内容相关度：<span className="text-[#42C83C] text-3xl">{Score2Grade(contentScore)}</span>
                                 </div>
                                 <div>
-                                    语言丰富度：<span className="text-[#42C83C] text-3xl">{grammarScore * 0.5 + vocabScore * 0.5}</span>
+                                    语言丰富度：<span className="text-[#42C83C] text-3xl">{Score2Grade(grammarScore * 0.5 + vocabScore * 0.5)}</span>
                                 </div>
                                 <div>
-                                    发音准确度：<span className="text-[#42C83C] text-3xl">{pronResult?.accuracy}</span>
+                                    发音准确度：<span className="text-[#42C83C] text-3xl">{Score2Grade(pronResult?.accuracy)}</span>
                                 </div>
                                 <div>
-                                    表达流利度：<span className="text-[#42C83C] text-3xl">{pronResult?.fluency}</span>
+                                    表达流利度：<span className="text-[#42C83C] text-3xl">{Score2Grade(pronResult?.fluency)}</span>
                                 </div>
                             </CardContent>
                         }
