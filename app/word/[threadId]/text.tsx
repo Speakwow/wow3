@@ -198,7 +198,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                         text: thread[currentIndex].text,
                         score: evalResult.accuracy,
                         detail_score: {
-                            accuray: evalResult.accuracy,
+                            accuracy: evalResult.accuracy,
                             fluency: evalResult.fluency,
                             completeness: evalResult.completeness,
                             prosody: evalResult.prosody,

@@ -2,7 +2,7 @@
 import { AssignmentRecord } from "@/app/dashboard/assignment/[threadId]/columns";
 import { clerkClient } from "@clerk/nextjs/server";
 
-export async function reformatRecords(records: any[], studentIds: string[]): Promise<AssignmentRecord[]> {
+export async function reformatRecords(records: any[], studentIds: string[],type:string): Promise<AssignmentRecord[]> {
     // 过滤出符合 studentIds 的记录并按分数降序排序
     const filteredRecords = records.filter(record => studentIds.includes(record.userId));
     const completedRecords = filteredRecords.filter(record => record.finishAt !== null);
@@ -23,7 +23,9 @@ export async function reformatRecords(records: any[], studentIds: string[]): Pro
             const rank = record.finishAt ? rankMap.get(record.userId)! : -1;
 
             return {
+                recordId:record._id.toString(),
                 threadId: record.threadId,
+                type:type,
                 userId: record.userId,
                 username: user.username ?? 'no name',
                 status: "已完成" as "已完成" | "未完成",
@@ -34,7 +36,9 @@ export async function reformatRecords(records: any[], studentIds: string[]): Pro
         } else {
             const user = await clerkClient().users.getUser(userId);
             return {
+                recordId:'',
                 threadId: "",
+                type:type,
                 userId:userId,
                 username: user.username ?? 'no name',
                 status: "未完成" as "已完成" | "未完成",

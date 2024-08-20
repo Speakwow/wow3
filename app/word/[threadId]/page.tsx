@@ -11,18 +11,6 @@ import { connect } from '@/lib/mongo'
 import { DB } from '@/lib/constant'
 
 
-export async function generateStaticParams() {
-    const mongo = await connect()
-    const [words,] = await Promise.all([
-        mongo.db(DB).collection('word_threads').find().toArray(),
-
-    ])
-    return words.map((write) => (
-        {
-            threadId: write._id.toString(),
-        }
-    ))
-}
 
 
 

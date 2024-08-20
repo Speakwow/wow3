@@ -21,19 +21,6 @@ import { connect } from "@/lib/mongo";
 import { DB } from "@/lib/constant";
 
 
-export async function generateStaticParams() {
-    const mongo = await connect()
-    const [assignments, ] = await Promise.all([
-      mongo.db(DB).collection('assignments').find().toArray(),
-  
-    ])
-    return assignments.map((assignment) => (
-        {
-          threadId: assignment._id.toString(),
-        }
-      ))
-  }
-
 export default async function AssginmentInfo({ params }: { params: { threadId: string } }) {
     const { userId, orgId } = auth();
     if (!orgId || !userId) {
@@ -64,7 +51,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
         hoursleft = +hoursleft.toFixed(0)
     }
 
-    const data = await reformatRecords(records, studentIds)
+    const data = await reformatRecords(records, studentIds,assignmentData.type)
     return (
         <div className="flex min-h-screen w-full flex-col">
             <Header activePage="assignment" />
