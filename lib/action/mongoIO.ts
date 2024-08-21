@@ -131,6 +131,7 @@ export async function getPublicData() {
     return mongo.db(DB)
       .collection(item)
       .find({ access: 'public' })
+      .limit(20)
       .toArray()
       .then(result => result.map(lesson => ({ type: collection2type(item), tag: Type2Tag(collection2type(item)), ...lesson })));
   });
