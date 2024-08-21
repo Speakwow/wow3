@@ -121,7 +121,7 @@ export function WriteForm({ userId, write }: { userId: string, write: any }) {
                 </Card>
                 <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className="">
+                        <CardTitle className="select-none">
                             表达升级✨
                         </CardTitle>
                     </CardHeader>
