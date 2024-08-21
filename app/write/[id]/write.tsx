@@ -125,7 +125,7 @@ export function WriteForm({ userId, write }: { userId: string, write: any }) {
                             表达升级✨
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="text-primary font-medium">
+                    <CardContent className="select-none text-primary font-medium">
                         {polished}
                     </CardContent>
                 </Card>
