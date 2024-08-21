@@ -41,12 +41,13 @@ export default async function SideBar() {
                     </Link>
                 </div>
                 <div className="flex flex-col gap-2">
-
+                {!orgId &&
                     <Button asChild className="w-full" size="lg">
                         <Link href='/create'>
                             创建课程
                         </Link>
                     </Button>
+                    }
                 </div>
                 < MyLessons lessonList={lessonList} userId={userId as string} />
             </div>
