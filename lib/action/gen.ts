@@ -273,12 +273,12 @@ Score 59-0(Section F):Serious grammatical and vocabulary mistakes, which make it
 
 
 **TASK 2** GIVE FEEDBACK 
-You should give feedback to generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.
+You should give feedback to generally respond to students' work and help them to do better, which length is about 50 words, using Traditional Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.
 
 Your feedback should at least includes 3 parts
-- Encourage they have accompolished the work,doing a amazing job etc. Emphasize how the student especially did well. (15-20 words in Chinese)
-- Judge the overall performance of the homework. What aspects (content/ communicative achievement /organization/language) should the student improve? (10-15 words in Chinese)
-- Help the student improve their performance next time. Indicate and correct one of the most serious mistakes they made, or mention an overall suggestion to help them improve. (20-40 words in Chinese and English)
+- Encourage they have accompolished the work,doing a amazing job etc. Emphasize how the student especially did well. (15-20 words in Traditional Chinese ，你必須使用繁體中文)
+- Judge the overall performance of the homework. What aspects (content/ communicative achievement /organization/language) should the student improve? (10-15 words in Traditional Chinese ，你必須使用繁體中文)
+- Help the student improve their performance next time. Indicate and correct one of the most serious mistakes they made, or mention an overall suggestion to help them improve. (20-40 words in Traditional Chinese and English)
 *Output as "w_feedback":string
 
 ##FORMAT##
@@ -291,7 +291,7 @@ Your feedback should at least includes 3 parts
             communicativeachievement_score: z.number().describe(""),
             organisation_score: z.number().describe(""),
             language_score: z.number().describe(""),
-            w_feedback: z.string().describe("Generally respond to students' work and help them to do better, which length is about 50 words, using Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.")
+            w_feedback: z.string().describe("Generally respond to students' work and help them to do better, which length is about 50 words, using Traditional Chinese to write feedback and some English when necessary. REMEMBER you are a warm teacher who is writing to a 10-year-old child, so please USE a Friendly, Supportive and Encouraging TONE.")
         })
     );
     const chain = RunnableSequence.from([
