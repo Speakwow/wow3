@@ -51,7 +51,7 @@ export default async function Talkabout({ params }: { params: { threadId: string
                     </Link>
                 </Button>
             </div>
-            <Card className='w-fit  p-2'>
+            <Card className='w-fit  p-2 md:w-2/3'>
                 <CardHeader>
                     <CardTitle className='text-center text-2xl p-2 font-bold text-[#42C83C]'>
                         看图说话

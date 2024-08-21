@@ -40,7 +40,7 @@ export function AssignCard({ userId, userData, name, type, id, intro, cover, tag
 
     return (
         <div className="relative w-full h-fit">
-            <DropdownMenu>
+            {/* <DropdownMenu>
                 <DropdownMenuTrigger className="absolute right-1 top-1 hover:bg-muted active:bg-muted focus:bg-black/25 h-6 w-6 p-1 rounded-full z-10" >
                     <MoreHorizontalIcon className="w-4 h-4" color="gray" />
                 </DropdownMenuTrigger>
@@ -55,7 +55,7 @@ export function AssignCard({ userId, userData, name, type, id, intro, cover, tag
                         </DropdownMenuItem>
                     }
                 </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
             <Link href={`/${type}/${id}`}>
                 <Card className={`relative flex flex-col bg-white rounded-[10px] border hover:ring focus:outline-none focus:ring focus:ring-[#42C83C] p-2 gap-2 hover:ring-[#42C83C]`}>
                     <div className="flex flex-row gap-3">

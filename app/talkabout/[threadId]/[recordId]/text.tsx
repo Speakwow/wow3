@@ -85,14 +85,14 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
     const [finishFeedback, setFinishFeedback] = useState(false)
     //Handle Correct
     const [feedback, setFeedback] = useState('')
-    const [themeScore, setThemeScore] = useState(0)
-    const [vocabScore, setVocabScore] = useState(0)
-    const [grammarScore, setGrammarScore] = useState(0)
     const [contentScore, setContentScore] = useState(0)
+    const [languageScore, setLanguageScore] = useState(0)
+    const [finalScore, setFinalScore] = useState(0)
     const [saveState, setSaveState] = useState('unsaved')
 
     async function handleFeedback(image_url: string, user_answer: string, pronResult: any) {
         setSaveState('saving')
+        sttRef?.current?.close()
         const res = await fetch('/api/talkabout/feedback',
             {
                 method: 'POST',
@@ -104,11 +104,9 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
         const feedbackData = await res.json()
 
         // console.log(data.message)
-        setThemeScore(feedbackData.theme_relevance_score)
-        setVocabScore(feedbackData.vocabulary_score)
-        setGrammarScore(feedbackData.grammarza_syntax_score)
         setFeedback(feedbackData.feedback)
-        setContentScore(feedbackData.score)
+        setContentScore(feedbackData.content_score)
+        setLanguageScore(feedbackData.language_score)
         setFinishFeedback(true)
         if (feedbackData) {
             setSaveState('saved')
@@ -116,15 +114,18 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
             setSaveState('failed')
 
         }
-        const finalScore = feedbackData.score * 0.6 + pronResult.accuracy * 0.28 + pronResult.fluency * 0.12
+        const finalScore = feedbackData.content_score * 0.4+feedbackData.language_score*0.2 +feedbackData.speed_score*0.13+ pronResult.accuracy * 0.14 + pronResult.fluency * 0.13
+        setFinalScore(finalScore)
         finishTalkaboutRecord(recordId, +finalScore.toFixed(0), {
             user_answer: pronResult.text,
             themeScore: feedbackData.theme_relevance_score,
             vocabScore: feedbackData.vocabulary_score,
             grammarScore: feedbackData.grammarza_syntax_score,
+            speedScore:feedbackData.speed_score,
             feedback: feedbackData.feedback,
-            overallContentScore: feedbackData.score,
-            overallPronScore: pronResult.accuracy * 0.7 + pronResult.fluency * 0.3,
+            overallContentScore: feedbackData.content_score,
+            overallLanguageScore: feedbackData.language_score,
+            overallPronScore: pronResult.accuracy * 0.34 + pronResult.fluency * 0.33 + feedbackData.speed_score*0.33,
             accuracy: pronResult.accuracy,
             fluency: pronResult.fluency
         }).then(res => {
@@ -139,6 +140,11 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
 
     var asrOff = new Howl({
         src: ['/sound/asr-off.wav'],
+        format: ['wav'],
+        autoplay: false,
+    });
+    var asrOn = new Howl({
+        src: ['/sound/asr-on.wav'],
         format: ['wav'],
         autoplay: false,
     });
@@ -158,6 +164,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
 
 
     const startListen = useCallback(() => {
+        asrOn.play()
         if (azureSpeechConfig === null) return
         setDisplayText('正在练习中')
         setIsRecording(true);
@@ -436,7 +443,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
                             <CardContent className="text-center grid grid-cols-4 gap-4">
                                 <div className="col-span-4">
                                     <Badge className="rounded-full px-6  border-[#42C83C]" variant="outline">
-                                        总分：<span className="text-[#42C83C] text-3xl">{Score2Grade((contentScore * 0.6 + pronResult.accuracy * 0.2 + pronResult.fluency * 0.2))}</span>
+                                        总分：<span className="text-[#42C83C] text-3xl">{Score2Grade(finalScore)}</span>
                                     </Badge>
                                 </div>
                                 <div className="col-span-4 px-6 text-xl text-[#42C83C] mb-4">
@@ -446,7 +453,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
                                     内容相关度：<span className="text-[#42C83C] text-3xl">{Score2Grade(contentScore)}</span>
                                 </div>
                                 <div>
-                                    语言丰富度：<span className="text-[#42C83C] text-3xl">{Score2Grade(grammarScore * 0.5 + vocabScore * 0.5)}</span>
+                                    语言丰富度：<span className="text-[#42C83C] text-3xl">{Score2Grade(languageScore)}</span>
                                 </div>
                                 <div>
                                     发音准确度：<span className="text-[#42C83C] text-3xl">{Score2Grade(pronResult?.accuracy)}</span>

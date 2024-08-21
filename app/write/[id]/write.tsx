@@ -15,19 +15,12 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
-import { createScenario } from "@/lib/action/mongoIO"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { useState } from "react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { genScenarioBasic, genScenarioFlow, genScenarioTarget, genWriteFeedback, improveWriting } from "@/lib/action/gen"
+import {  genWriteFeedback, improveWriting } from "@/lib/action/gen"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import WriteReportRadar from "@/components/radar-chart"
+import { Score2Grade } from "@/lib/tools"
 
 
 const formSchema = z.object({
@@ -52,23 +45,6 @@ export function WriteForm({ userId, write }: { userId: string, write: any }) {
     const [report, setReport] = useState<any>()
     const [polished, setPolished] = useState('')
 
-    function Score2Grade(score: number): string {
-        if (score < 0 || score > 100) {
-            throw new Error('Score must be between 0 and 100');
-        }
-
-        if (score >= 90 && score <= 100) {
-            return 'A';
-        } else if (score >= 75 && score < 90) {
-            return 'B';
-        } else if (score >= 70 && score < 85) {
-            return 'C';
-        } else if (score >= 60 && score < 70) {
-            return 'D';
-        } else {
-            return 'F';
-        }
-    }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setContent(values.content)
