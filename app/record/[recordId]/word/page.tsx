@@ -61,7 +61,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
 
             for (let i = 0; i < record.record.length; i++) {
                 detailScore[i] = [];
-                detailScore[i][0] = record.record[i].text;
+                detailScore[i][0] = record.record[i].text.text;
                 detailScore[i][1] = record.record[i].score;
                 detailScore[i][2] = record.record[i].detail_score.accuracy;
                 detailScore[i][3] = record.record[i].detail_score.fluency;
@@ -88,7 +88,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                 <div className="text-muted-foreground text-sm">返回上一页</div>
             </div>
             <ScrollArea className="w-full h-full mb-4">
-                <div className="p-4 h-full flex flex-col">
+                <div className="p-4 h-full flex flex-col mb-10">
 
 
                     <div className=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-10">
@@ -107,9 +107,9 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full col-span-2  h-fit pb-2 border-primary">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md ">课程名称</CardTitle>
+                                <CardTitle className="text-md ">課程名稱</CardTitle>
                                 <CardDescription className="text-xs">
-                                    跟读练习
+                                    詞彙練習
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
@@ -139,13 +139,13 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             <CardHeader className="p-4 pb-6">
                                 <CardTitle className="text-lg font-bold">{stuName}</CardTitle> {/* 學生名稱 */}
                                 <CardDescription className="text-xs">
-                                    課文跟讀 - 每段分析
+                                    詞彙練習 - 詳細分析
                                 </CardDescription>
                             </CardHeader>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>跟讀章節</TableHead>
+                                        <TableHead>單詞</TableHead>
                                         <TableHead>得分</TableHead>
 
                                     </TableRow>
