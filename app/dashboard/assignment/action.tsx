@@ -385,6 +385,7 @@ export function ReviewAssignmentButton(
                             <Button
                               id="date"
                               variant={"outline"}
+                              autoFocus
                               className={cn(
                                 "w-[300px] justify-start text-left font-normal",
                                 !field.value && "text-muted-foreground"
@@ -408,11 +409,11 @@ export function ReviewAssignmentButton(
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
-                            initialFocus
+                            // initialFocus
                             mode="range"
                             defaultMonth={field.value?.from}
                             selected={field.value}
-
+                          
                             onSelect={field.onChange}
                             numberOfMonths={2}
                           />
