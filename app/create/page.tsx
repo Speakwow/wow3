@@ -1,53 +1,8 @@
 import { Card } from "@/components/ui/card";
+import { typeMap } from "@/lib/db/db";
 import Link from "next/link";
 
 
-
-
-
-const types = [
-    {
-        'type': 'scenario',
-        'name': '情景对话',
-        'intro': '指定情景话题下的实时对话，AI引导学生探讨相关话题。',
-        'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar'
-    }
-    ,
-    {
-        'type': 'word',
-        'name': '单词跟读',
-        'intro': '与 AI 一同复习目标词汇',
-        'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/4592e163-cf97-4cf4-5c41-9a55dedf5100/avatar'
-    }
-    ,
-    {
-        'type': 'repeat',
-        'name': '跟读练习',
-        'intro': '一起读一读单词和句子吧',
-        'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/249ec15a-b7ea-4292-8236-e675a3596300/avatar'
-    }
-    ,
-    {
-        'type': 'story',
-        'name': '文字冒险',
-        'intro': '与 AI 展开一场生动有趣的文字冒险故事',
-        'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/060a7a04-6c6a-4de6-408c-dffee9638b00/avatar'
-    }
-    ,
-    {
-        'type': 'write',
-        'name': '写作练习',
-        'intro': '与 AI 一同提高你的写作技巧，通过有趣的写作任务和及时反馈来增强你的表达能力。',
-        'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/060a7a04-6c6a-4de6-408c-dffee9638b00/avatar'
-    }
-    ,
-    {
-        'type': 'talkabout',
-        'name': '看图说话',
-        'intro': '创建一个看图说话练习',
-        'banner': 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/060a7a04-6c6a-4de6-408c-dffee9638b00/avatar'
-    }
-];
 
 export default async function CreateBoard() {
     return (
@@ -60,12 +15,11 @@ export default async function CreateBoard() {
             </div>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {
-                    //@ts-ignore
-                    types.map(type => {
+                    typeMap.map(type => {
                         const key = Object.keys(type)[0];; // 获取对象的键
                         return (
                             <Link href={`./create/${type.type}`} key={key}>
-                                <VocabularyCard title={type.name} intro={type.intro} cover={type.banner} />
+                                <VocabularyCard title={type.tag} intro={type.intro} cover={type.banner} />
                             </Link>
                         )
                     })
