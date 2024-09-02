@@ -5,7 +5,7 @@ import { Message, useChat } from 'ai/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Keyboard, Mic, MoreVerticalIcon, PlayIcon, SendIcon, SkipForwardIcon } from 'lucide-react';
 import { Avatar, AvatarImage, } from "@/components/ui/avatar"
 import { synthesizeSpeech, synthesizeSpeechWithVoice } from '@/lib/speech/tts';
@@ -17,13 +17,6 @@ import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
 import Link from 'next/link';
 import { updateScenarioRecord } from '@/lib/action/mongoIO';
 import { useRouter } from 'next/navigation';
-import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
-import Image from 'next/image'
-import AzureConfig from "@/lib/speech/config";
-import _ from "lodash";
-import { Score2Grade } from "@/lib/tools"
-import { useUnmount } from 'usehooks-ts';
-
 
 
 let totalFluencyScore = 0
@@ -36,12 +29,6 @@ let stayTime = 0;
 
 export default function Chat(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
   const [sound, setSound] = useState<Howl | null>(null);
-  var asrOff = new Howl({
-    src: ['/sound/asr-off.wav'],
-    format: ['wav'],
-    autoplay: false,
-  });
-
 
   //Handle Playing Audio
   function handleAudioPlay(audioData: ArrayBuffer) {
@@ -70,7 +57,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     newSound.play();
   }
   // Cache Current Message
-  const [currentMessage, setCurrentMessage] = useState('')
+  let currentMessage = ''
 
   // Streaming Chat I/O
   // api: '/api/learn/' + params.scenarioId +'/'+params.characterId,
@@ -83,8 +70,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     },
     onFinish(messages) {
       setHint('')
-      setCurrentMessage(messages.content)
-      console.log("Get:", currentMessage)
+      currentMessage = messages.content
       synthesizeSpeechWithVoice(messages.content, params.character.voice_id, audioData => {
         if (audioData) {
           handleAudioPlay(audioData)
@@ -133,124 +119,83 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     }
   }, [input]);
 
-  const azureSpeechConfig = useMemo(() => {
-    // const speechConfig = speechsdk.SpeechConfig.fromSubscription('8d0f1ad8db3a41bf91ba8a1e9b44a621', 'westus')
-    const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
-    speechConfig.speechRecognitionLanguage = 'en-US'
-    // speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs', "12201")
-    // speechConfig.setProperty('SpeechServiceConnection_EndSilenceTimeoutMs', '3201')
+  // //Handle Asr
+  // const handleSpeechToText = async () => {
+  //   setDisplayText('Listening...');
+  //   setLoading(true)
+  //   setRecognitionText('');
+  //   try {
+  //     const text = await sttFromMic() as string;
+  //     setDisplayText(text);
+  //     setRecognitionText(text);
 
-    return { speechConfig }
-  }, [])
-
-  const listeningRef = useRef(false)
-  const [listening, setListening] = useState(false)
-  const sttRef = useRef<speechsdk.SpeechRecognizer>()
-  const evalRef = useRef<speechsdk.SpeechRecognizer>()
-  const audioConfigRef = useRef<speechsdk.AudioConfig>()
-  const mediaStreamRef = useRef<MediaStream>()
-
-  useUnmount(() => {
-    try {
-      listeningRef.current = false
-      setListening(false)
-      if (sttRef.current) sttRef.current.close()
-    } catch { }
-  })
-
+  //   } catch (error) {
+  //     console.error('Speech recognition error:', error);
+  //     setDisplayText('Not Hearing...');
+  //     if (currentMessage && currentMessage.length > 0) {
+  //       handleHint()
+  //     }
+  //     setLoading(false)
+  //   }
+  // };
 
   //Handle Asr with Eval
-  const handleSpeechToText = useCallback(() => {
+  const handleSpeechToText = async () => {
+    var sound = new Howl({
+      src: ['/sound/asr-on.wav'],
+      format: ['wav'],
+      autoplay: true,
+    });
+    sound.play();
     setDisplayText('Listening...');
     setLoading(true)
     setRecognitionText('');
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((stream: MediaStream) => {
-        mediaStreamRef.current = stream
-        const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
-        const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
-        audioConfigRef.current = audioConfig
-        sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
-                      evalRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
-              const pronunciationAssessmentConfig = new speechsdk.PronunciationAssessmentConfig(
-                "",
-                speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
-                speechsdk.PronunciationAssessmentGranularity.Phoneme,
-                false
-              );
-              pronunciationAssessmentConfig.applyTo(evalRef.current);
+    try {
+      // 使用 MediaRecorder API 进行录音
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      let audioChunks: Blob[] = [];
+      mediaRecorder.start();
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+      };
 
-        sttRef.current.recognizeOnceAsync(result => {
-          switch (result.reason) {
-            case speechsdk.ResultReason.RecognizedSpeech:
-              console.log(`RECOGNIZED: Text=${result.text}`);
-              setDisplayText(result.text);
-              setRecognitionText(result.text);
-              asrOff.play()
-              break;
-            case speechsdk.ResultReason.NoMatch:
-              console.log("NOMATCH: Speech could not be recognized.");
-              setDisplayText('Not Hearing...');
-
-              setHintTrigger(true)
-
-              setLoading(false)
-              break;
-            case speechsdk.ResultReason.Canceled:
-              const cancellation = speechsdk.CancellationDetails.fromResult(result);
-              console.log(`CANCELED: Reason=${cancellation.reason}`);
-
-              if (cancellation.reason == speechsdk.CancellationReason.Error) {
-                console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
-                console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
-                console.log("CANCELED: Did you set the speech resource key and region values?");
-              }
-              break;
-          }
-
-          if (mediaStreamRef.current) {
-            mediaStreamRef.current.getTracks().forEach(track => track.stop());
-          }
-          if (audioConfigRef.current) {
-            sttRef.current = undefined;
-          }
-        })
-
-        evalRef.current.recognizeOnceAsync(result => {
-          var pronunciation_result = speechsdk.PronunciationAssessmentResult.fromResult(result);
-          var evalResult = {
-            text: result.text,
-            pronunciation: pronunciation_result.pronunciationScore,
-            accuracy: pronunciation_result.accuracyScore,
-            fluency: pronunciation_result.fluencyScore,
-            length: pronunciation_result.detailResult.Words.length,
-          }
-          dialogLength = dialogLength + evalResult.length;
-          totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
-          totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
-          totalPronScore = totalPronScore + evalResult.pronunciation * evalResult.length;
-          console.log('words num:', dialogLength)
-          console.log('Accuracy:', totalAccuracyScore / dialogLength)
-          console.log('Fluency:', totalFluencyScore / dialogLength)
-          console.log(evalResult)
-        }
-      )
-      })
-
-
-  }, [azureSpeechConfig])
-
-  const [hintTrigger, setHintTrigger] = useState(false)
-
-  useEffect(() => {
-    if (hintTrigger == true) {
-      console.log(currentMessage)
-      handleHint()
-      setHintTrigger(false)
+      const text = await sttFromMic() as string;
+      setDisplayText(text);
+      setRecognitionText(text);
+      mediaRecorder.stop();
+      mediaRecorder.onstop = async () => {
+        var sound = new Howl({
+          src: ['/sound/asr-off.wav'],
+          format: ['wav'],
+          autoplay: true,
+        });
+        sound.play();
+        // 创建 Blob 保存音频文件
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const wavBlob = await webm2Wav(audioBlob)
+        // const audioUrl = URL.createObjectURL(wavBlob);
+        // downloadWavFile(wavBlob, 'output.wav');
+        const evalResult = await evalSpeechFromFile(text, wavBlob) as any;
+        dialogLength = dialogLength + evalResult.length;
+        totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
+        totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
+        totalPronScore = totalPronScore + evalResult.pronunciation * evalResult.length;
+        console.log('words num:', dialogLength)
+        console.log('Accuracy:', totalAccuracyScore / dialogLength)
+        console.log('Fluency:', totalFluencyScore / dialogLength)
+        // URL.revokeObjectURL(audioUrl);
+        audioChunks = []; // 清空数组以释放内存」
+      }
+    } catch (error) {
+      console.error('Speech recognition error:', error);
+      setDisplayText('Not Hearing...');
+      if (currentMessage && currentMessage.length > 0) {
+        handleHint()
+      }
+      setLoading(false)
     }
-
-  }, [hintTrigger]);
-
+  };
 
 
   //Handle Hint
@@ -270,7 +215,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   }
 
   const playHint = async () => {
-    synthesizeSpeechWithVoice(hint, params.character.voice_id, audioData => {
+    synthesizeSpeechWithVoice(hint, params.character.voice, audioData => {
       if (audioData) {
         const audioBlob = new Blob([audioData], { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -295,7 +240,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
     const keywords = ['goodbye', 'bye', 'see you', 'bye-bye'];
-    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 60) {
+    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 30) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
@@ -318,20 +263,20 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   }
   //handle Report
   function handleEnd() {
-    if (reportTriggerRef.current) {
-      stayTime = Date.now() - startTime
-      const reportResult = {
-        score: Math.round(totalPronScore / dialogLength),
-        accuracy: Math.round(totalAccuracyScore / dialogLength),
-        fluency: Math.round(totalFluencyScore / dialogLength),
-        duration: Math.round((stayTime / 1000)),
-        round: messages.length,
+      if (reportTriggerRef.current) {
+        stayTime = Date.now() - startTime
+        const reportResult = {
+          score: Math.round(totalPronScore / dialogLength),
+          accuracy: Math.round(totalAccuracyScore / dialogLength),
+          fluency: Math.round(totalFluencyScore / dialogLength),
+          duration: Math.round((stayTime / 1000)),
+          round: messages.length,
+        }
+        console.log(reportResult)
+        updateScenarioRecord(params.chatid, reportResult).then(() => setRecordSaved(true))
+        reportTriggerRef.current.click();
       }
-      console.log(reportResult)
-      updateScenarioRecord(params.chatid, reportResult).then(() => setRecordSaved(true))
-      reportTriggerRef.current.click();
     }
-  }
 
   // Cleanup on component unmount or page unload
   useEffect(() => {
@@ -397,7 +342,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
               <div className='w-full flex flex-col-reverse gap-4'>
                 <input className='sr-only' value={recognitionText} type="hidden" />
                 <div className='relative w-full flex flex-row justify-center items-end gap-6'>
-                  <div className='px-4 sr-only'>
+                  <div className='px-4'>
                     <Button ref={submitButtonRef} type="submit" className='sr-only'>
                       提交
                     </Button>
@@ -413,7 +358,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     >
                       <Mic width="60" height="60" />
                     </Button>
-                    <Button type='button' className='sr-only rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
+                    <Button type='button' className='rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
                       <Keyboard width={30} height={30} />
                     </Button>
                   </div>
@@ -478,7 +423,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
               </div>
               <div className='flex flex-col'>
                 <div className='text-center text-[#42C83C] text-5xl'>
-                  {Score2Grade(100 * (Math.pow(totalPronScore / dialogLength / 100, 1)))}
+                  {(100 * (Math.pow(totalPronScore / dialogLength / 100, 1))).toFixed(1)}
                 </div>
               </div>
               <div className='grid grid-cols-2 text-center gap-4 py-6'>
@@ -487,7 +432,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     Fluency
                   </div>
                   <div className=' text-[#FF8B01] text-5xl'>
-                    {Score2Grade((100 * (Math.pow(totalFluencyScore / dialogLength / 100, 1))))}
+                    {(100 * (Math.pow(totalFluencyScore / dialogLength / 100, 1))).toFixed(1)}
                   </div>
                 </div>
                 <div className='flex flex-col'>
@@ -495,7 +440,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     Accuracy
                   </div>
                   <div className='text-[#019FFF] text-5xl'>
-                    {Score2Grade(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1)))}
+                    {(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1))).toFixed(1)}
                   </div>
                 </div>
                 <div className='flex flex-col'>
@@ -547,7 +492,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
             </AlertDialogHeader>
             <AlertDialogFooter className='flex flex-row justify-between'>
-              <AlertDialogAction onClick={handleEnd}>
+              <AlertDialogAction  onClick={handleEnd}>
                 立即结束
               </AlertDialogAction>
               <AlertDialogCancel>

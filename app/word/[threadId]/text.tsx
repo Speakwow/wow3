@@ -6,12 +6,18 @@ import { sttFromMic } from "@/lib/speech/asr";
 import { EvalResult, evalSpeechFromFile } from "@/lib/speech/eval";
 import { synthesizeSpeech } from "@/lib/speech/tts";
 import { webm2Wav } from "@/lib/speech/wav";
-import { Mic,  RefreshCwIcon,  Volume1Icon } from "lucide-react";
-import React, { useState, useEffect, useRef } from 'react';
+import { Mic, RefreshCwIcon, Volume1Icon } from "lucide-react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Howl } from 'howler';
 import { Bravo } from "@/components/bravo";
 import { saveWordRecord } from "@/lib/action/mongoIO";
 import { LessonReport } from "@/components/report";
+import { useUnmount } from "usehooks-ts";
+import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
+import Image from 'next/image'
+import AzureConfig from "@/lib/speech/config";
+import _ from "lodash";
+import { Score2Grade } from "@/lib/tools"
 
 
 function calculateAverages(data: any[]): any {
@@ -51,13 +57,15 @@ function calculateAverages(data: any[]): any {
     };
 }
 
+let currentText = ''
+
 export default function RepeatText({ thread, userId, threadId }: { thread: any[], userId: string, threadId: string }) {
 
     const [audioFile, setAudioFile] = useState('')
     const [currentIndex, setCurrentIndex] = useState(0)
     const [threadRecord, setThreadRecord] = useState<any[]>([])
     const [currentRecord, setCurrentRecord] = useState<any>()
-
+    
     const [report, setReport] = useState<any>()
     const [saveState, setSaveState] = useState('unsaved')
 
@@ -79,6 +87,12 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
         format: ['wav'],
         autoplay: false,
     });
+
+    var asrOff = new Howl({
+        src: ['/sound/asr-off.wav'],
+        format: ['wav'],
+        autoplay: false,
+    });
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
         if (audioUrlRef.current) {
@@ -95,7 +109,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
             howlRef.current.unload();
             howlRef.current = null;
         }
-        
+
         var sound = new Howl({
             src: [audioUrl],
             format: ['wav'],
@@ -107,7 +121,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
             onend: function () {
                 setIsPlaying(false)
                 console.log('Playback finished');
-                handleSpeechToText()
+                handleSpeechToText(currentIndex)
 
             }
         });
@@ -162,15 +176,139 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
         sound.play();
     }
 
+    const azureSpeechConfig = useMemo(() => {
+        // const speechConfig = speechsdk.SpeechConfig.fromSubscription('8d0f1ad8db3a41bf91ba8a1e9b44a621', 'westus')
+        const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
+        speechConfig.speechRecognitionLanguage = 'en-US'
+        // speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs', "12201")
+        // speechConfig.setProperty('SpeechServiceConnection_EndSilenceTimeoutMs', '3201')
+
+        return { speechConfig }
+    }, [])
+
+    const listeningRef = useRef(false)
+    const [listening, setListening] = useState(false)
+    const sttRef = useRef<speechsdk.SpeechRecognizer>()
+    const evalRef = useRef<speechsdk.SpeechRecognizer>()
+    const audioConfigRef = useRef<speechsdk.AudioConfig>()
+    const mediaStreamRef = useRef<MediaStream>()
+
+    useUnmount(() => {
+        try {
+            listeningRef.current = false
+            setListening(false)
+            if (sttRef.current) sttRef.current.close()
+        } catch { }
+    })
 
     //Handle Asr with Eval
-    const handleSpeechToText = async () => {
+    const handleSpeechToText = useCallback((index:number) => {
+        setDisplayText('Listening...');
+        setLoading(true)
+        setIsRecognizing(true)
+        setRecognitionText('');
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then((stream: MediaStream) => {
+                console.log(thread[index].text)
+                mediaStreamRef.current = stream
+                const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
+                const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
+                audioConfigRef.current = audioConfig
+                sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
+                evalRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
+                const pronunciationAssessmentConfig = new speechsdk.PronunciationAssessmentConfig(
+                    thread[index].text,
+                    speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+                    speechsdk.PronunciationAssessmentGranularity.Phoneme,
+                    false
+                );
+                pronunciationAssessmentConfig.applyTo(evalRef.current);
+                sttRef.current.recognizeOnceAsync(result => {
+                    switch (result.reason) {
+                        case speechsdk.ResultReason.RecognizedSpeech:
+                            console.log(`RECOGNIZED: Text=${result.text}`);
+                            setDisplayText('Reviewing...');
+                            setRecognitionText(result.text);
+                            break;
+                        case speechsdk.ResultReason.NoMatch:
+                            console.log("NOMATCH: Speech could not be recognized.");
+                            console.error('Speech recognition error:');
+                            setDisplayText('Not Hearing...Try again');
+                            setLoading(false)
+                            setIsRecognizing(false)
+                            break;
+                        case speechsdk.ResultReason.Canceled:
+                            const cancellation = speechsdk.CancellationDetails.fromResult(result);
+                            console.log(`CANCELED: Reason=${cancellation.reason}`);
+
+                            if (cancellation.reason == speechsdk.CancellationReason.Error) {
+                                console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
+                                console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
+                                console.log("CANCELED: Did you set the speech resource key and region values?");
+
+                                setDisplayText('Not Hearing...Try again');
+                                setLoading(false)
+                                setIsRecognizing(false)
+                            }
+                            break;
+                    }
+
+                    if (mediaStreamRef.current) {
+                        mediaStreamRef.current.getTracks().forEach(track => track.stop());
+                    }
+                    if (audioConfigRef.current) {
+                        sttRef.current = undefined;
+                    }
+                })
+
+                evalRef.current.recognizeOnceAsync(result => {
+                    var pronunciation_result = speechsdk.PronunciationAssessmentResult.fromResult(result);
+                    var evalResult = {
+                        text: result.text,
+                        pronunciation: pronunciation_result.pronunciationScore,
+                        accuracy: pronunciation_result.accuracyScore,
+                        fluency: pronunciation_result.fluencyScore,
+                    }
+                    const recordReport = {
+                        index: index,
+                        text: thread[index].text,
+                        score: evalResult.pronunciation,
+                        detail_score: {
+                            accuracy: evalResult.accuracy,
+                            fluency: evalResult.fluency,
+                        },
+                    }
+                    console.log(recordReport)
+                    if (!currentRecord) {
+                        setThreadRecord(prev => [
+                            ...prev,
+                            recordReport,
+                        ]);
+                    } else {
+                        setThreadRecord(prev => [
+                            ...prev.slice(0, -1),
+                            recordReport,
+                        ])
+                    }
+                    setCurrentRecord(recordReport)
+                    setDisplayText('');
+                    setLoading(false)
+                    setIsRecognizing(false)
+                }
+                )
+            })
+
+
+    }, [azureSpeechConfig])
+
+    //Handle Asr with Eval
+    const handleSpeechToText2 = async () => {
         setDisplayText('Repeat After Me...');
         setLoading(true)
         setRecognitionText('');
         setIsRecognizing(true)
         asrOn.play()
-    
+
         try {
             // 使用 MediaRecorder API 进行录音
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -192,7 +330,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                 stream.getTracks().forEach(track => track.stop());
                 const wavBlob = await webm2Wav(audioBlob)
                 const evalResult = await evalSpeechFromFile(thread[currentIndex].text, wavBlob) as EvalResult;
-                const recordReport =  {
+                const recordReport = {
                     index: currentIndex,
                     text: thread[currentIndex],
                     score: evalResult.pronunciation,
@@ -204,14 +342,14 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                     },
                 }
                 console.log('Done Eval Speech')
-                if(!currentRecord){
-                setThreadRecord(prev => [
-                    ...prev,
-                    recordReport,
-                ]);
-                }else{
+                if (!currentRecord) {
                     setThreadRecord(prev => [
-                        ...prev.slice(0,-1),
+                        ...prev,
+                        recordReport,
+                    ]);
+                } else {
+                    setThreadRecord(prev => [
+                        ...prev.slice(0, -1),
                         recordReport,
                     ])
                 }
@@ -227,7 +365,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
             setDisplayText('Not Hearing...Try again');
             setLoading(false)
             setIsRecognizing(false)
-            
+
         }
     };
 
@@ -241,13 +379,14 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
         if (howlRef.current) {
             howlRef.current.unload();
         }
-        
+
         if (currentIndex + 1 <= thread.length - 1) {
             setLoading(true)
             setAudioFile("")
             setDisplayText('')
             setRecognitionText('')
             setCurrentIndex(currentIndex + 1)
+
         } else {
             setSaveState('saving')
             const final_report = calculateAverages(threadRecord)
@@ -286,7 +425,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                             <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
-                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying||isRecognizing}>
+                                <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying || isRecognizing}>
                                     <Volume1Icon color="#42C83C" className="w-8 h-8"></Volume1Icon>
                                 </Button>
                             </div>
@@ -299,15 +438,15 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                                 {thread[currentIndex].text}
                             </div>
                             :
-                            <div className={`text-4xl text-primary font-bold p-2 ${threadRecord[currentIndex].score >= 70?'text-primary':'text-red-600'}`}>
+                            <div className={`text-4xl text-primary font-bold p-2 ${threadRecord[currentIndex].score >= 70 ? 'text-primary' : 'text-red-600'}`}>
                                 {thread[currentIndex].text}
                             </div>
                         }
                         <div className="text-lg text-muted-foreground">
-                        {thread[currentIndex].symbol}
+                            {thread[currentIndex].symbol}
                         </div>
                         <div className="text-lg text-muted-foreground">
-                        {thread[currentIndex].meaning}
+                            {thread[currentIndex].meaning}
                         </div>
                     </div>
 
@@ -321,7 +460,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                         type='button'
                         size={'icon'}
                         className={`h-fit p-6 bg-[#42C83C] w-fit rounded-full border-8 border-white ${isRecognizing === true ? 'animate-bounce' : ''}`}
-                        onClick={handleSpeechToText}
+                        onClick={()=>handleSpeechToText(currentIndex)}
                         disabled={loading}
                     >   {
                             isRecognizing || isPlaying ?
