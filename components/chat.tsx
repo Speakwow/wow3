@@ -240,7 +240,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
     const keywords = ['goodbye', 'bye', 'see you', 'bye-bye'];
-    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 60) {
+    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 30) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
