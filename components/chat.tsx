@@ -29,17 +29,6 @@ let stayTime = 0;
 
 export default function Chat(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
   const [sound, setSound] = useState<Howl | null>(null);
-  const [asrOn, setAsrOn] = useState(new Howl({
-    src: ['/sound/asr-on.wav'],
-    format: ['wav'],
-    autoplay: false,
-  }))
-  const [asrOff, setAsrOff] = useState(new Howl({
-    src: ['/sound/asr-off.wav'],
-    format: ['wav'],
-    autoplay: false,
-  }))
-
 
 
   //Handle Playing Audio
@@ -59,7 +48,13 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         console.log('Playback finished');
         const continueSession = handleReport()
         if (isVoiceInput && continueSession) {
-          handleSpeechToText()
+          var sound = new Howl({
+            src: ['/sound/asr-on.wav'],
+            format: ['wav'],
+            autoplay: true,
+            onend:handleSpeechToText
+          });
+          sound.play();
         } else {
           setLoading(false)
         }
@@ -153,7 +148,6 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
   //Handle Asr with Eval
   const handleSpeechToText = async () => {
-    asrOn.play();
     setDisplayText('Listening...');
     setLoading(true)
     setRecognitionText('');
@@ -177,7 +171,12 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         setLoading(false)
       }
       dialogLength += text.length
-      asrOff.play()
+      var sound = new Howl({
+        src: ['/sound/asr-off.wav'],
+        format: ['wav'],
+        autoplay: true,
+      });
+      sound.play();
       setDisplayText(text);
       setRecognitionText(text);
       // mediaRecorder.stop();
@@ -256,7 +255,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
-          score: Math.round(totalPronScore / dialogLength),
+          score: calScore(dialogLength),
           accuracy: Math.round(totalAccuracyScore / dialogLength),
           fluency: Math.round(totalFluencyScore / dialogLength),
           duration: Math.round((stayTime / 1000)),
@@ -274,16 +273,16 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     }
   }
   function calScore(wordCount:number){
-    if (wordCount>80){
+    if (wordCount>100){
       return 90
     }
-    else if (wordCount>60){
+    else if (wordCount>80){
       return 80
     }
-    else if (wordCount>40){
+    else if (wordCount>60){
       return 70
     }
-    else if (wordCount>20){
+    else if (wordCount>40){
       return 60
     }
     else{
