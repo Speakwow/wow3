@@ -203,7 +203,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
 
     //Handle Asr with Eval
     const handleSpeechToText = useCallback((index:number) => {
-        setDisplayText('Listening...');
+        setDisplayText('Recording...');
         setLoading(true)
         setIsRecognizing(true)
         setRecognitionText('');
