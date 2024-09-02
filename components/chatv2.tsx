@@ -60,12 +60,6 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         console.log('Playback finished');
         const continueSession = handleReport()
         if (isVoiceInput && continueSession) {
-          var asrOn = new Howl({
-            src: ['/sound/asr-on.wav'],
-            format: ['wav'],
-            autoplay: false,
-          });
-          asrOn.play()
           handleSpeechToText()
         } else {
           setLoading(false)
