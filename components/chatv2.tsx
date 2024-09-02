@@ -64,7 +64,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
             src: ['/sound/asr-on.wav'],
             format: ['wav'],
             autoplay: false,
-            onend:handleSpeechToText
+            onend: handleSpeechToText
           });
           asrOn.play()
         } else {
@@ -76,7 +76,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     newSound.play();
   }
   // Cache Current Message
-  let currentMessage = ''
+  const [currentMessage,setCurrentMessage] = useState('')
 
   // Streaming Chat I/O
   // api: '/api/learn/' + params.scenarioId +'/'+params.characterId,
@@ -89,7 +89,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     },
     onFinish(messages) {
       setHint('')
-      currentMessage = messages.content
+      setCurrentMessage(messages.content)
+      console.log("Get:",currentMessage)
       synthesizeSpeechWithVoice(messages.content, params.character.voice_id, audioData => {
         if (audioData) {
           handleAudioPlay(audioData)
@@ -154,20 +155,20 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   const audioConfigRef = useRef<speechsdk.AudioConfig>()
   const mediaStreamRef = useRef<MediaStream>()
 
-  function calScore(wordCount:number){
-    if (wordCount>100){
+  function calScore(wordCount: number) {
+    if (wordCount > 120) {
       return 90
     }
-    else if (wordCount>80){
+    else if (wordCount > 100) {
       return 80
     }
-    else if (wordCount>60){
+    else if (wordCount > 80) {
       return 70
     }
-    else if (wordCount>40){
+    else if (wordCount > 50) {
       return 60
     }
-    else{
+    else {
       return 50
     }
 
@@ -195,15 +196,37 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         audioConfigRef.current = audioConfig
         sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
         sttRef.current.recognizeOnceAsync(result => {
-          console.log(`RECOGNIZED: Text=${result.text}`);
-          var evalResult = {
-            text: result.text,
+          switch (result.reason) {
+            case speechsdk.ResultReason.RecognizedSpeech:
+              console.log(`RECOGNIZED: Text=${result.text}`);
+              var evalResult = {
+                text: result.text,
 
+              }
+              dialogLength += result.text.length
+              setDisplayText(evalResult.text);
+              setRecognitionText(evalResult.text);
+              asrOff.play()
+              break;
+            case speechsdk.ResultReason.NoMatch:
+              console.log("NOMATCH: Speech could not be recognized.");
+              setDisplayText('Not Hearing...');
+  
+              setHintTrigger(true)
+              
+              setLoading(false)
+              break;
+            case speechsdk.ResultReason.Canceled:
+              const cancellation = speechsdk.CancellationDetails.fromResult(result);
+              console.log(`CANCELED: Reason=${cancellation.reason}`);
+
+              if (cancellation.reason == speechsdk.CancellationReason.Error) {
+                console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
+                console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
+                console.log("CANCELED: Did you set the speech resource key and region values?");
+              }
+              break;
           }
-          dialogLength+=result.text.length
-          setDisplayText(evalResult.text);
-          setRecognitionText(evalResult.text);
-          asrOff.play()
 
           if (mediaStreamRef.current) {
             mediaStreamRef.current.getTracks().forEach(track => track.stop());
@@ -212,18 +235,22 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
             sttRef.current = undefined;
           }
         })
-        sttRef.current.canceled = function (s, e) {
-          console.error('Speech recognition error:');
-          setDisplayText('Not Hearing...');
-          if (currentMessage && currentMessage.length > 0) {
-            handleHint()
-          }
-          setLoading(false)
-        };
       })
 
 
   }, [azureSpeechConfig])
+
+  const [hintTrigger,setHintTrigger]= useState(false)
+
+  useEffect(() => {
+    if(hintTrigger==true){
+      console.log(currentMessage)
+      handleHint()
+      setHintTrigger(false)
+    }
+   
+  }, [hintTrigger]);
+
 
 
   //Handle Hint
@@ -243,7 +270,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   }
 
   const playHint = async () => {
-    synthesizeSpeechWithVoice(hint, params.character.voice, audioData => {
+    synthesizeSpeechWithVoice(hint, params.character.voice_id, audioData => {
       if (audioData) {
         const audioBlob = new Blob([audioData], { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -274,7 +301,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         const reportResult = {
           score: calScore(dialogLength),
           accuracy: 90,
-          fluency:90,
+          fluency: 90,
           duration: Math.round((stayTime / 1000)),
           round: messages.length,
         }
@@ -370,7 +397,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
               <div className='w-full flex flex-col-reverse gap-4'>
                 <input className='sr-only' value={recognitionText} type="hidden" />
                 <div className='relative w-full flex flex-row justify-center items-end gap-6'>
-                  <div className='px-4'>
+                  <div className='px-4 sr-only'>
                     <Button ref={submitButtonRef} type="submit" className='sr-only'>
                       提交
                     </Button>
@@ -386,7 +413,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     >
                       <Mic width="60" height="60" />
                     </Button>
-                    <Button type='button' className='rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
+                    <Button type='button' className='sr-only rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
                       <Keyboard width={30} height={30} />
                     </Button>
                   </div>
