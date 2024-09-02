@@ -1,10 +1,11 @@
+
 'use client';
 
 import { Message, useChat } from 'ai/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Keyboard, Mic, MoreVerticalIcon, PlayIcon, SendIcon, SkipForwardIcon } from 'lucide-react';
 import { Avatar, AvatarImage, } from "@/components/ui/avatar"
 import { synthesizeSpeech, synthesizeSpeechWithVoice } from '@/lib/speech/tts';
@@ -16,7 +17,13 @@ import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
 import Link from 'next/link';
 import { updateScenarioRecord } from '@/lib/action/mongoIO';
 import { useRouter } from 'next/navigation';
-import { Score2Grade } from '@/lib/tools';
+import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
+import Image from 'next/image'
+import AzureConfig from "@/lib/speech/config";
+import _ from "lodash";
+import { Score2Grade } from "@/lib/tools"
+import { useUnmount } from 'usehooks-ts';
+
 
 
 let totalFluencyScore = 0
@@ -29,18 +36,16 @@ let stayTime = 0;
 
 export default function Chat(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
   const [sound, setSound] = useState<Howl | null>(null);
-  const [asrOn, setAsrOn] = useState(new Howl({
-    src: ['/sound/asr-on.wav'],
-    format: ['wav'],
-    autoplay: false,
-  }))
-  const [asrOff, setAsrOff] = useState(new Howl({
+  var asrOff = new Howl({
     src: ['/sound/asr-off.wav'],
     format: ['wav'],
     autoplay: false,
-  }))
-
-
+  });
+  var asrOn = new Howl({
+    src: ['/sound/asr-on.wav'],
+    format: ['wav'],
+    autoplay: false,
+  });
 
   //Handle Playing Audio
   function handleAudioPlay(audioData: ArrayBuffer) {
@@ -131,75 +136,85 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     }
   }, [input]);
 
-  // //Handle Asr
-  // const handleSpeechToText = async () => {
-  //   setDisplayText('Listening...');
-  //   setLoading(true)
-  //   setRecognitionText('');
-  //   try {
-  //     const text = await sttFromMic() as string;
-  //     setDisplayText(text);
-  //     setRecognitionText(text);
+  const azureSpeechConfig = useMemo(() => {
+    // const speechConfig = speechsdk.SpeechConfig.fromSubscription('8d0f1ad8db3a41bf91ba8a1e9b44a621', 'westus')
+    const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
+    speechConfig.speechRecognitionLanguage = 'en-US'
+    // speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs', "12201")
+    // speechConfig.setProperty('SpeechServiceConnection_EndSilenceTimeoutMs', '3201')
 
-  //   } catch (error) {
-  //     console.error('Speech recognition error:', error);
-  //     setDisplayText('Not Hearing...');
-  //     if (currentMessage && currentMessage.length > 0) {
-  //       handleHint()
-  //     }
-  //     setLoading(false)
-  //   }
-  // };
+    return { speechConfig }
+  }, [])
+
+  const listeningRef = useRef(false)
+  const [listening, setListening] = useState(false)
+  const sttRef = useRef<speechsdk.SpeechRecognizer>()
+  const audioConfigRef = useRef<speechsdk.AudioConfig>()
+  const mediaStreamRef = useRef<MediaStream>()
+  const [enableInput, setEnableInput] = useState(false)
+
+
+  useUnmount(() => {
+    try {
+      listeningRef.current = false
+      setListening(false)
+      if (sttRef.current) sttRef.current.close()
+    } catch { }
+  })
+
 
   //Handle Asr with Eval
-  const handleSpeechToText = async () => {
-    asrOn.play();
+  const handleSpeechToText = useCallback(() => {
+    asrOn.play()
     setDisplayText('Listening...');
     setLoading(true)
     setRecognitionText('');
-    try {
-      // // 使用 MediaRecorder API 进行录音
-      // const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // const mediaRecorder = new MediaRecorder(stream);
-      // let audioChunks: Blob[] = [];
-      // mediaRecorder.start();
-      // mediaRecorder.ondataavailable = event => {
-      //   audioChunks.push(event.data);
-      // };
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream: MediaStream) => {
+        mediaStreamRef.current = stream
+        const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
+        const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
+        audioConfigRef.current = audioConfig
+        sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
+        sttRef.current.recognizeOnceAsync(result => {
+          console.log(`RECOGNIZED: Text=${result.text}`);
+          var pronunciation_result = speechsdk.PronunciationAssessmentResult.fromResult(result);
+          var evalResult = {
+            text: result.text,
 
-      const text = await sttFromMic() as string;
-      dialogLength += text.length
-      asrOff.play()
-      setDisplayText(text);
-      setRecognitionText(text);
-      // mediaRecorder.stop();
-      // mediaRecorder.onstop = async () => {
-      //   asrOff.play();
-      //   // 创建 Blob 保存音频文件
-      //   const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-      //   const wavBlob = await webm2Wav(audioBlob)
-      //   // const audioUrl = URL.createObjectURL(wavBlob);
-      //   // downloadWavFile(wavBlob, 'output.wav');
-      //   const evalResult = await evalSpeechFromFile(text, wavBlob) as any;
-      //   dialogLength = dialogLength + evalResult.length;
-      //   totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
-      //   totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
-      //   totalPronScore = totalPronScore + evalResult.pronunciation * evalResult.length;
-      //   console.log('words num:', dialogLength)
-      //   console.log('Accuracy:', totalAccuracyScore / dialogLength)
-      //   console.log('Fluency:', totalFluencyScore / dialogLength)
-      //   // URL.revokeObjectURL(audioUrl);
-      //   audioChunks = []; // 清空数组以释放内存」
-      // }
-    } catch (error) {
-      console.error('Speech recognition error:', error);
-      setDisplayText('Not Hearing...');
-      if (currentMessage && currentMessage.length > 0) {
-        handleHint()
-      }
-      setLoading(false)
-    }
-  };
+          }
+          setDisplayText(evalResult.text);
+          setRecognitionText(evalResult.text);
+
+          asrOff.play()
+          if (sttRef.current) {
+            sttRef.current.stopContinuousRecognitionAsync(() => {
+              sttRef.current?.close();
+              sttRef.current = undefined;
+            });
+          }
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(track => track.stop());
+            sttRef.current = undefined;
+          }
+          if (audioConfigRef.current) {
+            sttRef.current = undefined;
+          }
+        })
+        sttRef.current.canceled = function (s, e) {
+          console.error('Speech recognition error:');
+          setDisplayText('Not Hearing...');
+          if (currentMessage && currentMessage.length > 0) {
+            handleHint()
+          }
+          setLoading(false)
+        };
+
+
+      })
+
+
+  }, [azureSpeechConfig])
 
 
   //Handle Hint
@@ -265,33 +280,14 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       return true
     }
   }
-  function calScore(wordCount:number){
-    if (wordCount>80){
-      return 90
-    }
-    else if (wordCount>60){
-      return 80
-    }
-    else if (wordCount>40){
-      return 70
-    }
-    else if (wordCount>20){
-      return 60
-    }
-    else{
-      return 50
-    }
-
-  }
   //handle Report
   function handleEnd() {
     if (reportTriggerRef.current) {
       stayTime = Date.now() - startTime
       const reportResult = {
-        // score: Math.round(totalPronScore / dialogLength),
-        score:calScore(dialogLength),
-        accuracy: 90,
-        fluency:90,
+        score: Math.round(totalPronScore / dialogLength),
+        accuracy: Math.round(totalAccuracyScore / dialogLength),
+        fluency: Math.round(totalFluencyScore / dialogLength),
         duration: Math.round((stayTime / 1000)),
         round: messages.length,
       }
@@ -381,7 +377,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     >
                       <Mic width="60" height="60" />
                     </Button>
-                    <Button type='button' className='sr-only rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
+                    <Button type='button' className='rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
                       <Keyboard width={30} height={30} />
                     </Button>
                   </div>
@@ -438,19 +434,19 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           <AlertDialogHeader>
             <AlertDialogTitle className='text-center text-2xl'>PERFECT!</AlertDialogTitle>
             <AlertDialogDescription>
-              {/* <div className='flex justify-center'>
+              <div className='flex justify-center'>
                 <img src='/report-bravo.gif' className='w-1/5'></img>
-              </div> */}
+              </div>
               <div className='text-center text-xl'>
                 You did it! Final Score:
               </div>
               <div className='flex flex-col'>
                 <div className='text-center text-[#42C83C] text-5xl'>
-                  {Score2Grade(calScore(dialogLength))}
+                  {Score2Grade(100 * (Math.pow(totalPronScore / dialogLength / 100, 1)))}
                 </div>
               </div>
               <div className='grid grid-cols-2 text-center gap-4 py-6'>
-                {/* <div className='flex flex-col'>
+                <div className='flex flex-col'>
                   <div>
                     Fluency
                   </div>
@@ -465,7 +461,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                   <div className='text-[#019FFF] text-5xl'>
                     {(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1))).toFixed(1)}
                   </div>
-                </div> */}
+                </div>
                 <div className='flex flex-col'>
                   <div>
                     Round
