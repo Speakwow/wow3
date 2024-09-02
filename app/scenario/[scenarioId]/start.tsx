@@ -1,6 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
-import Chat from "@/components/chat";
+import Chat from "@/components/chatv2";
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 

@@ -41,11 +41,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     format: ['wav'],
     autoplay: false,
   });
-  var asrOn = new Howl({
-    src: ['/sound/asr-on.wav'],
-    format: ['wav'],
-    autoplay: false,
-  });
+
 
   //Handle Playing Audio
   function handleAudioPlay(audioData: ArrayBuffer) {
@@ -64,7 +60,13 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         console.log('Playback finished');
         const continueSession = handleReport()
         if (isVoiceInput && continueSession) {
-          handleSpeechToText()
+          var asrOn = new Howl({
+            src: ['/sound/asr-on.wav'],
+            format: ['wav'],
+            autoplay: false,
+            onend:handleSpeechToText
+          });
+          asrOn.play()
         } else {
           setLoading(false)
         }
@@ -151,8 +153,25 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   const sttRef = useRef<speechsdk.SpeechRecognizer>()
   const audioConfigRef = useRef<speechsdk.AudioConfig>()
   const mediaStreamRef = useRef<MediaStream>()
-  const [enableInput, setEnableInput] = useState(false)
 
+  function calScore(wordCount:number){
+    if (wordCount>100){
+      return 90
+    }
+    else if (wordCount>80){
+      return 80
+    }
+    else if (wordCount>60){
+      return 70
+    }
+    else if (wordCount>40){
+      return 60
+    }
+    else{
+      return 50
+    }
+
+  }
 
   useUnmount(() => {
     try {
@@ -165,7 +184,6 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
   //Handle Asr with Eval
   const handleSpeechToText = useCallback(() => {
-    asrOn.play()
     setDisplayText('Listening...');
     setLoading(true)
     setRecognitionText('');
@@ -178,24 +196,17 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
         sttRef.current.recognizeOnceAsync(result => {
           console.log(`RECOGNIZED: Text=${result.text}`);
-          var pronunciation_result = speechsdk.PronunciationAssessmentResult.fromResult(result);
           var evalResult = {
             text: result.text,
 
           }
+          dialogLength+=result.text.length
           setDisplayText(evalResult.text);
           setRecognitionText(evalResult.text);
-
           asrOff.play()
-          if (sttRef.current) {
-            sttRef.current.stopContinuousRecognitionAsync(() => {
-              sttRef.current?.close();
-              sttRef.current = undefined;
-            });
-          }
+
           if (mediaStreamRef.current) {
             mediaStreamRef.current.getTracks().forEach(track => track.stop());
-            sttRef.current = undefined;
           }
           if (audioConfigRef.current) {
             sttRef.current = undefined;
@@ -209,8 +220,6 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           }
           setLoading(false)
         };
-
-
       })
 
 
@@ -263,9 +272,9 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
-          score: Math.round(totalPronScore / dialogLength),
-          accuracy: Math.round(totalAccuracyScore / dialogLength),
-          fluency: Math.round(totalFluencyScore / dialogLength),
+          score: calScore(dialogLength),
+          accuracy: 90,
+          fluency:90,
           duration: Math.round((stayTime / 1000)),
           round: messages.length,
         }
@@ -442,11 +451,11 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
               </div>
               <div className='flex flex-col'>
                 <div className='text-center text-[#42C83C] text-5xl'>
-                  {Score2Grade(100 * (Math.pow(totalPronScore / dialogLength / 100, 1)))}
+                  {Score2Grade(calScore(dialogLength))}
                 </div>
               </div>
               <div className='grid grid-cols-2 text-center gap-4 py-6'>
-                <div className='flex flex-col'>
+                {/* <div className='flex flex-col'>
                   <div>
                     Fluency
                   </div>
@@ -461,7 +470,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                   <div className='text-[#019FFF] text-5xl'>
                     {(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1))).toFixed(1)}
                   </div>
-                </div>
+                </div> */}
                 <div className='flex flex-col'>
                   <div>
                     Round
