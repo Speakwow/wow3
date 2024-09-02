@@ -290,8 +290,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   function handleReport() {
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
-    const keywords = ['goodbye', 'bye', 'see you', 'bye-bye'];
-    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 30) {
+    const keywords = ['goodbye', 'bye', 'see you', 'bye-bye','good bye','see-you'];
+    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 36) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
