@@ -25,118 +25,123 @@ import { redirect } from "next/navigation"
 
 export default async function Plan() {
     const today = new Date()
-    const { userId, orgId,has  } = auth();
-    if(!has({ role: "org:admin" })){
+    const { userId, orgId, has } = auth();
+    if (!has({ role: "org:admin" })) {
         redirect('/404/unauthoried')
     }
     const textbookId = "66b0937bfdcc2483666628a5"
-    const [data,studentIds] = await Promise.all([getTextbookData(textbookId),getOrgStudents(orgId as string)])
+    const [data, studentIds] = await Promise.all([getTextbookData(textbookId), getOrgStudents(orgId as string)])
 
     return (
-        <div className="flex h-screen w-full flex-col">
+        <div className="flex h-screen w-full flex-col bg-muted">
             <ScrollArea className="h-full">
-            <Header activePage="assignment"/>
-            <main className="flex flex-1 flex-col gap-2 p-4 md:gap-8 md:p-8 bg-muted">
-            <Breadcrumb>
-                    <BreadcrumbList>
-                    <BreadcrumbSeparator/>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>概览</BreadcrumbPage>
-                        </BreadcrumbItem>
-                        
-                    </BreadcrumbList>
-                </Breadcrumb>
-                <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-                    <Card className="col-span-4 h-full">
-                        <CardHeader className="flex flex-row items-center">
-                            <div className="grid gap-2">
-                                <CardTitle>{data.name}</CardTitle>
-                                <CardDescription>
-                                    课程导览
-                                </CardDescription>
-                            </div>
-                            <div className="ml-auto flex flex-row gap-2">
-                                {/* <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
+                <Header activePage="assignment" />
+                <main className="flex flex-1 flex-col gap-2 p-4 md:gap-8 md:p-8 ">
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>概览</BreadcrumbPage>
+                            </BreadcrumbItem>
+
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                    <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+                        <Card className="col-span-4 h-full">
+                            <CardHeader className="flex flex-row items-center">
+                                <div className="grid gap-2">
+                                    <CardTitle>{data?.name ?? '无课程'}</CardTitle>
+                                    <CardDescription>
+                                        课程导览
+                                    </CardDescription>
+                                </div>
+                                <div className="ml-auto flex flex-row gap-2">
+                                    {/* <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
                                     <Link href="#">
                                         查看全部
                                     </Link>
                                 </Button> */}
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>
-                                            单元
-                                        </TableHead>
-                                        <TableHead>
-                                            作业
-                                        </TableHead>
-                                        <TableHead>
-                                            类型
-                                        </TableHead>
-                                        <TableHead>
-                                            状态
-                                        </TableHead>
-                                        <TableHead>
-                                            截止日期
-                                        </TableHead>
-                                        <TableHead className="text-right">操作</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                
-                                <TableBody>
-                                    {
-                                        data.units.map((unit: { unit: number, lessons: any[] }) => {
-                                            return unit.lessons.map(
-                                                lesson => {
-                                                    if (lesson.data) {
-                                                        return (
-                                                            <Suspense key={lesson.id} fallback={                                                                
-                                                            <AssignmentRowLoading
-                                                                unit={unit.unit}
-                                                                name={lesson.data.name}
-                                                                type={lesson.type}
-                                                                threadId={lesson.id}
-                                                                orgId={orgId as string}
-                                                                studentIds={studentIds}
-                                                                textbookId={textbookId}
-                                                                userId={userId as string} 
-                                                                />}>
-                                                                {/* @ts-ignore */}
-                                                                <AssignmentRow
-                                                                    unit={unit.unit}
-                                                                    name={lesson.data.name}
-                                                                    type={lesson.type}
-                                                                    threadId={lesson.id}
-                                                                    orgId={orgId as string}
-                                                                    studentIds={studentIds}
-                                                                    textbookId={textbookId}
-                                                                    userId={userId as string} 
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>
+                                                单元
+                                            </TableHead>
+                                            <TableHead>
+                                                作业
+                                            </TableHead>
+                                            <TableHead>
+                                                类型
+                                            </TableHead>
+                                            <TableHead>
+                                                状态
+                                            </TableHead>
+                                            <TableHead>
+                                                截止日期
+                                            </TableHead>
+                                            <TableHead className="text-right">操作</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+
+                                    <TableBody>
+                                        {data ?
+                                            data.units.map((unit: { unit: number, lessons: any[] }) => {
+                                                return unit.lessons.map(
+                                                    lesson => {
+                                                        if (lesson.data) {
+                                                            return (
+                                                                <Suspense key={lesson.id} fallback={
+                                                                    <AssignmentRowLoading
+                                                                        unit={unit.unit}
+                                                                        name={lesson.data.name}
+                                                                        type={lesson.type}
+                                                                        threadId={lesson.id}
+                                                                        orgId={orgId as string}
+                                                                        studentIds={studentIds}
+                                                                        textbookId={textbookId}
+                                                                        userId={userId as string}
+                                                                    />}>
+                                                                    {/* @ts-ignore */}
+                                                                    <AssignmentRow
+                                                                        unit={unit.unit}
+                                                                        name={lesson.data.name}
+                                                                        type={lesson.type}
+                                                                        threadId={lesson.id}
+                                                                        orgId={orgId as string}
+                                                                        studentIds={studentIds}
+                                                                        textbookId={textbookId}
+                                                                        userId={userId as string}
                                                                     />
-                                                            </Suspense>
-                                                        )
+                                                                </Suspense>
+                                                            )
+                                                        }
+                                                        return null
                                                     }
-                                                    return null
-                                                }
-                                            )
-                                        })
-                                    }
+                                                )
+                                            })
+                                            :
+                                            <div className="p-4">
+                                                暂无数据
+                                            </div>
 
-                                </TableBody>
-                            
-                            </Table>
-                        </CardContent>
-            
-                    </Card>
-                    
+                                        }
+
+                                    </TableBody>
+
+                                </Table>
+                            </CardContent>
+
+                        </Card>
 
 
 
 
-                </div>
-            </main>
+
+                    </div>
+                </main>
             </ScrollArea>
         </div>
     )

@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { finishTalkaboutRecord } from "@/lib/action/mongoIO";
 import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
 import Image from 'next/image'
-import { error } from "console";
 import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
 import {Score2Grade} from "@/lib/tools"
