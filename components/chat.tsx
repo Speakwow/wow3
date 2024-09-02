@@ -168,6 +168,14 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       // };
 
       const text = await sttFromMic() as string;
+      if(!text){
+        console.error('Not hearing');
+        setDisplayText('Not Hearing...');
+        if (currentMessage && currentMessage.length > 0) {
+          handleHint()
+        }
+        setLoading(false)
+      }
       dialogLength += text.length
       asrOff.play()
       setDisplayText(text);
