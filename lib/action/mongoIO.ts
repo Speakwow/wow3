@@ -899,7 +899,8 @@ export async function getRecordsForAssignment(threadId: string, orgId: string, s
         threadId: threadId,
         userId: { $in: userIds },
         isFinished: true,
-        finishAt: { $gte: assignment?.startAt, $lte: assignment?.endAt }
+        finishAt: { $gte: assignment?.startAt, $lte: assignment?.endAt },
+        score: { $gte: 0, $lte: 100 }
       }
     },
     {

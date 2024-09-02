@@ -358,7 +358,7 @@ export function ReviewAssignmentButton(
                       </div>
                       <div className="font-medium flex flex-col justify-center text-center">
                         <div className="text-xl text-primary">
-                          {averageScore}
+                          {averageScore.toFixed(2)}
                         </div>
                         <div className="text-muted-foreground text-xs">
                           平均分
