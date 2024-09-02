@@ -64,9 +64,9 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
             src: ['/sound/asr-on.wav'],
             format: ['wav'],
             autoplay: false,
-            onend: handleSpeechToText
           });
           asrOn.play()
+          handleSpeechToText()
         } else {
           setLoading(false)
         }
@@ -76,7 +76,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     newSound.play();
   }
   // Cache Current Message
-  const [currentMessage,setCurrentMessage] = useState('')
+  const [currentMessage, setCurrentMessage] = useState('')
 
   // Streaming Chat I/O
   // api: '/api/learn/' + params.scenarioId +'/'+params.characterId,
@@ -90,7 +90,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     onFinish(messages) {
       setHint('')
       setCurrentMessage(messages.content)
-      console.log("Get:",currentMessage)
+      console.log("Get:", currentMessage)
       synthesizeSpeechWithVoice(messages.content, params.character.voice_id, audioData => {
         if (audioData) {
           handleAudioPlay(audioData)
@@ -152,27 +152,9 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   const listeningRef = useRef(false)
   const [listening, setListening] = useState(false)
   const sttRef = useRef<speechsdk.SpeechRecognizer>()
+  const evalRef = useRef<speechsdk.SpeechRecognizer>()
   const audioConfigRef = useRef<speechsdk.AudioConfig>()
   const mediaStreamRef = useRef<MediaStream>()
-
-  function calScore(wordCount: number) {
-    if (wordCount > 120) {
-      return 90
-    }
-    else if (wordCount > 100) {
-      return 80
-    }
-    else if (wordCount > 80) {
-      return 70
-    }
-    else if (wordCount > 50) {
-      return 60
-    }
-    else {
-      return 50
-    }
-
-  }
 
   useUnmount(() => {
     try {
@@ -195,25 +177,29 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
         audioConfigRef.current = audioConfig
         sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
+                      evalRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
+              const pronunciationAssessmentConfig = new speechsdk.PronunciationAssessmentConfig(
+                "",
+                speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+                speechsdk.PronunciationAssessmentGranularity.Phoneme,
+                false
+              );
+              pronunciationAssessmentConfig.applyTo(evalRef.current);
+
         sttRef.current.recognizeOnceAsync(result => {
           switch (result.reason) {
             case speechsdk.ResultReason.RecognizedSpeech:
               console.log(`RECOGNIZED: Text=${result.text}`);
-              var evalResult = {
-                text: result.text,
-
-              }
-              dialogLength += result.text.length
-              setDisplayText(evalResult.text);
-              setRecognitionText(evalResult.text);
+              setDisplayText(result.text);
+              setRecognitionText(result.text);
               asrOff.play()
               break;
             case speechsdk.ResultReason.NoMatch:
               console.log("NOMATCH: Speech could not be recognized.");
               setDisplayText('Not Hearing...');
-  
+
               setHintTrigger(true)
-              
+
               setLoading(false)
               break;
             case speechsdk.ResultReason.Canceled:
@@ -235,20 +221,40 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
             sttRef.current = undefined;
           }
         })
+
+        evalRef.current.recognizeOnceAsync(result => {
+          var pronunciation_result = speechsdk.PronunciationAssessmentResult.fromResult(result);
+          var evalResult = {
+            text: result.text,
+            pronunciation: pronunciation_result.pronunciationScore,
+            accuracy: pronunciation_result.accuracyScore,
+            fluency: pronunciation_result.fluencyScore,
+            length: pronunciation_result.detailResult.Words.length,
+          }
+          dialogLength = dialogLength + evalResult.length;
+          totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
+          totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
+          totalPronScore = totalPronScore + evalResult.pronunciation * evalResult.length;
+          console.log('words num:', dialogLength)
+          console.log('Accuracy:', totalAccuracyScore / dialogLength)
+          console.log('Fluency:', totalFluencyScore / dialogLength)
+          console.log(evalResult)
+        }
+      )
       })
 
 
   }, [azureSpeechConfig])
 
-  const [hintTrigger,setHintTrigger]= useState(false)
+  const [hintTrigger, setHintTrigger] = useState(false)
 
   useEffect(() => {
-    if(hintTrigger==true){
+    if (hintTrigger == true) {
       console.log(currentMessage)
       handleHint()
       setHintTrigger(false)
     }
-   
+
   }, [hintTrigger]);
 
 
@@ -299,9 +305,9 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
-          score: calScore(dialogLength),
-          accuracy: 90,
-          fluency: 90,
+          score: Math.round(totalPronScore / dialogLength),
+          accuracy: Math.round(totalAccuracyScore / dialogLength),
+          fluency: Math.round(totalFluencyScore / dialogLength),
           duration: Math.round((stayTime / 1000)),
           round: messages.length,
         }
@@ -478,16 +484,16 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
               </div>
               <div className='flex flex-col'>
                 <div className='text-center text-[#42C83C] text-5xl'>
-                  {Score2Grade(calScore(dialogLength))}
+                  {Score2Grade(100 * (Math.pow(totalPronScore / dialogLength / 100, 1)))}
                 </div>
               </div>
               <div className='grid grid-cols-2 text-center gap-4 py-6'>
-                {/* <div className='flex flex-col'>
+                <div className='flex flex-col'>
                   <div>
                     Fluency
                   </div>
                   <div className=' text-[#FF8B01] text-5xl'>
-                    {(100 * (Math.pow(totalFluencyScore / dialogLength / 100, 1))).toFixed(1)}
+                    {Score2Grade((100 * (Math.pow(totalFluencyScore / dialogLength / 100, 1))))}
                   </div>
                 </div>
                 <div className='flex flex-col'>
@@ -495,9 +501,9 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     Accuracy
                   </div>
                   <div className='text-[#019FFF] text-5xl'>
-                    {(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1))).toFixed(1)}
+                    {Score2Grade(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1)))}
                   </div>
-                </div> */}
+                </div>
                 <div className='flex flex-col'>
                   <div>
                     Round
