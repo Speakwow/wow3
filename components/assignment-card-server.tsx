@@ -16,8 +16,9 @@ export async function AssignCardServer({ userId, orgId, userData, name, type, th
     return (
         <AssignCard
             userId={userId as string}
-            userData={userData}
             name={name}
+            startAt={new Date(assignmentData.startAt)}
+            endAt={new Date(assignmentData.endAt)}
             type={type}
             tag={tag}
             id={threadId}

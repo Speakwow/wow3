@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { connect } from "@/lib/mongo";
 import { DB } from "@/lib/constant";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 export default async function AssginmentInfo({ params }: { params: { threadId: string } }) {
@@ -31,7 +32,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
         )
     }
     const studentIds = await getOrgStudents(orgId)
-    const assignmentData = await getRecordsForAssignment(params.threadId, orgId,studentIds)
+    const assignmentData = await getRecordsForAssignment(params.threadId, orgId, studentIds)
     const records = assignmentData.records
     const averageScore = calculateAverageScore(records);
     const lowestScoreDoc = findLowestScoreDoc(records);
@@ -51,11 +52,11 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
         hoursleft = +hoursleft.toFixed(0)
     }
 
-    const data = await reformatRecords(records, studentIds,assignmentData.type)
+    const data = await reformatRecords(records, studentIds, assignmentData.type)
     return (
-        <div className="flex min-h-screen w-full flex-col">
+        <div className="flex h-full w-full flex-col">
             <Header activePage="assignment" />
-            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-muted">
+            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-muted h-full">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
@@ -67,75 +68,81 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                本次作业均分
-                            </CardTitle>
-                            <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold"> {averageScore.toFixed(1)}</div>
-                            <p className="text-xs text-muted-foreground">
+                <ScrollArea className="w-full h-full flex flex-col gap-8">
+                    <div className="w-full h-full flex flex-col gap-8 mb-24">
+                        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
 
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                本次作业最高分
-                            </CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{highestScoreDoc?.score.toFixed(1)}</div>
-                            <p className="text-xs text-muted-foreground">
-                                学生：{bestUser.username}
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">本次作业最低分</CardTitle>
-                            <CreditCard className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{lowestScoreDoc?.score.toFixed(1)}</div>
-                            <p className="text-xs text-muted-foreground">
-                                学生：{worstUser.username}
-                            </p>
-                        </CardContent>
-                    </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        本次作业均分
+                                    </CardTitle>
+                                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold"> {averageScore.toFixed(1)}</div>
+                                    <p className="text-xs text-muted-foreground">
 
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        本次作业最高分
+                                    </CardTitle>
+                                    <Users className="h-4 w-4 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{highestScoreDoc?.score.toFixed(1)}</div>
+                                    <p className="text-xs text-muted-foreground">
+                                        学生：{bestUser.username}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">本次作业最低分</CardTitle>
+                                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{lowestScoreDoc?.score.toFixed(1)}</div>
+                                    <p className="text-xs text-muted-foreground">
+                                        学生：{worstUser.username}
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                        </div>
+
+                        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
 
 
-                    <Card className="col-span-4 h-full">
-                        <CardHeader className="flex flex-row items-center">
-                            <div className="grid gap-2">
-                                <CardTitle>{assignmentData.info.name}</CardTitle>
-                                <CardDescription>
-                                    成绩详情
-                                </CardDescription>
-                            </div>
-                            <div className="ml-auto flex flex-row gap-2">
-                                {/* <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
+                            <Card className="col-span-4 h-full">
+                                <CardHeader className="flex flex-row items-center">
+                                    <div className="grid gap-2">
+                                        <CardTitle>{assignmentData.info.name}</CardTitle>
+                                        <CardDescription>
+                                            成绩详情
+                                        </CardDescription>
+                                    </div>
+                                    <div className="ml-auto flex flex-row gap-2">
+                                        {/* <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
                                     <Link href="#">
                                         查看全部
                                     </Link>
                                 </Button> */}
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <DataTable columns={columns} data={data} />
-                        </CardContent>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <DataTable columns={columns} data={data} />
+                                </CardContent>
 
-                    </Card>
+                            </Card>
 
-                </div>
+                        </div>
+                    </div>
+                </ScrollArea>
 
 
             </main>
