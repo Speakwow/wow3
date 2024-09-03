@@ -277,7 +277,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                             }
                             const recordReport = {
                                 index: index,
-                                text: thread[index].text,
+                                text: thread[index],
                                 score: evalResult.pronunciation,
                                 detail_score: {
                                     accuracy: evalResult.accuracy,

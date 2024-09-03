@@ -9,7 +9,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Keyboard, Mic, MoreVerticalIcon, PlayIcon, SendIcon, SkipForwardIcon } from 'lucide-react';
 import { Avatar, AvatarImage, } from "@/components/ui/avatar"
 import { synthesizeSpeechWithVoice } from '@/lib/speech/tts';
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { updateScenarioRecord } from '@/lib/action/mongoIO';
 import { useRouter } from 'next/navigation';
@@ -36,7 +36,10 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     src: ['/sound/asr-off.wav'],
     format: ['wav'],
     autoplay: false,
+
   });
+
+
 
 
   //Handle Playing Audio
@@ -167,14 +170,14 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
         audioConfigRef.current = audioConfig
         sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
-                      evalRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
-              const pronunciationAssessmentConfig = new speechsdk.PronunciationAssessmentConfig(
-                "",
-                speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
-                speechsdk.PronunciationAssessmentGranularity.Phoneme,
-                false
-              );
-              pronunciationAssessmentConfig.applyTo(evalRef.current);
+        evalRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
+        const pronunciationAssessmentConfig = new speechsdk.PronunciationAssessmentConfig(
+          "",
+          speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+          speechsdk.PronunciationAssessmentGranularity.Phoneme,
+          false
+        );
+        pronunciationAssessmentConfig.applyTo(evalRef.current);
 
         sttRef.current.recognizeOnceAsync(result => {
           switch (result.reason) {
@@ -230,7 +233,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           console.log('Fluency:', totalFluencyScore / dialogLength)
           console.log(evalResult)
         }
-      )
+        )
       })
 
 
@@ -290,7 +293,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   function handleReport() {
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
-    const keywords = ['goodbye', 'bye', 'see you', 'bye-bye','good bye','see-you'];
+    const keywords = ['goodbye', 'bye', 'see you', 'bye-bye', 'good bye', 'see-you'];
     if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 36) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
