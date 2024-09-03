@@ -194,23 +194,19 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     }
 
     const listeningRef = useRef(false)
-    const [listening, setListening] = useState(false)
     const sttRef = useRef<speechsdk.SpeechRecognizer>()
     const audioConfigRef = useRef<speechsdk.AudioConfig>()
     const mediaStreamRef = useRef<MediaStream>()
-    const [enableInput, setEnableInput] = useState(false)
 
 
     useUnmount(() => {
         try {
             listeningRef.current = false
-            setListening(false)
+            setIsRecognizing(false)
             if (sttRef.current) sttRef.current.close()
         } catch { }
     })
 
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const audioChunksRef = useRef<Blob[]>([]);
 
     var asrOff = new Howl({
         src: ['/sound/asr-off.wav'],
@@ -350,12 +346,16 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             })
             .catch(error => {
                 setSaveState('failed')
+                setDisplayText('Failed, try again');
+                setIsRecognizing(false);
+                setIsFinish(false)
+                setIsReviewing(false)
                 console.error('Error accessing media devices.', error);
             });
     }, [azureSpeechConfig])
 
     useEffect(() => {
-        console.log('Get Cached Record', currentRecord)
+        console.log('Get Record', currentRecord)
         if (currentRecord) {
             if (!threadRecord[currentIndex]) {
                 setThreadRecord(prev => [
@@ -371,90 +371,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             }
         }
     }, [currentRecord])
-
-    useEffect(() => {
-        console.log('Update Thread Record', threadRecord)
-
-    }, [threadRecord])
-
-    // const handleStartRecording2 = async () => {
-
-    //     asrOn.play()
-    //     try {
-    //         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    //         const mediaRecorder = new MediaRecorder(stream);
-    //         mediaRecorderRef.current = mediaRecorder;
-    //         audioChunksRef.current = [];
-
-    //         mediaRecorder.ondataavailable = event => {
-    //             audioChunksRef.current.push(event.data);
-    //         };
-
-    //         mediaRecorder.onstop = async () => {
-    //             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-    //             stream.getTracks().forEach(track => track.stop());
-    //             try {
-    //                 console.log('Start Webm2Wav')
-    //                 const wavBlob = await webm2Wav(audioBlob);
-    //                 console.log('Start Eval Speech')
-    //                 const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as any;
-    //                 const recordReport = {
-    //                     index: currentIndex,
-    //                     text: thread[currentIndex],
-    //                     score: evalResult.pronunciation,
-    //                     detail_score: {
-    //                         accuracy: evalResult.accuracy,
-    //                         fluency: evalResult.fluency,
-    //                         completeness: evalResult.completeness,
-    //                         prosody: evalResult.prosody,
-    //                     },
-    //                 }
-    //                 console.log('Done Eval Speech')
-    //                 if (!currentRecord) {
-    //                     setThreadRecord(prev => [
-    //                         ...prev,
-    //                         recordReport,
-    //                     ]);
-    //                 } else {
-    //                     setThreadRecord(prev => [
-    //                         ...prev.slice(0, -1),
-    //                         recordReport,
-    //                     ])
-    //                 }
-    //                 setCurrentRecord(recordReport)
-    //                 setDisplayText('');
-    //                 setIsRecognizing(false);
-    //                 setRecognitionText(thread[currentIndex]);
-    //                 setIsFinish(true)
-    //                 setIsReviewing(false)
-    //                 audioChunksRef.current = []; // Clear array to release memory
-    //             } catch (error) {
-    //                 console.error('Error ASR:', error);
-    //                 setDisplayText('Not Hearing...Try again');
-    //                 setIsRecognizing(false)
-    //                 setIsReviewing(false)
-    //                 setIsReviewing(false);
-    //             }
-    //         };
-
-    //         mediaRecorder.start();
-    //         setDisplayText('Repeat After Me...');
-    //         setIsRecognizing(true);
-    //     } catch (error) {
-    //         console.error('Error starting recording:', error);
-    //         setDisplayText('Not Hearing...Try again');
-    //         setIsRecognizing(false);
-    //     }
-    // };
-
-    // const handleStopRecording2 = async () => {
-    //     if (mediaRecorderRef.current) {
-    //         setIsReviewing(true)
-    //         mediaRecorderRef.current.stop();
-    //         setDisplayText('Reviewing...');
-
-    //     }
-    // };
 
     const handleStopRecording = useCallback(() => {
         setIsReviewing(true)
