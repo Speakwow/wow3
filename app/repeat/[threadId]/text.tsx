@@ -94,6 +94,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     }
     function HowlerResume() {
         try {
+            setSound(null)
             Howler.ctx?.resume();
         } catch (e) {
             console.log('HowlerResume error', e);
@@ -104,7 +105,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
             HowlerResume();
-            sound?.play()
         }else if(document.visibilityState === 'hidden'){
             setIsRecognizing(false);
             setIsFinish(false);
