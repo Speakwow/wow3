@@ -104,7 +104,13 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
             HowlerResume();
+            sound?.play()
         }else if(document.visibilityState === 'hidden'){
+            setIsRecognizing(false);
+            setIsFinish(false);
+            setIsPlaying(false);
+            setDisplayText('Press the button and try agian')
+            setRecognitionText('')
             HowlerSuspend()
         }
     });
