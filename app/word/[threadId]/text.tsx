@@ -58,6 +58,17 @@ function calculateAverages(data: any[]): any {
 }
 
 let currentText = ''
+var asrOn = new Howl({
+    src: ['/sound/asr-on.wav'],
+    format: ['wav'],
+    autoplay: false,
+});
+
+var asrOff = new Howl({
+    src: ['/sound/asr-off.wav'],
+    format: ['wav'],
+    autoplay: false,
+});
 
 export default function RepeatText({ thread, userId, threadId }: { thread: any[], userId: string, threadId: string }) {
 
@@ -65,7 +76,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
     const [currentIndex, setCurrentIndex] = useState(0)
     const [threadRecord, setThreadRecord] = useState<any[]>([])
     const [currentRecord, setCurrentRecord] = useState<any>()
-    
+
     const [report, setReport] = useState<any>()
     const [saveState, setSaveState] = useState('unsaved')
 
@@ -82,17 +93,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
     const howlRef = useRef<Howl | null>(null);
     const audioUrlRef = useRef<string | null>(null);
 
-    var asrOn = new Howl({
-        src: ['/sound/asr-on.wav'],
-        format: ['wav'],
-        autoplay: false,
-    });
 
-    var asrOff = new Howl({
-        src: ['/sound/asr-off.wav'],
-        format: ['wav'],
-        autoplay: false,
-    });
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
         if (audioUrlRef.current) {
@@ -202,13 +203,15 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
     })
 
     //Handle Asr with Eval
-    const handleSpeechToText = useCallback((index:number) => {
-        setDisplayText('Recording...');
+    const handleSpeechToText = useCallback((index: number) => {
+
+        setDisplayText('loading...');
         setLoading(true)
         setIsRecognizing(true)
         setRecognitionText('');
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then((stream: MediaStream) => {
+                setDisplayText('Say it out loud!');
                 console.log(thread[index].text)
                 mediaStreamRef.current = stream
                 const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
@@ -223,12 +226,70 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                     false
                 );
                 pronunciationAssessmentConfig.applyTo(evalRef.current);
+
                 sttRef.current.recognizeOnceAsync(result => {
                     switch (result.reason) {
                         case speechsdk.ResultReason.RecognizedSpeech:
                             console.log(`RECOGNIZED: Text=${result.text}`);
                             setDisplayText('Reviewing...');
                             setRecognitionText(result.text);
+                            break;
+                        case speechsdk.ResultReason.NoMatch:
+                            console.log("NOMATCH: Speech could not be recognized.");
+                            console.error('Speech recognition error:');
+                            // setDisplayText('Not Hearing...Try again');
+                            // setLoading(false)
+                            // setIsRecognizing(false)
+                            break;
+                        case speechsdk.ResultReason.Canceled:
+                            const cancellation = speechsdk.CancellationDetails.fromResult(result);
+                            console.log(`CANCELED: Reason=${cancellation.reason}`);
+
+                            if (cancellation.reason == speechsdk.CancellationReason.Error) {
+                                console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
+                                console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
+                                console.log("CANCELED: Did you set the speech resource key and region values?");
+
+                                // setDisplayText('Not Hearing...Try again');
+                                // setLoading(false)
+                                // setIsRecognizing(false)
+                            }
+                            break;
+                    }
+
+                    if (mediaStreamRef.current) {
+                        mediaStreamRef.current.getTracks().forEach(track => track.stop());
+                    }
+                    if (audioConfigRef.current) {
+                        sttRef.current = undefined;
+                    }
+                })
+
+                evalRef.current.recognizeOnceAsync(result => {
+                    switch (result.reason) {
+                        case speechsdk.ResultReason.RecognizedSpeech:
+                            var pronunciation_result = speechsdk.PronunciationAssessmentResult.fromResult(result);
+                            var evalResult = {
+                                text: result.text,
+                                pronunciation: pronunciation_result.pronunciationScore,
+                                accuracy: pronunciation_result.accuracyScore,
+                                fluency: pronunciation_result.fluencyScore,
+                            }
+                            const recordReport = {
+                                index: index,
+                                text: thread[index].text,
+                                score: evalResult.pronunciation,
+                                detail_score: {
+                                    accuracy: evalResult.accuracy,
+                                    fluency: evalResult.fluency,
+                                },
+                            }
+                            setRecognitionText(result.text);
+                            console.log(recordReport)
+                            setCurrentRecord(recordReport)
+                            setDisplayText('');
+                            setLoading(false)
+                            setIsRecognizing(false)
                             break;
                         case speechsdk.ResultReason.NoMatch:
                             console.log("NOMATCH: Speech could not be recognized.");
@@ -252,54 +313,30 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                             }
                             break;
                     }
-
-                    if (mediaStreamRef.current) {
-                        mediaStreamRef.current.getTracks().forEach(track => track.stop());
-                    }
-                    if (audioConfigRef.current) {
-                        sttRef.current = undefined;
-                    }
-                })
-
-                evalRef.current.recognizeOnceAsync(result => {
-                    var pronunciation_result = speechsdk.PronunciationAssessmentResult.fromResult(result);
-                    var evalResult = {
-                        text: result.text,
-                        pronunciation: pronunciation_result.pronunciationScore,
-                        accuracy: pronunciation_result.accuracyScore,
-                        fluency: pronunciation_result.fluencyScore,
-                    }
-                    const recordReport = {
-                        index: index,
-                        text: thread[index].text,
-                        score: evalResult.pronunciation,
-                        detail_score: {
-                            accuracy: evalResult.accuracy,
-                            fluency: evalResult.fluency,
-                        },
-                    }
-                    console.log(recordReport)
-                    if (!currentRecord) {
-                        setThreadRecord(prev => [
-                            ...prev,
-                            recordReport,
-                        ]);
-                    } else {
-                        setThreadRecord(prev => [
-                            ...prev.slice(0, -1),
-                            recordReport,
-                        ])
-                    }
-                    setCurrentRecord(recordReport)
-                    setDisplayText('');
-                    setLoading(false)
-                    setIsRecognizing(false)
                 }
                 )
             })
 
 
     }, [azureSpeechConfig])
+
+    useEffect(() => {
+        console.log('Get Current Record', currentRecord)
+        if (currentRecord) {
+            if (!threadRecord[currentIndex]) {
+                setThreadRecord(prev => [
+                    ...prev,
+                    currentRecord,
+                ]);
+                console.log(threadRecord)
+            } else {
+                setThreadRecord(prev => [
+                    ...prev.slice(0, -1),
+                    currentRecord,
+                ])
+            }
+        }
+    }, [currentRecord])
 
     //Handle Asr with Eval
     const handleSpeechToText2 = async () => {
@@ -421,7 +458,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
 
                 <Card className="w-5/6 z-50 p-4 pb-8 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center pb-4 w-full">
-                        {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex].score ?
+                        {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex] && threadRecord[currentIndex].score ?
                             <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
@@ -460,7 +497,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                         type='button'
                         size={'icon'}
                         className={`h-fit p-6 bg-[#42C83C] w-fit rounded-full border-8 border-white ${isRecognizing === true ? 'animate-bounce' : ''}`}
-                        onClick={()=>handleSpeechToText(currentIndex)}
+                        onClick={() => handleSpeechToText(currentIndex)}
                         disabled={loading}
                     >   {
                             isRecognizing || isPlaying ?
