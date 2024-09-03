@@ -128,8 +128,8 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
         if (getPlatform() === 'ios' && document.visibilityState === 'visible') {
             toast({
                 title: "请重新开始练习",
-                description: "课程中途不要退出开小差喔！",
-                action: <ToastAction altText="刷新" onClick={router.refresh}>刷新</ToastAction>,
+                description: "练习中途不要退出开小差喔！",
+                action: <ToastAction altText="刷新" onClick={()=>router.refresh()}>刷新</ToastAction>,
             })
             HowlerSuspend()
         } else if (getPlatform() === 'ios' && document.visibilityState === 'hidden') {
