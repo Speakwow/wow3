@@ -111,9 +111,9 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
             toast({
-                title: "课程中不要中途退出哦！",
-                description: "There was a problem with your request.",
-                action: <ToastAction altText="Try again" onClick={router.refresh}>Try again</ToastAction>,
+                title: "请重新开始练习",
+                description: "课程中途不要退出开小差喔！",
+                action: <ToastAction altText="刷新" onClick={router.refresh}>刷新</ToastAction>,
               })
             HowlerSuspend()
         }else if(document.visibilityState === 'hidden'){
