@@ -85,7 +85,21 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     const [sound, setSound] = useState<Howl | null>(null);
 
+    function HowlerSuspend() {
+        try {
+            Howler.ctx.state == 'suspended';
+            Howler.ctx?.suspend();
+        } catch (e) {
+            console.log('HowlerSuspend error', e);
+        }
+    }
 
+    /// 监听页面可见性变化事件
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') {
+            HowlerSuspend();
+        }
+    });
 
     // Cleanup on component unmount or page unload
     useEffect(() => {
@@ -104,6 +118,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             }
         };
     }, [sound]);
+
 
     //Handle Playing Audio
     function handleAudioPlay(audioData: ArrayBuffer) {
@@ -266,7 +281,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                         text: recognizedText,
                         accuracy: +(total_score.accuracy * compRate / word_count).toFixed(0),
                         fluency: +(total_score.fluency * compRate / word_count).toFixed(0),
-                        pron: +(total_score.pron * compRate / word_count).toFixed(0), 
+                        pron: +(total_score.pron * compRate / word_count).toFixed(0),
                         comp: +(total_score.comp * compRate / word_count).toFixed(0),
                         prosody: +(total_score.prosody * compRate / word_count).toFixed(0)
                     }
@@ -293,7 +308,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                         setIsFinish(true)
                         setIsReviewing(false)
 
-                    }else{
+                    } else {
                         setDisplayText('Not hearing, try again');
                         setIsRecognizing(false);
                         setIsFinish(false)
@@ -504,7 +519,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 <Card className="w-full md:w-3/4 z-50 p-4 pb-6 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full p-2">
                         {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex] && threadRecord[currentIndex].score ?
-                            <Bravo score={threadRecord[currentIndex].score*1.1} />
+                            <Bravo score={threadRecord[currentIndex].score * 1.1} />
                             :
                             <div>
                                 <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying || isRecognizing}>
@@ -515,7 +530,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
                     </div>
 
-                    {!recognitionText||!threadRecord[currentIndex] ?
+                    {!recognitionText || !threadRecord[currentIndex] ?
                         <div className="text-xl md:text-2xl  w-full text-pretty text-ellipsis overflow-hidden">
                             {thread[currentIndex]}
                         </div>
