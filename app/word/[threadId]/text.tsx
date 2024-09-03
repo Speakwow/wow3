@@ -260,9 +260,9 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                     if (mediaStreamRef.current) {
                         mediaStreamRef.current.getTracks().forEach(track => track.stop());
                     }
-                    if (audioConfigRef.current) {
-                        sttRef.current = undefined;
-                    }
+                    // if (audioConfigRef.current) {
+                    //     sttRef.current = undefined;
+                    // }
                 })
 
                 evalRef.current.recognizeOnceAsync(result => {

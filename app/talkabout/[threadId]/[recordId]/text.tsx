@@ -325,7 +325,7 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
 
 
     return (
-        <div className="flex flex-col items-center justify-center h-full gap-4">
+        <div className="flex flex-col items-center justify-center h-full gap-4 mb-32">
             <Card className={`px-4 py-2 text-center text-xm flex flex-row justify-center  items-center  gap-4 whitespace-pre-line ${step == "end" && 'text-white bg-[#42C83C]'} ${step == "practice" && 'border-2 border-[#42C83C]'}`}>
                 {step == "prepare" && <div>准备时间剩余 ： <span className="text-2xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></div>}
                 {step == "practice" && <div>作答时间剩余 ： <span className="text-2xl  text-[#42C83C]">{Math.floor(countdown / 60)}:{('0' + (countdown % 60)).slice(-2)}</span></div>}
