@@ -21,7 +21,6 @@ import { useUnmount } from "usehooks-ts";
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from "next/navigation";
-import { Capacitor } from '@capacitor/core';
 
 
 function calculateAverages(data: any[]): any {
@@ -67,6 +66,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     const [currentIndex, setCurrentIndex] = useState(0)
 
 
+
     const [currentRecord, setCurrentRecord] = useState<any>()
 
     const [threadRecord, setThreadRecord] = useState<any[]>([])
@@ -90,7 +90,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     const [sound, setSound] = useState<Howl | null>(null);
 
-    const [paused,setPaused] = useState(false)
     const { toast } = useToast()
 
     function HowlerSuspend() {
@@ -110,26 +109,39 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
         }
     }
 
+    function getPlatform() {
+        if (/iPhone/i.test(navigator.userAgent)) {
+            return ('ios')
+        }
+        else if (/Mobi|Android/i.test(navigator.userAgent)) {
+            return ('android')
+        }
+        else {
+            console.log('pc')
+            return ('pc')
+        }
+    }
+
     /// 监听页面可见性变化事件
-    useEffect(() => {
-        document.addEventListener('visibilitychange', function () {
-            if (Capacitor.getPlatform() === 'ios' && document.visibilityState === 'visible') {
-                toast({
-                    title: "请重新开始练习",
-                    description: "课程中途不要退出开小差喔！",
-                    action: <ToastAction altText="刷新" onClick={router.refresh}>刷新</ToastAction>,
-                })
-                HowlerSuspend()
-            } else if (Capacitor.getPlatform() === 'ios' && document.visibilityState === 'hidden') {
-                sound?.stop()
-                setIsRecognizing(false);
-                setIsFinish(false);
-                setIsPlaying(false);
-                setDisplayText('Press the button and try agian')
-                setRecognitionText('')
-            }
-        });
-    }, [])
+
+    document.addEventListener('visibilitychange', function () {
+        if (getPlatform() === 'ios' && document.visibilityState === 'visible') {
+            toast({
+                title: "请重新开始练习",
+                description: "课程中途不要退出开小差喔！",
+                action: <ToastAction altText="刷新" onClick={router.refresh}>刷新</ToastAction>,
+            })
+            HowlerSuspend()
+        } else if (getPlatform() === 'ios' && document.visibilityState === 'hidden') {
+            sound?.stop()
+            setIsRecognizing(false);
+            setIsFinish(false);
+            setIsPlaying(false);
+            setDisplayText('Press the button and try agian')
+            setRecognitionText('')
+        }
+    });
+
 
     // Cleanup on component unmount or page unload
     useEffect(() => {
@@ -462,20 +474,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             <div className="w-full text-xl  mx-6 flex  flex-col h-full justify-center items-center">
                 <audio ref={audioRef} className="sr-only">
                 </audio>
-                <Button
-      variant="outline"
-      onClick={() => {
-        toast({
-          title: "Scheduled: Catch up ",
-          description: "Friday, February 10, 2023 at 5:57 PM",
-          action: (
-            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
-          ),
-        })
-      }}
-    >
-      Add to calendar
-    </Button>
 
                 <Card className="w-full md:w-3/4 z-50 p-4 pb-6 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full p-2">
