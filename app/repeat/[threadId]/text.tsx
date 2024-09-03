@@ -87,6 +87,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     function HowlerSuspend() {
         try {
+            setSound(null)
             Howler.ctx?.suspend();
         } catch (e) {
             console.log('HowlerSuspend error', e);
@@ -104,14 +105,13 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     /// 监听页面可见性变化事件
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
-            HowlerResume();
+            HowlerSuspend()
         }else if(document.visibilityState === 'hidden'){
             setIsRecognizing(false);
             setIsFinish(false);
             setIsPlaying(false);
             setDisplayText('Press the button and try agian')
             setRecognitionText('')
-            HowlerSuspend()
         }
     });
 
