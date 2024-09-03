@@ -87,17 +87,25 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     function HowlerSuspend() {
         try {
-            Howler.ctx.state == 'suspended';
             Howler.ctx?.suspend();
         } catch (e) {
             console.log('HowlerSuspend error', e);
+        }
+    }
+    function HowlerResume() {
+        try {
+            Howler.ctx?.resume();
+        } catch (e) {
+            console.log('HowlerResume error', e);
         }
     }
 
     /// 监听页面可见性变化事件
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
-            HowlerSuspend();
+            HowlerResume();
+        }else if(document.visibilityState === 'hidden'){
+            HowlerSuspend()
         }
     });
 
