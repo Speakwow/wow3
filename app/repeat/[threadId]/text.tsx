@@ -18,6 +18,9 @@ import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
 import { Score2Grade } from "@/lib/tools"
 import { useUnmount } from "usehooks-ts";
+import { useToast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
+import { useRouter } from "next/navigation";
 
 
 function calculateAverages(data: any[]): any {
@@ -69,6 +72,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     const [report, setReport] = useState<any>()
     const [saveState, setSaveState] = useState('unsaved')
+    const router = useRouter()
 
     const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
@@ -84,6 +88,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const [sound, setSound] = useState<Howl | null>(null);
+    const { toast } = useToast()
 
     function HowlerSuspend() {
         try {
@@ -105,8 +110,14 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     /// 监听页面可见性变化事件
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
+            toast({
+                title: "课程中不要中途退出哦！",
+                description: "There was a problem with your request.",
+                action: <ToastAction altText="Try again" onClick={router.refresh}>Try again</ToastAction>,
+              })
             HowlerSuspend()
         }else if(document.visibilityState === 'hidden'){
+            sound?.stop()
             setIsRecognizing(false);
             setIsFinish(false);
             setIsPlaying(false);
