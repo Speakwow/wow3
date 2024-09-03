@@ -6,18 +6,12 @@ import { evalSpeechFromFile } from "@/lib/speech/eval";
 import { synthesizeSpeech } from "@/lib/speech/tts";
 import { webm2Wav } from "@/lib/speech/wav";
 import { Mic, RefreshCwIcon, Volume1Icon } from "lucide-react";
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Howl } from 'howler';
 import { Bravo } from "@/components/bravo";
 import { saveRepeatRecord } from "@/lib/action/mongoIO";
 import { LessonReport } from "@/components/report";
 import { StopIcon } from "@radix-ui/react-icons";
-import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
-import Image from 'next/image'
-import AzureConfig from "@/lib/speech/config";
-import _ from "lodash";
-import {Score2Grade} from "@/lib/tools"
-import { useUnmount } from "usehooks-ts";
 
 
 function calculateAverages(data: any[]): any {
@@ -162,164 +156,15 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
         sound.play();
     }
 
-    const listeningRef = useRef(false)
-    const [listening, setListening] = useState(false)
-    const sttRef = useRef<speechsdk.SpeechRecognizer>()
-    const audioConfigRef = useRef<speechsdk.AudioConfig>()
-    const mediaStreamRef = useRef<MediaStream>()
-    const [enableInput, setEnableInput] = useState(false)
-
-
-    useUnmount(() => {
-        try {
-            listeningRef.current = false
-            setListening(false)
-            if (sttRef.current) sttRef.current.close()
-        } catch { }
-    })
-
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
-
-    var asrOff = new Howl({
-        src: ['/sound/asr-off.wav'],
-        format: ['wav'],
-        autoplay: false,
-    });
     var asrOn = new Howl({
         src: ['/sound/asr-on.wav'],
         format: ['wav'],
         autoplay: false,
     });
 
-
-    const azureSpeechConfig = useMemo(() => {
-        // const speechConfig = speechsdk.SpeechConfig.fromSubscription('8d0f1ad8db3a41bf91ba8a1e9b44a621', 'westus')
-        const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
-        speechConfig.speechRecognitionLanguage = 'en-US'
-        // speechConfig.setProperty('SpeechServiceConnection_InitialSilenceTimeoutMs', "12201")
-        // speechConfig.setProperty('SpeechServiceConnection_EndSilenceTimeoutMs', '3201')
-
-        return { speechConfig }
-    }, [])
-
-
-    const handleStartRecording = useCallback((index:number) => {
-        setDisplayText('Repeat After Me...');
-        setIsRecognizing(true);
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then((stream: MediaStream) => {
-                mediaStreamRef.current = stream
-                const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
-                const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
-                audioConfigRef.current = audioConfig
-                sttRef.current = new speechsdk.SpeechRecognizer(speechConfig, audioConfig)
-                const pronunciationAssessmentConfig = new speechsdk.PronunciationAssessmentConfig(
-                    thread[index],
-                    speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
-                    speechsdk.PronunciationAssessmentGranularity.Phoneme,
-                    false
-                );
-                pronunciationAssessmentConfig.enableProsodyAssessment = true;
-                pronunciationAssessmentConfig.applyTo(sttRef.current);
-                var results: any[] = [];
-                var recognizedText = "";
-
-                sttRef.current.recognized = function (s, e) {
-                    var jo = JSON.parse(e.result.properties.getProperty(speechsdk.PropertyId.SpeechServiceResponse_JsonResult));
-                    if (jo.DisplayText != ".") {
-                        console.log(`Recognizing: ${jo.DisplayText}`);
-                        recognizedText += jo.DisplayText + " ";
-                    }
-                    console.log(jo)
-                    results.push(jo);
-                }
-
-                function onRecognizedResult() {
-                    console.log(`Recognized text: ${recognizedText}`);
-                    let word_count = 0
-                    let total_score = {
-                        accuracy: 0,
-                        fluency: 0,
-                        comp:0,
-                        pron: 0,
-                        prosody: 0
-                    }
-                    results.forEach(result => {
-                        if (result.RecognitionStatus == 'Success') {
-                            console.log(result)
-                            word_count += result.NBest[0].Words.length
-                            total_score.accuracy += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.AccuracyScore
-                            total_score.fluency += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.FluencyScore
-                            total_score.prosody += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.ProsodyScore
-                            total_score.comp += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.CompletenessScore
-                            total_score.pron += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.PronScore
-                        }
-                    })
-                    const evalResult = {
-                        text: recognizedText,
-                        accuracy: +(total_score.accuracy / word_count).toFixed(0),
-                        fluency: +(total_score.fluency / word_count).toFixed(0),
-                        pron: +(total_score.pron / word_count).toFixed(0),
-                        comp:+(total_score.comp / word_count).toFixed(0),
-                        prosody: +(total_score.prosody / word_count).toFixed(0)
-                    }
-                    const recordReport =  {
-                        index: currentIndex,
-                        text: thread[currentIndex],
-                        score: evalResult.pron,
-                        detail_score: {
-                            accuracy: evalResult.accuracy,
-                            fluency: evalResult.fluency,
-                            completeness: evalResult.comp,
-                            prosody: evalResult.prosody,
-                        },
-                    }
-                    console.log('Done Eval Speech')
-                    if(!currentRecord){
-                    setThreadRecord(prev => [
-                        ...prev,
-                        recordReport,
-                    ]);
-                    }else{
-                        setThreadRecord(prev => [
-                            ...prev.slice(0,-1),
-                            recordReport,
-                        ])
-                    }
-                    setCurrentRecord(recordReport)
-                    setDisplayText('');
-                    setIsRecognizing(false);
-                    setRecognitionText(thread[currentIndex]);
-                    setIsFinish(true)
-                    setIsReviewing(false)
-                    console.log(evalResult);
-                }
-
-                sttRef.current.canceled = function (s, e) {
-                    if (e.reason === speechsdk.CancellationReason.Error) {
-                        var str = "(cancel) Reason: " + speechsdk.CancellationReason[e.reason] + ": " + e.errorDetails;
-                        console.log(str);
-                    }
-                    
-                    sttRef.current?.stopContinuousRecognitionAsync();
-                };
-
-                sttRef.current.sessionStopped = function (s, e) {
-                    sttRef.current?.stopContinuousRecognitionAsync();
-                    sttRef.current?.close();
-                    onRecognizedResult();
-                };
-                sttRef.current.startContinuousRecognitionAsync();
-
-            })
-            .catch(error => {
-                setSaveState('failed')
-                console.error('Error accessing media devices.', error);
-            });
-    }, [azureSpeechConfig])
-
-    const handleStartRecording2 = async () => {
+    const handleStartRecording = async () => {
 
         asrOn.play()
         try {
@@ -390,7 +235,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
         }
     };
 
-    const handleStopRecording2 = async () => {
+    const handleStopRecording = async () => {
         if (mediaRecorderRef.current) {
             setIsReviewing(true)
             mediaRecorderRef.current.stop();
@@ -398,23 +243,12 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
         }
     };
-    
-    const  handleStopRecording = useCallback(() => {
-        asrOff.play()
-        if (sttRef.current) {
-            sttRef.current.stopContinuousRecognitionAsync(() => {
-                sttRef.current?.close();
-                sttRef.current = undefined;
-            });
-        }
-        if (mediaStreamRef.current) {
-            mediaStreamRef.current.getTracks().forEach(track => track.stop());
-            sttRef.current = undefined;
-        }
-        if (audioConfigRef.current) {
-            sttRef.current = undefined;
-        }
-    }, []);
+
+
+
+
+
+
 
 
 
