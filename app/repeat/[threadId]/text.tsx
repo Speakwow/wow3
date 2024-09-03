@@ -110,7 +110,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     }
 
     function getPlatform() {
-        if (/iPhone/i.test(navigator.userAgent)) {
+        if (/iPhone|iPad/i.test(navigator.userAgent)) {
             return ('ios')
         }
         else if (/Mobi|Android/i.test(navigator.userAgent)) {
