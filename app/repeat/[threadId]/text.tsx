@@ -89,6 +89,8 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const [sound, setSound] = useState<Howl | null>(null);
+
+    const [paused,setPaused] = useState(false)
     const { toast } = useToast()
 
     function HowlerSuspend() {
@@ -460,6 +462,20 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             <div className="w-full text-xl  mx-6 flex  flex-col h-full justify-center items-center">
                 <audio ref={audioRef} className="sr-only">
                 </audio>
+                <Button
+      variant="outline"
+      onClick={() => {
+        toast({
+          title: "Scheduled: Catch up ",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+          action: (
+            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+          ),
+        })
+      }}
+    >
+      Add to calendar
+    </Button>
 
                 <Card className="w-full md:w-3/4 z-50 p-4 pb-6 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full p-2">
