@@ -21,6 +21,7 @@ import { useUnmount } from "usehooks-ts";
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from "next/navigation";
+import { Capacitor } from '@capacitor/core';
 
 
 function calculateAverages(data: any[]): any {
@@ -108,23 +109,25 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     }
 
     /// 监听页面可见性变化事件
-    document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') {
-            toast({
-                title: "请重新开始练习",
-                description: "课程中途不要退出开小差喔！",
-                action: <ToastAction altText="刷新" onClick={router.refresh}>刷新</ToastAction>,
-              })
-            HowlerSuspend()
-        }else if(document.visibilityState === 'hidden'){
-            sound?.stop()
-            setIsRecognizing(false);
-            setIsFinish(false);
-            setIsPlaying(false);
-            setDisplayText('Press the button and try agian')
-            setRecognitionText('')
-        }
-    });
+    useEffect(() => {
+        document.addEventListener('visibilitychange', function () {
+            if (Capacitor.getPlatform() === 'ios' && document.visibilityState === 'visible') {
+                toast({
+                    title: "请重新开始练习",
+                    description: "课程中途不要退出开小差喔！",
+                    action: <ToastAction altText="刷新" onClick={router.refresh}>刷新</ToastAction>,
+                })
+                HowlerSuspend()
+            } else if (Capacitor.getPlatform() === 'ios' && document.visibilityState === 'hidden') {
+                sound?.stop()
+                setIsRecognizing(false);
+                setIsFinish(false);
+                setIsPlaying(false);
+                setDisplayText('Press the button and try agian')
+                setRecognitionText('')
+            }
+        });
+    }, [])
 
     // Cleanup on component unmount or page unload
     useEffect(() => {

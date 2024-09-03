@@ -89,11 +89,12 @@ export default function RootLayout({
                 </div>
                 <div className="h-full">
                   <AI>{children}</AI>
-                  <Toaster />
+                  
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
           </main>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>
