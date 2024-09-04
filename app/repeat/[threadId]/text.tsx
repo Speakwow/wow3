@@ -125,7 +125,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             toast({
                 title: "请重新开始练习",
                 description: "练习中途不要退出开小差喔！",
-                action: <ToastAction altText="刷新" onClick={()=>window.location.reload()}>刷新</ToastAction>,
+                action: <ToastAction altText="刷新" onClick={() => window.location.reload()}>刷新</ToastAction>,
             })
             HowlerSuspend()
         } else if (getPlatform() === 'ios' && document.visibilityState === 'hidden') {
@@ -371,7 +371,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             })
             .catch(error => {
                 setSaveState('failed')
-                setDisplayText('Failed, try again');
+                setDisplayText('load failed, try again');
                 setIsRecognizing(false);
                 setIsFinish(false)
                 setIsReviewing(false)

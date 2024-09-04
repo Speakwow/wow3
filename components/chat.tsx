@@ -21,6 +21,7 @@ import { Score2Grade } from "@/lib/tools"
 import { useUnmount } from 'usehooks-ts';
 import { ToastAction } from './ui/toast';
 import { useToast } from './ui/use-toast';
+import { error } from 'console';
 
 
 
@@ -297,6 +298,9 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           console.log(evalResult)
         }
         )
+      }).catch(error=>{
+        setLoading(false)
+        setDisplayText('load failed, try again')
       })
 
 
