@@ -113,7 +113,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           toast({
               title: "请重新开始练习",
               description: "练习中途不要退出开小差喔！",
-              action: <ToastAction altText="刷新" onClick={()=>window.location.reload()}>刷新</ToastAction>,
+              action: <ToastAction autoFocus altText="刷新" onClick={()=>window.location.reload()}>刷新</ToastAction>,
           })
           HowlerSuspend()
       } else if (getPlatform() === 'ios' && document.visibilityState === 'hidden') {
