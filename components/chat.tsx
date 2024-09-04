@@ -88,9 +88,16 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         if (audioData) {
           handleAudioPlay(audioData)
         } else {
+          setLoading(false)
+          setDisplayText('too busy, try agian')
           console.error('Speech synthesis failed or returned no audio');
         }
       })
+    },
+    onError(error){
+      console.error('AI Not Response',error);
+      setLoading(false)
+      setDisplayText('too busy, try agian')
     }
   },);
 
@@ -111,6 +118,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       if (audioData) {
         handleAudioPlay(audioData)
       } else {
+        setLoading(false)
+        setDisplayText('try agian')
         console.error('Speech synthesis failed or returned no audio');
       }
     })
