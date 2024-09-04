@@ -2,8 +2,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconRightArrow } from "@/components/ui/icons"
-import { evalSpeechFromFile, evalSpeechWithTopicFromFile } from "@/lib/speech/eval";
-import { webm2Wav } from "@/lib/speech/wav";
 import { LoaderIcon, Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';

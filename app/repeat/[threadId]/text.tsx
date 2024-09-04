@@ -2,9 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card";
 import { IconRightArrow } from "@/components/ui/icons"
-import { evalSpeechFromFile } from "@/lib/speech/eval";
 import { synthesizeSpeech } from "@/lib/speech/tts";
-import { webm2Wav } from "@/lib/speech/wav";
 import { Mic, RefreshCwIcon, Volume1Icon } from "lucide-react";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Howl } from 'howler';
@@ -13,10 +11,8 @@ import { saveRepeatRecord } from "@/lib/action/mongoIO";
 import { LessonReport } from "@/components/report";
 import { StopIcon } from "@radix-ui/react-icons";
 import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
-import Image from 'next/image'
 import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
-import { Score2Grade } from "@/lib/tools"
 import { useUnmount } from "usehooks-ts";
 
 
