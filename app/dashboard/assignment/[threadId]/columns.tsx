@@ -45,7 +45,7 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
       const record = row.original
       if (record.finishAt) {
         return (
-          <div>{UTC2Beijing(record.finishAt?.toISOString())}</div>
+          <div>{UTC2Beijing(record.finishAt.toISOString())}</div>
         )
       } else {
         return(
