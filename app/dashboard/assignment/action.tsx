@@ -157,6 +157,7 @@ export function NewAssignmentButton(
                         <FormControl>
                           <Button
                             id="date"
+                            autoFocus
                             variant={"outline"}
                             className={cn(
                               "w-[300px] justify-start text-left font-normal",
@@ -181,7 +182,6 @@ export function NewAssignmentButton(
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
-                          initialFocus
                           mode="range"
                           defaultMonth={field.value?.from}
                           selected={field.value}
