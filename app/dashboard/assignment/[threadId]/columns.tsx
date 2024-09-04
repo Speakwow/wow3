@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { UTC2Beijing } from "@/lib/tools"
 import { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -9,15 +10,15 @@ import { useRouter } from "next/navigation"
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type AssignmentRecord = {
-    recordId:string
-    threadId:string,
-    type:string,
-    userId:string,
-    username:string,
-    status: "未完成" | "已完成",
-    score:number,
-    rank:number,
-    finishAt:Date
+  recordId: string
+  threadId: string,
+  type: string,
+  userId: string,
+  username: string,
+  status: "未完成" | "已完成",
+  score: number,
+  rank: number,
+  finishAt: Date
 }
 
 export const columns: ColumnDef<AssignmentRecord>[] = [
@@ -38,14 +39,26 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
     header: "排名",
   },
   {
-    accessorKey: "finishAt",
+    id: "finishAt",
     header: "提交时间",
-  },
-  {
-    id:"actions",
     cell: ({ row }) => {
       const record = row.original
-      
+      if (record.finishAt) {
+        return (
+          <div>{UTC2Beijing(record.finishAt?.toISOString())}</div>
+        )
+      } else {
+        return(
+        <div>-</div>
+        )
+      }
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const record = row.original
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -68,5 +81,5 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
       )
     },
   }
-  
+
 ]

@@ -9,7 +9,7 @@ import { useState } from "react"
 import { Suspense } from 'react';
 import { NewAssignmentButton, ReviewAssignmentButton } from "./action"
 import { Loader2Icon, LoaderIcon } from "lucide-react"
-import { getBeijingTime } from "@/lib/tools"
+import { getBeijingTime, UTC2Beijing } from "@/lib/tools"
 import { isAfter, isBefore, isWithinInterval } from "date-fns"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -39,7 +39,7 @@ export async function AssignmentRow(
         textbookId: string,
         userId: string
     }) {
-    const today = getBeijingTime()
+    const today = new Date()
     const countStudents = studentIds.length
     let state = 'undeployed'
     let countFinished = 0
@@ -50,7 +50,7 @@ export async function AssignmentRow(
     if (data) {
         countFinished = data.records.length
         assignCount = `${countFinished} / ${countStudents}`
-        endDate = data.endAt
+        endDate = UTC2Beijing(data.endAt)
         if (isWithinInterval(today, { start: data.startAt, end: data.endAt })) {
             status = `进行中`
             assignCount = `${countFinished} / ${countStudents}`
@@ -58,7 +58,6 @@ export async function AssignmentRow(
             status = `待开始`
         } else if (isAfter(today, data.endAt))
             status = `已结束`
-
     }
 
     return (
@@ -95,7 +94,7 @@ export async function AssignmentRow(
                 {status}
             </TableCell>
             <TableCell className="font-medium">
-                {endDate.split('T')[0] as string}
+                {endDate.split(' ')[0] as string}
             </TableCell>
             <TableCell className="text-right">
                 {
