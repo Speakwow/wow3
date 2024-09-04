@@ -15,7 +15,7 @@ import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
 import Image from 'next/image'
 import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
-import {Score2Grade} from "@/lib/tools"
+import { Score2Grade } from "@/lib/tools"
 // function HighlightWords({ story }: { story: any }) {
 //     return story.section.telling_word_timestamps.map((item: any, index: number) => <span key={index} className={story.audioPlayTime >= item.start && story.audioPlayTime < item.end ? "text-primary" : ''}>{item.word} </span>)
 // }
@@ -107,24 +107,19 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
         setContentScore(feedbackData.content_score)
         setLanguageScore(feedbackData.language_score)
         setFinishFeedback(true)
-        if (feedbackData) {
-            setSaveState('saved')
-        } else {
-            setSaveState('failed')
-
-        }
-        const finalScore = feedbackData.content_score * 0.4+feedbackData.language_score*0.2 +feedbackData.speed_score*0.13+ pronResult.accuracy * 0.14 + pronResult.fluency * 0.13
+        const finalScore = feedbackData.content_score * 0.4 + feedbackData.language_score * 0.2 + feedbackData.speed_score * 0.13 + pronResult.accuracy * 0.14 + pronResult.fluency * 0.13
         setFinalScore(finalScore)
+
         finishTalkaboutRecord(recordId, +finalScore.toFixed(0), {
             user_answer: pronResult.text,
             themeScore: feedbackData.theme_relevance_score,
             vocabScore: feedbackData.vocabulary_score,
             grammarScore: feedbackData.grammarza_syntax_score,
-            speedScore:feedbackData.speed_score,
+            speedScore: feedbackData.speed_score,
             feedback: feedbackData.feedback,
             overallContentScore: feedbackData.content_score,
             overallLanguageScore: feedbackData.language_score,
-            overallPronScore: pronResult.accuracy * 0.34 + pronResult.fluency * 0.33 + feedbackData.speed_score*0.33,
+            overallPronScore: pronResult.accuracy * 0.34 + pronResult.fluency * 0.33 + feedbackData.speed_score * 0.33,
             accuracy: pronResult.accuracy,
             fluency: pronResult.fluency
         }).then(res => {
@@ -469,10 +464,6 @@ export default function Talkabout({ image_url, threadId, recordId, prepare_time,
                                 </Button> :
                                 saveState == 'failed' ?
                                     <div className="flex flex-row gap-4">
-                                        <Button variant="destructive" className=" " onClick={() => window.location.reload()} >
-                                            再试一次
-                                        </Button>
-
                                         <Button variant="outline" className=" " onClick={() => router.push('/')} >
                                             返回首页
                                         </Button>

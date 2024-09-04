@@ -160,11 +160,12 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
   //Handle Asr with Eval
   const handleSpeechToText = useCallback(() => {
-    setDisplayText('Listening...');
+    setDisplayText('...');
     setLoading(true)
     setRecognitionText('');
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then((stream: MediaStream) => {
+        
         mediaStreamRef.current = stream
         const speechConfig = speechsdk.SpeechConfig.fromSubscription(AzureConfig.key, AzureConfig.region);
         const audioConfig = speechsdk.AudioConfig.fromStreamInput(stream)
@@ -178,7 +179,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           false
         );
         pronunciationAssessmentConfig.applyTo(evalRef.current);
-
+        setDisplayText('Listening...');
         sttRef.current.recognizeOnceAsync(result => {
           switch (result.reason) {
             case speechsdk.ResultReason.RecognizedSpeech:
@@ -198,7 +199,8 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
             case speechsdk.ResultReason.Canceled:
               const cancellation = speechsdk.CancellationDetails.fromResult(result);
               console.log(`CANCELED: Reason=${cancellation.reason}`);
-
+              setDisplayText('Try agian');
+              setLoading(false)
               if (cancellation.reason == speechsdk.CancellationReason.Error) {
                 console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
                 console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
