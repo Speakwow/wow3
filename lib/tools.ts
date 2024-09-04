@@ -62,6 +62,13 @@ export const getBeijingTime = () => {
     return beijingTime;
 };
 
+// 获取当前北京时间
+export const UTC2Beijing = (dateString:string) => {
+    const date = new Date(dateString);
+    const beijingTime = date.toLocaleString("zh-TW", { timeZone: "Asia/Shanghai" });
+    return beijingTime;
+};
+
 export const getBeijingDate = () => {
     const now = new Date();
     const beijingTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));

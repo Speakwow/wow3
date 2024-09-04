@@ -319,7 +319,7 @@ export async function finishRepeatRecord(recordId: string) {
       {
         $set: {
           isFinished: true,
-          finishAt: getBeijingTime(),
+          finishAt: new Date(),
           score: final_score,
         }
       });
@@ -388,7 +388,7 @@ export async function createTalkaboutRecord(threadId: string, userId: string) {
       threadId: threadId,
       userId: userId,
       isFinished: false,
-      createAt: getBeijingTime(),
+      createAt: new Date(),
       score: 0,
     });
   return res.insertedId.toString()
@@ -408,7 +408,7 @@ export async function finishTalkaboutRecord(recordId: string, score: number, res
       {
         $set: {
           isFinished: true,
-          finishAt: new Date(getBeijingTime()),
+          finishAt: new Date(),
           score: score,
           report: result
         }
@@ -462,7 +462,7 @@ export async function createWordRecord(threadId: string, userId: string) {
       threadId: threadId,
       userId: userId,
       isFinished: false,
-      createAt: new Date(getBeijingTime()),
+      createAt: new Date(),
       score: 0,
       record: []
     });
@@ -484,7 +484,7 @@ export async function finishWordRecord(recordId: string) {
       {
         $set: {
           isFinished: true,
-          finishAt: getBeijingTime(),
+          finishAt: new Date(),
           score: final_score,
         }
       });
@@ -534,7 +534,7 @@ export async function saveWordRecord(userId: string, threadId: string, score: nu
       report: report,
       record: record,
       isFinished: true,
-      finishAt: getBeijingTime(),
+      finishAt: new Date()
     })
   return res.insertedId.toString()
 }
@@ -572,12 +572,11 @@ export async function getImgtalkById(id: string) {
 
 export async function createImgtalkRecord(userId: string) {
   const mongo = await connect()
-  const now = Date.now(); // 获取当前时间的时间戳
-  const date = new Date(now); // 将时间戳转换为 Date 对象
+  const now = new Date(); // 获取当前时间的时间戳
   const res = await mongo.db(DB).collection('imgtalk_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: getBeijingTime()
+    createAt: new Date()
   });
   return res.insertedId.toString()
 }
@@ -592,7 +591,7 @@ export async function updateScenarioRecord(chatId: string, report: any) {
         score: +report.score ?? 0,
         report: report,
         isFinished: true,
-        finishAt: getBeijingTime()
+        finishAt: new Date()
       }
     })
   return lesson
@@ -606,7 +605,7 @@ export async function createScenarioRecord(userId: string, threadId: string) {
   const res = await mongo.db(DB).collection('scenario_records').insertOne({
     userId: userId,
     isFinished: false,
-    createAt: getBeijingTime(),
+    createAt: new Date(),
     threadId: threadId
   });
   return res.insertedId.toString()
@@ -681,7 +680,7 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
       score: +feedback.score,
       report: feedback,
       isFinished: true,
-      finishAt: getBeijingTime()
+      finishAt: new Date()
     })
 
   return JSON.parse(JSON.stringify(res))
@@ -729,7 +728,7 @@ export async function saveRepeatRecord(userId: string, threadId: string, score: 
       report: report,
       record: record,
       isFinished: true,
-      finishAt: new Date(getBeijingTime()),
+      finishAt: new Date(),
     })
   return res.insertedId.toString()
 }
@@ -800,7 +799,7 @@ export async function updateAssignment(assignment: Assignment) {
       {
         $set: {
           ...assignment,
-          updateAt: getBeijingTime()
+          updateAt: new Date()
         }
       })
   return res.acknowledged
