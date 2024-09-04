@@ -19,6 +19,8 @@ import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
 import { Score2Grade } from "@/lib/tools"
 import { useUnmount } from 'usehooks-ts';
+import { ToastAction } from './ui/toast';
+import { useToast } from './ui/use-toast';
 
 
 
@@ -70,6 +72,56 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
   }
   // Cache Current Message
   const [currentMessage, setCurrentMessage] = useState('')
+
+
+  const { toast } = useToast()
+
+  function HowlerSuspend() {
+      try {
+          setSound(null)
+          Howler.ctx?.suspend();
+      } catch (e) {
+          console.log('HowlerSuspend error', e);
+      }
+  }
+  function HowlerResume() {
+      try {
+          setSound(null)
+          Howler.ctx?.resume();
+      } catch (e) {
+          console.log('HowlerResume error', e);
+      }
+  }
+
+  function getPlatform() {
+      if (/iPhone|iPad/i.test(navigator.userAgent)) {
+          return ('ios')
+      }
+      else if (/Mobi|Android/i.test(navigator.userAgent)) {
+          return ('android')
+      }
+      else {
+          console.log('pc')
+          return ('pc')
+      }
+  }
+
+  /// 监听页面可见性变化事件
+  document.addEventListener('visibilitychange', function () {
+      if (getPlatform() === 'ios' && document.visibilityState === 'visible') {
+          toast({
+              title: "请重新开始练习",
+              description: "练习中途不要退出开小差喔！",
+              action: <ToastAction altText="刷新" onClick={()=>window.location.reload()}>刷新</ToastAction>,
+          })
+          HowlerSuspend()
+      } else if (getPlatform() === 'ios' && document.visibilityState === 'hidden') {
+          sound?.stop()
+          setLoading(false)
+          setIsPlaying(false);
+          setDisplayText('Try agian')
+      }
+  });
 
   // Streaming Chat I/O
   // api: '/api/learn/' + params.scenarioId +'/'+params.characterId,
