@@ -14,6 +14,9 @@ import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
 import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
 import { useUnmount } from "usehooks-ts";
+import { useToast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
+import { useRouter } from "next/navigation";
 
 
 function calculateAverages(data: any[]): any {
@@ -59,12 +62,14 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     const [currentIndex, setCurrentIndex] = useState(0)
 
 
+
     const [currentRecord, setCurrentRecord] = useState<any>()
 
     const [threadRecord, setThreadRecord] = useState<any[]>([])
 
     const [report, setReport] = useState<any>()
     const [saveState, setSaveState] = useState('unsaved')
+    const router = useRouter()
 
     const [recognitionText, setRecognitionText] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
@@ -81,6 +86,57 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
     const [sound, setSound] = useState<Howl | null>(null);
 
+    const { toast } = useToast()
+
+    function HowlerSuspend() {
+        try {
+            setSound(null)
+            Howler.ctx?.suspend();
+        } catch (e) {
+            console.log('HowlerSuspend error', e);
+        }
+    }
+    function HowlerResume() {
+        try {
+            setSound(null)
+            Howler.ctx?.resume();
+        } catch (e) {
+            console.log('HowlerResume error', e);
+        }
+    }
+
+    function getPlatform() {
+        if (/iPhone|iPad/i.test(navigator.userAgent)) {
+            return ('ios')
+        }
+        else if (/Mobi|Android/i.test(navigator.userAgent)) {
+            return ('android')
+        }
+        else {
+            console.log('pc')
+            return ('pc')
+        }
+    }
+
+    /// 监听页面可见性变化事件
+
+    document.addEventListener('visibilitychange', function () {
+        if (getPlatform() === 'ios' && document.visibilityState === 'visible') {
+            toast({
+                title: "请重新开始练习",
+                description: "练习中途不要退出开小差喔！",
+                action: <ToastAction autoFocus altText="刷新" onClick={() => window.location.reload()}>刷新</ToastAction>,
+            })
+            HowlerSuspend()
+        } else if (getPlatform() === 'ios' && document.visibilityState === 'hidden') {
+            sound?.stop()
+            setIsRecognizing(false);
+            setIsFinish(false);
+            setIsPlaying(false);
+            setDisplayText('Press the button and try agian')
+            setRecognitionText('')
+        }
+    });
 
 
     // Cleanup on component unmount or page unload
@@ -163,23 +219,19 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
     }
 
     const listeningRef = useRef(false)
-    const [listening, setListening] = useState(false)
     const sttRef = useRef<speechsdk.SpeechRecognizer>()
     const audioConfigRef = useRef<speechsdk.AudioConfig>()
     const mediaStreamRef = useRef<MediaStream>()
-    const [enableInput, setEnableInput] = useState(false)
 
 
     useUnmount(() => {
         try {
             listeningRef.current = false
-            setListening(false)
+            setIsRecognizing(false)
             if (sttRef.current) sttRef.current.close()
         } catch { }
     })
 
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const audioChunksRef = useRef<Blob[]>([]);
 
     var asrOff = new Howl({
         src: ['/sound/asr-off.wav'],
@@ -264,7 +316,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                         text: recognizedText,
                         accuracy: +(total_score.accuracy * compRate / word_count).toFixed(0),
                         fluency: +(total_score.fluency * compRate / word_count).toFixed(0),
-                        pron: +(total_score.pron * compRate / word_count).toFixed(0), 
+                        pron: +(total_score.pron * compRate / word_count).toFixed(0),
                         comp: +(total_score.comp * compRate / word_count).toFixed(0),
                         prosody: +(total_score.prosody * compRate / word_count).toFixed(0)
                     }
@@ -291,7 +343,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                         setIsFinish(true)
                         setIsReviewing(false)
 
-                    }else{
+                    } else {
                         setDisplayText('Not hearing, try again');
                         setIsRecognizing(false);
                         setIsFinish(false)
@@ -319,12 +371,16 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             })
             .catch(error => {
                 setSaveState('failed')
+                setDisplayText('load failed, try again');
+                setIsRecognizing(false);
+                setIsFinish(false)
+                setIsReviewing(false)
                 console.error('Error accessing media devices.', error);
             });
     }, [azureSpeechConfig])
 
     useEffect(() => {
-        console.log('Get Cached Record', currentRecord)
+        console.log('Get Record', currentRecord)
         if (currentRecord) {
             if (!threadRecord[currentIndex]) {
                 setThreadRecord(prev => [
@@ -340,90 +396,6 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
             }
         }
     }, [currentRecord])
-
-    useEffect(() => {
-        console.log('Update Thread Record', threadRecord)
-
-    }, [threadRecord])
-
-    // const handleStartRecording2 = async () => {
-
-    //     asrOn.play()
-    //     try {
-    //         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    //         const mediaRecorder = new MediaRecorder(stream);
-    //         mediaRecorderRef.current = mediaRecorder;
-    //         audioChunksRef.current = [];
-
-    //         mediaRecorder.ondataavailable = event => {
-    //             audioChunksRef.current.push(event.data);
-    //         };
-
-    //         mediaRecorder.onstop = async () => {
-    //             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-    //             stream.getTracks().forEach(track => track.stop());
-    //             try {
-    //                 console.log('Start Webm2Wav')
-    //                 const wavBlob = await webm2Wav(audioBlob);
-    //                 console.log('Start Eval Speech')
-    //                 const evalResult = await evalSpeechFromFile(thread[currentIndex], wavBlob) as any;
-    //                 const recordReport = {
-    //                     index: currentIndex,
-    //                     text: thread[currentIndex],
-    //                     score: evalResult.pronunciation,
-    //                     detail_score: {
-    //                         accuracy: evalResult.accuracy,
-    //                         fluency: evalResult.fluency,
-    //                         completeness: evalResult.completeness,
-    //                         prosody: evalResult.prosody,
-    //                     },
-    //                 }
-    //                 console.log('Done Eval Speech')
-    //                 if (!currentRecord) {
-    //                     setThreadRecord(prev => [
-    //                         ...prev,
-    //                         recordReport,
-    //                     ]);
-    //                 } else {
-    //                     setThreadRecord(prev => [
-    //                         ...prev.slice(0, -1),
-    //                         recordReport,
-    //                     ])
-    //                 }
-    //                 setCurrentRecord(recordReport)
-    //                 setDisplayText('');
-    //                 setIsRecognizing(false);
-    //                 setRecognitionText(thread[currentIndex]);
-    //                 setIsFinish(true)
-    //                 setIsReviewing(false)
-    //                 audioChunksRef.current = []; // Clear array to release memory
-    //             } catch (error) {
-    //                 console.error('Error ASR:', error);
-    //                 setDisplayText('Not Hearing...Try again');
-    //                 setIsRecognizing(false)
-    //                 setIsReviewing(false)
-    //                 setIsReviewing(false);
-    //             }
-    //         };
-
-    //         mediaRecorder.start();
-    //         setDisplayText('Repeat After Me...');
-    //         setIsRecognizing(true);
-    //     } catch (error) {
-    //         console.error('Error starting recording:', error);
-    //         setDisplayText('Not Hearing...Try again');
-    //         setIsRecognizing(false);
-    //     }
-    // };
-
-    // const handleStopRecording2 = async () => {
-    //     if (mediaRecorderRef.current) {
-    //         setIsReviewing(true)
-    //         mediaRecorderRef.current.stop();
-    //         setDisplayText('Reviewing...');
-
-    //     }
-    // };
 
     const handleStopRecording = useCallback(() => {
         setIsReviewing(true)
@@ -502,7 +474,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 <Card className="w-full md:w-3/4 z-50 p-4 pb-6 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full p-2">
                         {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex] && threadRecord[currentIndex].score ?
-                            <Bravo score={threadRecord[currentIndex].score*1.1} />
+                            <Bravo score={threadRecord[currentIndex].score * 1.1} />
                             :
                             <div>
                                 <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying || isRecognizing}>
@@ -513,7 +485,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
 
                     </div>
 
-                    {!recognitionText||!threadRecord[currentIndex] ?
+                    {!recognitionText || !threadRecord[currentIndex] ?
                         <div className="text-xl md:text-2xl  w-full text-pretty text-ellipsis overflow-hidden">
                             {thread[currentIndex]}
                         </div>

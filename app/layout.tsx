@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Toaster } from "@/components/ui/toaster"
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -88,10 +89,12 @@ export default function RootLayout({
                 </div>
                 <div className="h-full">
                   <AI>{children}</AI>
+                  
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
           </main>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

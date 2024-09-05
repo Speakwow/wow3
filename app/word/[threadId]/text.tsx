@@ -18,6 +18,8 @@ import Image from 'next/image'
 import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
 import { Score2Grade } from "@/lib/tools"
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 
 function calculateAverages(data: any[]): any {
@@ -130,7 +132,53 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
         sound.play();
     }
 
+    const { toast } = useToast()
 
+    function HowlerSuspend() {
+        try {
+            Howler.ctx?.suspend();
+        } catch (e) {
+            console.log('HowlerSuspend error', e);
+        }
+    }
+    function HowlerResume() {
+        try {
+            Howler.ctx?.resume();
+        } catch (e) {
+            console.log('HowlerResume error', e);
+        }
+    }
+
+    function getPlatform() {
+        if (/iPhone|iPad/i.test(navigator.userAgent)) {
+            return ('ios')
+        }
+        else if (/Mobi|Android/i.test(navigator.userAgent)) {
+            return ('android')
+        }
+        else {
+            console.log('pc')
+            return ('pc')
+        }
+    }
+
+    /// 监听页面可见性变化事件
+
+    document.addEventListener('visibilitychange', function () {
+        if (getPlatform() === 'ios' && document.visibilityState === 'visible') {
+            toast({
+                title: "请重新开始练习",
+                description: "练习中途不要退出开小差喔！",
+                action: <ToastAction autoFocus altText="刷新" onClick={()=>window.location.reload()}>刷新</ToastAction>,
+            })
+            HowlerSuspend()
+        } else if (getPlatform() === 'ios' && document.visibilityState === 'hidden') {
+            setIsRecognizing(false);
+            setIsPlaying(false);
+            setDisplayText('Press the button and try agian')
+            setRecognitionText('')
+        }
+    });
 
     //Welcome Messgae TTS
     useEffect(() => {
@@ -316,6 +364,12 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                 }
                 )
             })
+            .catch(error => {
+                setDisplayText('load failed, try again');
+                setLoading(false)
+                setIsRecognizing(false);
+                console.error('Error accessing media devices.', error);
+            });
 
 
     }, [azureSpeechConfig])
