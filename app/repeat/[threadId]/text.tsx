@@ -17,6 +17,7 @@ import { useUnmount } from "usehooks-ts";
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from "next/navigation";
+import stringSimilarity from "string-similarity"
 
 
 function calculateAverages(data: any[]): any {
@@ -308,16 +309,21 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                             total_score.pron += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.PronScore
                         }
                     })
-                    let compRate = recognizedText.length / thread[index].length * 1.1
+                    let compRate = stringSimilarity.compareTwoStrings(recognizedText, thread[index]) * 1.1
                     if (compRate > 1) {
                         compRate = 1
+                    }
+                    console.log('compRate=', compRate)
+                    let finalScore = total_score.pron * compRate * 1.03 / word_count
+                    if (finalScore > 100) {
+                        finalScore = 100
                     }
                     const evalResult = {
                         text: recognizedText,
                         accuracy: +(total_score.accuracy * compRate / word_count).toFixed(0),
                         fluency: +(total_score.fluency * compRate / word_count).toFixed(0),
-                        pron: +(total_score.pron * compRate / word_count).toFixed(0),
-                        comp: +(total_score.comp * compRate / word_count).toFixed(0),
+                        pron: +finalScore.toFixed(0),
+                        comp: +(total_score.comp * compRate * compRate / word_count).toFixed(0),
                         prosody: +(total_score.prosody * compRate / word_count).toFixed(0)
                     }
                     if (evalResult.pron) {
@@ -474,7 +480,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 <Card className="w-full md:w-3/4 z-50 p-4 pb-6 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full p-2">
                         {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex] && threadRecord[currentIndex].score ?
-                            <Bravo score={threadRecord[currentIndex].score * 1.1} />
+                            <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
                                 <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying || isRecognizing}>
