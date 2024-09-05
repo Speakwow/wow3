@@ -150,7 +150,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     onError(error){
       console.error('AI Not Response',error);
       setLoading(false)
-      setDisplayText('too busy, try agian')
+      setDisplayText('Frank is busy, try agian later')
     }
   },);
 
