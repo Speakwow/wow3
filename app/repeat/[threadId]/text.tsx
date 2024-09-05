@@ -308,7 +308,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                             total_score.pron += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.PronScore
                         }
                     })
-                    let compRate = recognizedText.length / thread[index].length * 1.1
+                    let compRate = recognizedText.length / thread[index].length * 1.05
                     if (compRate > 1) {
                         compRate = 1
                     }
@@ -474,7 +474,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                 <Card className="w-full md:w-3/4 z-50 p-4 pb-6 h-fit rounded-[36px]  font-medium text-center bg-white/75 ">
                     <div className="flex justify-center  w-full p-2">
                         {recognitionText.length > 0 && !isRecognizing && threadRecord[currentIndex] && threadRecord[currentIndex].score ?
-                            <Bravo score={threadRecord[currentIndex].score * 1.1} />
+                            <Bravo score={threadRecord[currentIndex].score} />
                             :
                             <div>
                                 <Button onClick={handleReplay} size='icon' variant='ghost' className="w-12 h-12" disabled={isPlaying || isRecognizing}>
