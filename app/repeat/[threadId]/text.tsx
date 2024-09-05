@@ -17,6 +17,7 @@ import { useUnmount } from "usehooks-ts";
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from "next/navigation";
+import stringSimilarity from "string-similarity"
 
 
 function calculateAverages(data: any[]): any {
@@ -308,16 +309,21 @@ export default function RepeatText({ thread, userId, threadId }: { thread: strin
                             total_score.pron += result.NBest[0].Words.length * result.NBest[0].PronunciationAssessment.PronScore
                         }
                     })
-                    let compRate = recognizedText.length / thread[index].length * 1.05
+                    let compRate = stringSimilarity.compareTwoStrings(recognizedText, thread[index]) * 1.1
                     if (compRate > 1) {
                         compRate = 1
+                    }
+                    console.log('compRate=', compRate)
+                    let finalScore = total_score.pron * compRate * 1.03 / word_count
+                    if (finalScore > 100) {
+                        finalScore = 100
                     }
                     const evalResult = {
                         text: recognizedText,
                         accuracy: +(total_score.accuracy * compRate / word_count).toFixed(0),
                         fluency: +(total_score.fluency * compRate / word_count).toFixed(0),
-                        pron: +(total_score.pron * compRate / word_count).toFixed(0),
-                        comp: +(total_score.comp * compRate / word_count).toFixed(0),
+                        pron: +finalScore.toFixed(0),
+                        comp: +(total_score.comp * compRate * compRate / word_count).toFixed(0),
                         prosody: +(total_score.prosody * compRate / word_count).toFixed(0)
                     }
                     if (evalResult.pron) {
