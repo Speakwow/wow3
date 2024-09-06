@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Message, useChat } from 'ai/react';
@@ -17,6 +16,7 @@ import { EvalResult, evalSpeechFromFile } from '@/lib/speech/eval';
 import Link from 'next/link';
 import { updateScenarioRecord } from '@/lib/action/mongoIO';
 import { useRouter } from 'next/navigation';
+import { Score2Grade } from '@/lib/tools';
 
 
 let totalFluencyScore = 0
@@ -29,6 +29,7 @@ let stayTime = 0;
 
 export default function Chat(params: { chatid: string, scenarioId: string, characterId: string, scenario: any, character: any }) {
   const [sound, setSound] = useState<Howl | null>(null);
+
 
   //Handle Playing Audio
   function handleAudioPlay(audioData: ArrayBuffer) {
@@ -47,7 +48,13 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
         console.log('Playback finished');
         const continueSession = handleReport()
         if (isVoiceInput && continueSession) {
-          handleSpeechToText()
+          var sound = new Howl({
+            src: ['/sound/asr-on.wav'],
+            format: ['wav'],
+            autoplay: true,
+            onend:handleSpeechToText
+          });
+          sound.play();
         } else {
           setLoading(false)
         }
@@ -141,52 +148,56 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
   //Handle Asr with Eval
   const handleSpeechToText = async () => {
-    var sound = new Howl({
-      src: ['/sound/asr-on.wav'],
-      format: ['wav'],
-      autoplay: true,
-    });
-    sound.play();
     setDisplayText('Listening...');
     setLoading(true)
     setRecognitionText('');
     try {
-      // 使用 MediaRecorder API 进行录音
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      let audioChunks: Blob[] = [];
-      mediaRecorder.start();
-      mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
-      };
+      // // 使用 MediaRecorder API 进行录音
+      // const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // const mediaRecorder = new MediaRecorder(stream);
+      // let audioChunks: Blob[] = [];
+      // mediaRecorder.start();
+      // mediaRecorder.ondataavailable = event => {
+      //   audioChunks.push(event.data);
+      // };
 
       const text = await sttFromMic() as string;
+      if(!text){
+        console.error('Not hearing');
+        setDisplayText('Not Hearing...');
+        if (currentMessage && currentMessage.length > 0) {
+          handleHint()
+        }
+        setLoading(false)
+      }
+      dialogLength += text.length
+      var sound = new Howl({
+        src: ['/sound/asr-off.wav'],
+        format: ['wav'],
+        autoplay: true,
+      });
+      sound.play();
       setDisplayText(text);
       setRecognitionText(text);
-      mediaRecorder.stop();
-      mediaRecorder.onstop = async () => {
-        var sound = new Howl({
-          src: ['/sound/asr-off.wav'],
-          format: ['wav'],
-          autoplay: true,
-        });
-        sound.play();
-        // 创建 Blob 保存音频文件
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        const wavBlob = await webm2Wav(audioBlob)
-        // const audioUrl = URL.createObjectURL(wavBlob);
-        // downloadWavFile(wavBlob, 'output.wav');
-        const evalResult = await evalSpeechFromFile(text, wavBlob) as any;
-        dialogLength = dialogLength + evalResult.length;
-        totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
-        totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
-        totalPronScore = totalPronScore + evalResult.pronunciation * evalResult.length;
-        console.log('words num:', dialogLength)
-        console.log('Accuracy:', totalAccuracyScore / dialogLength)
-        console.log('Fluency:', totalFluencyScore / dialogLength)
-        // URL.revokeObjectURL(audioUrl);
-        audioChunks = []; // 清空数组以释放内存」
-      }
+      // mediaRecorder.stop();
+      // mediaRecorder.onstop = async () => {
+      //   asrOff.play();
+      //   // 创建 Blob 保存音频文件
+      //   const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      //   const wavBlob = await webm2Wav(audioBlob)
+      //   // const audioUrl = URL.createObjectURL(wavBlob);
+      //   // downloadWavFile(wavBlob, 'output.wav');
+      //   const evalResult = await evalSpeechFromFile(text, wavBlob) as any;
+      //   dialogLength = dialogLength + evalResult.length;
+      //   totalAccuracyScore = totalAccuracyScore + evalResult.accuracy * evalResult.length;
+      //   totalFluencyScore = totalFluencyScore + evalResult.fluency * evalResult.length;
+      //   totalPronScore = totalPronScore + evalResult.pronunciation * evalResult.length;
+      //   console.log('words num:', dialogLength)
+      //   console.log('Accuracy:', totalAccuracyScore / dialogLength)
+      //   console.log('Fluency:', totalFluencyScore / dialogLength)
+      //   // URL.revokeObjectURL(audioUrl);
+      //   audioChunks = []; // 清空数组以释放内存」
+      // }
     } catch (error) {
       console.error('Speech recognition error:', error);
       setDisplayText('Not Hearing...');
@@ -240,11 +251,11 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
     const lowerCaseMessage = currentMessage.toLowerCase()
     console.log(totalAccuracyScore / dialogLength)
     const keywords = ['goodbye', 'bye', 'see you', 'bye-bye'];
-    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 30) {
+    if (keywords.some(keyword => lowerCaseMessage.includes(keyword)) || messages.length > 60) {
       if (reportTriggerRef.current) {
         stayTime = Date.now() - startTime
         const reportResult = {
-          score: Math.round(totalPronScore / dialogLength),
+          score: calScore(dialogLength),
           accuracy: Math.round(totalAccuracyScore / dialogLength),
           fluency: Math.round(totalFluencyScore / dialogLength),
           duration: Math.round((stayTime / 1000)),
@@ -261,22 +272,41 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
       return true
     }
   }
+  function calScore(wordCount:number){
+    if (wordCount>100){
+      return 90
+    }
+    else if (wordCount>80){
+      return 80
+    }
+    else if (wordCount>60){
+      return 70
+    }
+    else if (wordCount>40){
+      return 60
+    }
+    else{
+      return 50
+    }
+
+  }
   //handle Report
   function handleEnd() {
-      if (reportTriggerRef.current) {
-        stayTime = Date.now() - startTime
-        const reportResult = {
-          score: Math.round(totalPronScore / dialogLength),
-          accuracy: Math.round(totalAccuracyScore / dialogLength),
-          fluency: Math.round(totalFluencyScore / dialogLength),
-          duration: Math.round((stayTime / 1000)),
-          round: messages.length,
-        }
-        console.log(reportResult)
-        updateScenarioRecord(params.chatid, reportResult).then(() => setRecordSaved(true))
-        reportTriggerRef.current.click();
+    if (reportTriggerRef.current) {
+      stayTime = Date.now() - startTime
+      const reportResult = {
+        // score: Math.round(totalPronScore / dialogLength),
+        score:calScore(dialogLength),
+        accuracy: 90,
+        fluency:90,
+        duration: Math.round((stayTime / 1000)),
+        round: messages.length,
       }
+      console.log(reportResult)
+      updateScenarioRecord(params.chatid, reportResult).then(() => setRecordSaved(true))
+      reportTriggerRef.current.click();
     }
+  }
 
   // Cleanup on component unmount or page unload
   useEffect(() => {
@@ -358,7 +388,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                     >
                       <Mic width="60" height="60" />
                     </Button>
-                    <Button type='button' className='rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
+                    <Button type='button' className='sr-only rounded-full p-2 h-fit w-fit' variant="outline" onClick={() => setIsVoiceInput(false)}>
                       <Keyboard width={30} height={30} />
                     </Button>
                   </div>
@@ -415,19 +445,19 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
           <AlertDialogHeader>
             <AlertDialogTitle className='text-center text-2xl'>PERFECT!</AlertDialogTitle>
             <AlertDialogDescription>
-              <div className='flex justify-center'>
+              {/* <div className='flex justify-center'>
                 <img src='/report-bravo.gif' className='w-1/5'></img>
-              </div>
+              </div> */}
               <div className='text-center text-xl'>
                 You did it! Final Score:
               </div>
               <div className='flex flex-col'>
                 <div className='text-center text-[#42C83C] text-5xl'>
-                  {(100 * (Math.pow(totalPronScore / dialogLength / 100, 1))).toFixed(1)}
+                  {Score2Grade(calScore(dialogLength))}
                 </div>
               </div>
               <div className='grid grid-cols-2 text-center gap-4 py-6'>
-                <div className='flex flex-col'>
+                {/* <div className='flex flex-col'>
                   <div>
                     Fluency
                   </div>
@@ -442,7 +472,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
                   <div className='text-[#019FFF] text-5xl'>
                     {(100 * (Math.pow(totalAccuracyScore / dialogLength / 100, 1))).toFixed(1)}
                   </div>
-                </div>
+                </div> */}
                 <div className='flex flex-col'>
                   <div>
                     Round
@@ -492,7 +522,7 @@ export default function Chat(params: { chatid: string, scenarioId: string, chara
 
             </AlertDialogHeader>
             <AlertDialogFooter className='flex flex-row justify-between'>
-              <AlertDialogAction  onClick={handleEnd}>
+              <AlertDialogAction onClick={handleEnd}>
                 立即结束
               </AlertDialogAction>
               <AlertDialogCancel>
