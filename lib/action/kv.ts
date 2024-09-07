@@ -2,6 +2,15 @@
 
 import { kv } from "@vercel/kv"
 
+export async function setCurrentTextbook(userId:string,bookId:string) {
+    await kv.hset(userId,{textbook:bookId})
+}
+
+export async function getCurrentTextbook(userId:string) {
+    const bookId = await kv.hget(userId,'textbook')
+    return bookId
+}
+
 
 export async function getPoint(userId:string) {
     const point = await kv.hget(userId,'point')

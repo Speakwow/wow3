@@ -26,6 +26,9 @@ import { redirect } from "next/navigation"
 export default async function Plan() {
     const today = new Date()
     const { userId, orgId, has } = auth();
+    if (!orgId) {
+        redirect('/')
+    }
     if (!has({ role: "org:admin" })) {
         redirect('/404/unauthoried')
     }

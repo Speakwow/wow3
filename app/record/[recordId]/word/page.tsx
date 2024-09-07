@@ -71,6 +71,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
         }
 
     } catch (error) {
+        
 
     }
 

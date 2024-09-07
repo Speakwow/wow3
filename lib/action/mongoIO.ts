@@ -9,6 +9,7 @@ import { assign } from 'lodash';
 import { clerkClient } from '@clerk/nextjs/server';
 import { logger } from '../logger';
 import { getBeijingTime } from '../tools';
+import { getCurrentTextbook } from './kv';
 
 export async function updateScenario(name: string, content: any) {
   const mongo = await connect()
@@ -76,6 +77,7 @@ export async function addToUserLessonList(userId: string, lessonId: string, name
       });
   return res.acknowledged
 }
+
 
 export async function delFromUserLessonList(userId: string, lessonId: string) {
   const mongo = await connect()
@@ -759,6 +761,32 @@ export async function getTextbookData(id: string) {
   return JSON.parse(JSON.stringify(res))
 }
 
+export async function getCurrentTextbookData(userId: string) {
+  const id = await getCurrentTextbook(userId) as string
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('textbooks')
+    .findOne({
+      _id: new ObjectId(id)
+    })
+  if (!res) {
+    return null
+  }
+  for (const unit of res.units) {
+    for (const lesson of unit.lessons) {
+      const collectionName = (typeMap.find(item => item.type === lesson.type))?.collection
+      try {
+        const lessonData = await mongo.db(DB).collection(collectionName as string).findOne({ _id: new ObjectId(lesson.id as string) })
+        lesson.data = lessonData;
+      } catch (error) {
+        logger.info(`Get lesson data error,${lesson.type}:${lesson.id}`)
+        throw (error)
+      }
+    }
+  }
+  return JSON.parse(JSON.stringify(res))
+}
+
 
 
 export async function createAssignment(assignment: Assignment) {
@@ -922,6 +950,59 @@ export async function getRecordsForAssignment(threadId: string, orgId: string, s
   return JSON.parse(JSON.stringify(assignmentData))
 }
 
+export async function getAllRecordsByUserId(userId: string) {
+  const mongo = await connect();
+
+  const promises = typeMap.map(typeEntry => {
+    const pipeline = [
+      {
+        $match: {
+          userId: userId,
+          isFinished: true
+        }
+      },
+      {
+        $sort: {
+          finishAt: -1  // 按finishAt字段倒序排序
+        }
+      },
+      {
+        $limit: 10  // 限制查询结果最多为10条
+      },
+      {
+        $addFields: {
+          type: typeEntry.type,
+          tag: typeEntry.tag,
+          convertedThreadId: { $toObjectId: "$threadId" } 
+        }
+      },
+      {
+        $lookup: {
+          from: Type2Collection(typeEntry.type),  // 关联详细信息集合
+          localField: 'convertedThreadId',  // 本集合的关联字段
+          foreignField: '_id',  // 目标集合的关联字段
+          as: 'info'  // 将结果存储到字段 "info"
+        }
+      },
+      {
+        $unwind: {
+          path: "$info",
+          preserveNullAndEmptyArrays: true  // 如果没有匹配到，也保持结果
+        }
+      }
+    ];
+    return mongo.db(DB).collection(typeEntry.type + '_records').aggregate(pipeline).toArray();
+  });
+
+  const records = await Promise.all(promises);
+  const mergedRecords = records.flat();
+
+
+  mergedRecords.sort((a, b) => new Date(b.finishAt).getTime() - new Date(a.finishAt).getTime());
+  return JSON.parse(JSON.stringify(mergedRecords));
+}
+
+
 
 export async function getBriefForAssignment(threadId: string, orgId: string) {
   const mongo = await connect()
@@ -974,7 +1055,7 @@ export async function getAnyRecord(userId: string, threadId: string, type: strin
   const collectionName = Type2Collection(type)
   const mongo = await connect()
   const res = await mongo.db(DB)
-    .collection(collectionName)
+    .collection(type+'_records')
     .find({ userId: userId, threadId: threadId })
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录
