@@ -68,7 +68,7 @@ export default function TextbookSelector({ textbooks,userId,currentBookId}: { te
                                 >
                                     {textbooks.map(textbook => {
                                         return (
-                                            <FormItem className="w-full relative">
+                                            <FormItem className="w-full relative" key={textbook._id}>
                                                 <FormControl>
                                                     <RadioGroupItem className="absolute top-2 right-2 z-10" value={textbook._id} />
                                                 </FormControl>
