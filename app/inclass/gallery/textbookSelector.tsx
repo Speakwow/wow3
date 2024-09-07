@@ -18,7 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { setCurrentTextbook } from "@/lib/action/kv"
 import { useRouter } from "next/navigation"
 
-export default function TextbookSelector({ textbooks,userId,currentBookId}: { textbooks: any[],userId:string ,currentBookId:string}) {
+export default function TextbookSelector({ textbooks, userId, currentBookId }: { textbooks: any[], userId: string, currentBookId: string }) {
 
     const textbookIds = textbooks.map((textbook: any) => { return textbook._id as string })
     const FormSchema = z.object({
@@ -28,14 +28,14 @@ export default function TextbookSelector({ textbooks,userId,currentBookId}: { te
     });
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
-        defaultValues:{
-            bookId:currentBookId
+        defaultValues: {
+            bookId: currentBookId
         }
     })
     const router = useRouter()
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-        setCurrentTextbook(userId,data.bookId).then(()=>{
+        setCurrentTextbook(userId, data.bookId).then(() => {
             toast({
                 title: "保存成功",
             })
@@ -57,7 +57,7 @@ export default function TextbookSelector({ textbooks,userId,currentBookId}: { te
                                 <RadioGroup
                                     onValueChange={field.onChange}
                                     defaultValue={field.value}
-                                    className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 space-y-1"
+                                    className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                                 >
                                     {textbooks.map(textbook => {
                                         return (
@@ -66,20 +66,54 @@ export default function TextbookSelector({ textbooks,userId,currentBookId}: { te
                                                     <RadioGroupItem className="absolute top-2 right-2 z-10" value={textbook._id} />
                                                 </FormControl>
                                                 <FormLabel className="font-normal">
-                                                <Card className="w-full relative">
-                                                    <CardHeader>
-                                                        <CardTitle>
-                                                            测试版：{textbook.name}
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            {textbook.level}
-                                                        </CardDescription>
-                                                    </CardHeader>
-                                                </Card>
+                                                    <Card className="w-full relative">
+                                                        <CardHeader>
+                                                            <CardTitle>
+                                                                测试版：{textbook.name}
+                                                            </CardTitle>
+                                                            <CardDescription>
+                                                                {textbook.level}
+                                                            </CardDescription>
+                                                        </CardHeader>
+                                                    </Card>
                                                 </FormLabel>
                                             </FormItem>
                                         )
                                     })}
+                                    <FormItem className="w-full relative">
+                                        <FormControl>
+                                            {/* <RadioGroupItem className="absolute top-2 right-2 z-10" value={'yilin'} /> */}
+                                        </FormControl>
+                                        <FormLabel className="font-normal">
+                                            <Card className="w-full relative text-muted-foreground bg-muted">
+                                                <CardHeader>
+                                                    <CardTitle>
+                                                        测试版：译林版
+                                                    </CardTitle>
+                                                    <CardDescription>
+                                                        暂无权限
+                                                    </CardDescription>
+                                                </CardHeader>
+                                            </Card>
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="w-full relative">
+                                        <FormControl>
+                                            {/* <RadioGroupItem className="absolute top-2 right-2 z-10" value={'yilin'} /> */}
+                                        </FormControl>
+                                        <FormLabel className="font-normal">
+                                            <Card className="w-full relative text-muted-foreground bg-muted">
+                                                <CardHeader>
+                                                    <CardTitle>
+                                                        测试版：人教版
+                                                    </CardTitle>
+                                                    <CardDescription>
+                                                        暂无权限
+                                                    </CardDescription>
+                                                </CardHeader>
+                                            </Card>
+                                        </FormLabel>
+                                    </FormItem>
 
                                 </RadioGroup>
                             </FormControl>
@@ -87,7 +121,10 @@ export default function TextbookSelector({ textbooks,userId,currentBookId}: { te
                         </FormItem>
                     )}
                 />
-                <Button type="submit">确认</Button>
+                <div className="flex flex-row gap-2">
+                    <Button type="submit">确认</Button>
+                    <Button type="button" variant="outline" onClick={()=>router.push('/')} >返回首页</Button>
+                </div>
             </form>
         </Form>
     )

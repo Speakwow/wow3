@@ -160,75 +160,67 @@ export default async function Home() {
     // console.log(publicLessonList)
     return (
 
-        <div className="h-screen flex flex-col  bg-[#F5F5F5]">
+        <div className="h-full flex flex-col  bg-[#F5F5F5]">
             <Header activePage="/" />
-            <div className=" lg:p-8 md:p-6 p-6">
-                <ScrollArea className="w-full h-full">
+                <ScrollArea className="w-full h-full lg:p-8 md:p-6 p-6">
                     <div className="w-full h-full mb-24 flex flex-col gap-4">
                         <div className=" w-full text-xl text-primary">
                             欢迎回来
                         </div>
-                        {/* <Input className=" w-full text-xl bg-white" placeholder="..." /> */}    
+                        {/* <Input className=" w-full text-xl bg-white" placeholder="..." /> */}
 
-                    
-                    <div>
-                        当前课程
-                    </div>
-                    {currentTextbook?
-                     <div className="">
-                     <Card className="flex flex-row justify-between items-center border-primary border-2">
-                         <div>
-                         <CardHeader>
-                             <CardTitle>
-                                 {currentTextbook.name}
-                             </CardTitle>
-                             <CardDescription>
-                                 {currentTextbook.level}
-                             </CardDescription>
-                             
-                         </CardHeader>
-                         </div>
-                         <div className="px-4 py-8">
-                         <Button asChild >
-                             <Link href='/inclass'>
-                             进入课程
-                             </Link>
-                         </Button>
-                         </div>
-                     </Card>
-                 </div>:
-                 <div>
-                    暂无课程
-                    </div>
-                    
-                }
-                   
-                    <div>
-                        课外推荐
-                    </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+                        {currentTextbook ?
+                            <div className="">
+                                <Card className="flex flex-row justify-between items-center border-primary border-2">
+                                    <div>
+                                        <CardHeader>
+                                            <CardTitle>
+                                                {currentTextbook.name}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {currentTextbook.level}
+                                            </CardDescription>
 
-                        {
-                            //@ts-ignore
-                            publicLessonList.map(item => (
-                                <LessonCard
-                                    userId={userId as string}
-                                    userData={userData}
-                                    name={item.name}
-                                    type={item.type}
-                                    tag={item.tag}
-                                    id={item._id}
-                                    intro={item.intro}
-                                    key={item._id}
-                                    cover='' />
-                            )
-                            )
+                                        </CardHeader>
+                                    </div>
+                                    <div className="px-4 py-8">
+                                        <Button asChild >
+                                            <Link href='/inclass'>
+                                                进入课程
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </Card>
+                            </div> :
+                            null
+
                         }
 
-                    </div>
+                        <div>
+                            课外推荐
+                        </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+
+                            {
+                                //@ts-ignore
+                                publicLessonList.map(item => (
+                                    <LessonCard
+                                        userId={userId as string}
+                                        userData={userData}
+                                        name={item.name}
+                                        type={item.type}
+                                        tag={item.tag}
+                                        id={item._id}
+                                        intro={item.intro}
+                                        key={item._id}
+                                        cover='' />
+                                )
+                                )
+                            }
+
+                        </div>
                     </div>
                 </ScrollArea>
-            </div>
         </div>
     )
 }
