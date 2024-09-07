@@ -3,7 +3,8 @@
 import { kv } from "@vercel/kv"
 import { unstable_noStore as noStore } from 'next/cache';
 export async function setCurrentTextbook(userId:string,bookId:string) {
-    await kv.hset(userId,{textbook:bookId})
+    const res = await kv.hset(userId,{textbook:bookId})
+    return res
 }
 
 export async function getCurrentTextbook(userId:string) {

@@ -35,11 +35,11 @@ export default function TextbookSelector({ textbooks, userId, currentBookId }: {
     const router = useRouter()
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-        setCurrentTextbook(userId, data.bookId).then(() => {
+        setCurrentTextbook(userId, data.bookId).then((res) => {
             toast({
                 title: "保存成功",
             })
-            router.push('/inclass')
+            router.push('/inclass/'+data.bookId)
         }
         )
 
