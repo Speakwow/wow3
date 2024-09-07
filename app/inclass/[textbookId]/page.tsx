@@ -27,9 +27,12 @@ import Link from "next/link"
 
 export default async function InClassPlan({ params }: { params: { textbookId: string } }) {
     const today = new Date()
-    const { userId, has } = auth();
+    const { userId,orgId, has } = auth();
     const textbookId = params.textbookId
     const data = await getTextbookData(textbookId)
+    if (orgId) {
+        redirect('/')
+    }
 
     return (
         <div className="flex h-full w-full flex-col bg-muted">

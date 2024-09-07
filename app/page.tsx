@@ -178,7 +178,7 @@ export default async function Home() {
                                                 {currentTextbook.name}
                                             </CardTitle>
                                             <CardDescription>
-                                                {currentTextbook.level}
+                                                当前课程
                                             </CardDescription>
 
                                         </CardHeader>

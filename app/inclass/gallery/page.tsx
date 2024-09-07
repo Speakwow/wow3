@@ -17,6 +17,9 @@ export default async function Home() {
         redirectToSignIn()
         return null
     }
+    if (orgId) {
+        redirect('/')
+    }
     const mongo = await connect()
     const [rawTextbooks, currentBookId] = await Promise.all([mongo.db(DB).collection('textbooks').find({ access: 'tbds-only' }).toArray(), kv.hget(userId, 'textbook')])
     const textbooks = JSON.parse(JSON.stringify(rawTextbooks))

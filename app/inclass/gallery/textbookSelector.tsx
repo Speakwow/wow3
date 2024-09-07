@@ -68,11 +68,11 @@ export default function TextbookSelector({ textbooks, userId, currentBookId }: {
                                                 <FormLabel className="font-normal">
                                                     <Card className="w-full relative">
                                                         <CardHeader>
-                                                            <CardTitle>
-                                                                测试版：{textbook.name}
+                                                            <CardTitle className="text-lg">
+                                                               {textbook.name}
                                                             </CardTitle>
                                                             <CardDescription>
-                                                                {textbook.level}
+                                                            测试版：{textbook.level}
                                                             </CardDescription>
                                                         </CardHeader>
                                                     </Card>
@@ -87,11 +87,11 @@ export default function TextbookSelector({ textbooks, userId, currentBookId }: {
                                         <FormLabel className="font-normal">
                                             <Card className="w-full relative text-muted-foreground bg-muted">
                                                 <CardHeader>
-                                                    <CardTitle>
-                                                        测试版：译林版
+                                                    <CardTitle className="text-lg">
+                                                        牛津译林版
                                                     </CardTitle>
                                                     <CardDescription>
-                                                        暂无权限
+                                                    测试版：暂无权限
                                                     </CardDescription>
                                                 </CardHeader>
                                             </Card>
@@ -104,11 +104,11 @@ export default function TextbookSelector({ textbooks, userId, currentBookId }: {
                                         <FormLabel className="font-normal">
                                             <Card className="w-full relative text-muted-foreground bg-muted">
                                                 <CardHeader>
-                                                    <CardTitle>
-                                                        测试版：人教版
+                                                    <CardTitle className="text-lg">
+                                                        人教版
                                                     </CardTitle>
                                                     <CardDescription>
-                                                        暂无权限
+                                                        测试版：暂无权限
                                                     </CardDescription>
                                                 </CardHeader>
                                             </Card>
