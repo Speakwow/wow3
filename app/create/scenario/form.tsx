@@ -60,6 +60,7 @@ const levels = [
 ]
 
 const rounds = [
+  10,
   15,
   20,
   25,
