@@ -1,18 +1,20 @@
 'use server'
 
 import { kv } from "@vercel/kv"
-
+import { unstable_noStore as noStore } from 'next/cache';
 export async function setCurrentTextbook(userId:string,bookId:string) {
     await kv.hset(userId,{textbook:bookId})
 }
 
 export async function getCurrentTextbook(userId:string) {
+    noStore()
     const bookId = await kv.hget(userId,'textbook')
     return bookId
 }
 
 
 export async function getPoint(userId:string) {
+    noStore()
     const point = await kv.hget(userId,'point')
     if(!point){
         await kv.hset(userId,{point:1000})
