@@ -21,13 +21,6 @@ import { useRouter } from "next/navigation"
 export default function TextbookSelector({ textbooks,userId,currentBookId}: { textbooks: any[],userId:string ,currentBookId:string}) {
 
     const textbookIds = textbooks.map((textbook: any) => { return textbook._id as string })
-    if (textbookIds.length === 0) {
-        return (
-            <div>
-                暂无可选教材
-            </div>
-        )
-    }
     const FormSchema = z.object({
         bookId: z.enum(textbookIds as [string, ...string[]], {
             required_error: "未选择教材",

@@ -12,15 +12,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 export default async function Home() {
-    const { userId, orgId, redirectToSignIn,has } = auth();
+    const { userId, orgId, redirectToSignIn, has } = auth();
     if (!userId) {
         redirectToSignIn()
         return null
     }
-    const mongo = await connect()   
-    const [rawTextbooks,currentBookId] = await Promise.all([mongo.db(DB).collection('textbooks').find({ access: 'tbds-only' }).toArray(),kv.hget(userId,'textbook')])
+    const mongo = await connect()
+    const [rawTextbooks, currentBookId] = await Promise.all([mongo.db(DB).collection('textbooks').find({ access: 'tbds-only' }).toArray(), kv.hget(userId, 'textbook')])
     const textbooks = JSON.parse(JSON.stringify(rawTextbooks))
-    
+
 
     return (
         <div className="flex h-full w-full flex-col">
@@ -31,7 +31,14 @@ export default async function Home() {
                 </div>
                 <ScrollArea className="w-full h-full flex flex-col gap-8">
                     <div className="w-full h-full flex flex-col gap-8 mb-24">
+                        {textbooks.length > 0 ?
                             <TextbookSelector textbooks={textbooks} userId={userId} currentBookId={currentBookId as string} />
+                            :
+                            <div>
+                                暂无可用课程
+                            </div>
+                        }
+
                     </div>
                 </ScrollArea>
             </main>
