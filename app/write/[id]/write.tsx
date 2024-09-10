@@ -20,7 +20,7 @@ import { useState } from "react"
 import {  genWriteFeedback, improveWriting } from "@/lib/action/gen"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import WriteReportRadar from "@/components/radar-chart"
-import { Score2Grade } from "@/lib/tools"
+import { countWords, Score2Grade } from "@/lib/tools"
 
 
 const formSchema = z.object({
@@ -155,7 +155,7 @@ export function WriteForm({ userId, write }: { userId: string, write: any }) {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-6">
-                    <div className="col-span-2">
+                    <div className="col-span-2 flex flex-col gap-4">
                         <FormField
                             control={form.control}
                             name="content"
@@ -166,6 +166,9 @@ export function WriteForm({ userId, write }: { userId: string, write: any }) {
                                         <Textarea className="h-64 border-primary " placeholder="请输入..." {...field} />
                                     </FormControl>
                                     <FormMessage />
+                                    <div className="w-full flex justify-end">
+                                    <FormLabel className="text-right text-muted-foreground text-xs">字数统计：{countWords(field.value)}词</FormLabel>
+                                    </div>
                                 </FormItem>
                             )}
                         />
