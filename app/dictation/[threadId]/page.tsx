@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { getWordById } from '@/lib/action/mongoIO'
+import { getDictationById} from '@/lib/action/mongoIO'
 import { auth } from '@clerk/nextjs/server'
 import RepeatText from './text'
 import { Badge } from '@/components/ui/badge'
@@ -16,8 +16,7 @@ import { DB } from '@/lib/constant'
 
 export default async function WordRepeat({ params }: { params: { threadId: string } }) {
     const { userId, orgId } = auth();
-    // const section = await kv.hgetall('repeatPage@' +params.bookid + ':' params.id) as unknown as RepeatPage
-    const thread = await getWordById(params.threadId) as any
+    const thread = await getDictationById(params.threadId) as any
     // 将thread.content数组打乱顺序
     const shuffledContent = thread.content.sort(() => Math.random() - 0.5);
     // 更新thread对象,使用打乱后的内容

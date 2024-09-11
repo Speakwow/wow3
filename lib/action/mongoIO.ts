@@ -482,6 +482,16 @@ export async function saveWordRecord(userId: string, threadId: string, score: nu
   return res.insertedId.toString()
 }
 
+
+export async function getDictationById(threadId: string) {
+  const mongo = await connect()
+  const threadPromise = mongo.db(DB).collection("dictation_threads").findOne({ _id: new ObjectId(threadId) })
+  const pagesPromise = mongo.db(DB).collection("dictation_pages").find({ threadId: threadId }).sort({ index: 1 }).toArray()
+  const [thread, pages] = await Promise.all([threadPromise, pagesPromise])
+  const repeatData = { ...thread, content: pages }
+  return repeatData
+}
+
 export async function saveDictationRecord(userId: string, threadId: string, score: number, report: any, record: any[]) {
   const mongo = await connect()
   const res = await mongo.db(DB)

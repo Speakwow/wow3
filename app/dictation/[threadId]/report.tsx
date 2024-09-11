@@ -51,7 +51,7 @@ export function DictationReport({ threadRecord }: { threadRecord: any[] }) {
                         </div>
                         <div className='text-red-500 text-xl font-bold flex flex-wrap items-center justify-center'>
                             {incorrectRecords.map((record, index) => (
-                                <div key={index} className="text-center">
+                                <div key={index} className="text-center px-2">
                                     {record.text}
                                 </div>
                             ))}
