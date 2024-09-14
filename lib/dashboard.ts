@@ -21,7 +21,7 @@ export async function reformatRecords(records: any[], studentIds: string[],type:
             const score = parseFloat(record.score);
             const status = record.finishAt ? "已完成" : "未完成";
             const rank = record.finishAt ? rankMap.get(record.userId)! : -1;
-            const chineseName = `${user.lastName??user.username??'no name'} ${user.firstName??user.username}`
+            const chineseName = `${user.lastName??user.username??'no name'}${user.firstName??user.username}`
 
             return {
                 recordId:record._id.toString(),
@@ -36,7 +36,7 @@ export async function reformatRecords(records: any[], studentIds: string[],type:
             };
         } else {
             const user = await clerkClient().users.getUser(userId);
-            const chineseName = `${user.lastName??user.username??'no name'} ${user.firstName}`
+            const chineseName = `${user.lastName??user.username??'no name'}${user.firstName}`
             return {
                 recordId:'',
                 threadId: "",
