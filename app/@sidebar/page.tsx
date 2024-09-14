@@ -67,7 +67,7 @@ export default async function SideBar() {
                                 }} />
                             </SignedIn>
                             <div className="text-lg text-muted-foreground font-medium">
-                                {user.username}
+                                {user.fullName ?? user.username}
                             </div>
                         </div>
                         <div>
