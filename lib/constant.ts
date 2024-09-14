@@ -1,4 +1,5 @@
 export const DB = 'abcwow-test'
+export const DB_CORE = 'wow-core'
 export const C_USERS = 'users'
 export const C_CHARACTERS = 'characters'
 

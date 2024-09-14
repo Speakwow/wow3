@@ -1,6 +1,6 @@
 'use server'
-import { connect } from '@/lib/mongo'
-import { C_CHARACTERS, C_REPEAT_PAGES, C_REPEAT_THREADS, C_SCENARIOS, DB, lesson_collections } from '@/lib/constant'
+import { connect, connectCore } from '@/lib/mongo'
+import { C_CHARACTERS, C_REPEAT_PAGES, C_REPEAT_THREADS, C_SCENARIOS, DB, DB_CORE, lesson_collections } from '@/lib/constant'
 import { ObjectId } from 'mongodb'
 import { unstable_noStore as noStore } from 'next/cache';
 import { collection2type, Type2Collection, typeMap, Type2Tag } from '../db/db';
@@ -675,15 +675,6 @@ export async function getRepeatById(threadId: string) {
   return JSON.parse(JSON.stringify(res))
 }
 
-// export async function saveRepeatRecord(userId: string, name: string, content: string[]) {
-//   const mongo = await connect()
-//   const res = await mongo.db(DB)
-//     .collection('repeats')
-//     .insertOne({ creator: userId, name: name, content: content })
-//   await addToUserLessonList(userId, res.insertedId.toString(), name, 'repeat')
-//   return res.insertedId.toString()
-// }
-
 
 export async function saveRepeatRecord(userId: string, threadId: string, score: number, report: any, record: any[]) {
   const now = Date.now(); // 获取当前时间的时间戳
@@ -700,6 +691,14 @@ export async function saveRepeatRecord(userId: string, threadId: string, score: 
       finishAt: new Date(),
     })
   return res.insertedId.toString()
+}
+
+export async function getReadingById(threadId: string) {
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
+    .collection('readings')
+    .findOne({ _id: new ObjectId(threadId) })
+  return JSON.parse(JSON.stringify(res))
 }
 
 
@@ -919,7 +918,6 @@ export async function getRecordsForAssignment(threadId: string, orgId: string, s
 
 export async function getAllRecordsByUserId(userId: string) {
   const mongo = await connect();
-
   const promises = typeMap.map(typeEntry => {
     const pipeline = [
       {
