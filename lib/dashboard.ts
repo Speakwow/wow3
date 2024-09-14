@@ -1,7 +1,7 @@
 'use server'
 import { AssignmentRecord } from "@/app/dashboard/assignment/[threadId]/columns";
 import { clerkClient } from "@clerk/nextjs/server";
-import { getChineseName } from "./tools";
+import { getChineseName } from "@/lib/tools";
 
 export async function reformatRecords(records: any[], studentIds: string[],type:string): Promise<AssignmentRecord[]> {
     // 过滤出符合 studentIds 的记录并按分数降序排序

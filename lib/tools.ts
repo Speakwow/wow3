@@ -1,3 +1,4 @@
+import { User } from "@clerk/nextjs/server";
 
 export function Score2Grade(score: number): string {
     if (score < 0 || score > 100) {
@@ -101,4 +102,8 @@ export function hoursUntil(endAt: Date): number {
     const differenceInMilliseconds = end.getTime() - now.getTime();
     const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
     return differenceInHours;
+}
+
+export function getChineseName(user: User): string {
+    return `${user.lastName??user.username}${user.firstName??''}`
 }
