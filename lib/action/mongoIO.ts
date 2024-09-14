@@ -11,8 +11,8 @@ import { getCurrentTextbook } from './kv';
 
 
 export async function updateScenario(name: string, content: any) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection(C_SCENARIOS)
     .updateOne(
       { name: name }, // 查询条件
@@ -21,8 +21,8 @@ export async function updateScenario(name: string, content: any) {
     );
 }
 export async function createScenario(userId: string, content: any) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection(C_SCENARIOS)
     .insertOne({
       creator: userId,
@@ -38,8 +38,8 @@ export async function createScenario(userId: string, content: any) {
 }
 
 export async function createTalkabout(userId: string, content: any) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('talkabouts')
     .insertOne({
       creator: userId,
@@ -94,9 +94,9 @@ export async function delFromUserLessonList(userId: string, lessonId: string) {
 }
 
 export async function deleteLesson(userId: string, lessonId: string, type: string) {
-  const mongo = await connect()
+  const mongo = await connectCore()
   const collection = Type2Collection(type)
-  const res = await mongo.db(DB)
+  const res = await mongo.db(DB_CORE)
     .collection(collection)
     .deleteOne(
       { creator: userId, _id: new ObjectId(lessonId) });
@@ -125,16 +125,16 @@ export async function getUserData(userId: string) {
 }
 
 export async function getPublicData() {
-  const mongo = await connect()
+  const mongo = await connectCore()
   let publicLessons = [] as any[]
   const collections = lesson_collections
-  const promises = collections.map(item => {
-    return mongo.db(DB)
-      .collection(item)
+  const promises = typeMap.map(item => {
+    return mongo.db(DB_CORE)
+      .collection(item.collection)
       .find({ access: 'public' })
-      .limit(20)
+      .limit(10)
       .toArray()
-      .then(result => result.map(lesson => ({ type: collection2type(item), tag: Type2Tag(collection2type(item)), ...lesson })));
+      .then(result => result.map(lesson => ({ type: item.type, tag: item.tag, ...lesson })));
   });
 
   // 使用 Promise.all 并行执行所有查询
@@ -145,11 +145,11 @@ export async function getPublicData() {
 }
 
 export async function getLessonsByCreator(userId: string) {
-  const mongo = await connect()
+  const mongo = await connectCore()
   let resultLessons = [] as any[]
   const collections = lesson_collections
   const promises = collections.map(item => {
-    return mongo.db(DB)
+    return mongo.db(DB_CORE)
       .collection(item)
       .find({ creator: userId })
       .toArray()
@@ -202,12 +202,12 @@ export async function deleteFavourite(userId: string, lessonId: string) {
 }
 
 export async function getFavouriteLessons(userId: string) {
-  const mongo = await connect()
+  const mongo = await connectCore()
   let resultLessons = [] as any[]
   const userData = await getUserData(userId)
   const favouriteList = userData.favourite
   const promises = favouriteList.map((item: any) => {
-    return mongo.db(DB)
+    return mongo.db(DB_CORE)
       .collection(Type2Collection(item.type))
       .findOne({ _id: new ObjectId(item.id as string) })
       .then(lesson => ({ type: item.type, tag: Type2Tag(item.type), ...lesson }));
@@ -224,8 +224,8 @@ export async function getFavouriteLessons(userId: string) {
 
 
 export async function deleteScenario(name: string) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection(C_SCENARIOS)
     .deleteOne(
       { name: name }// 查询条件
@@ -233,58 +233,58 @@ export async function deleteScenario(name: string) {
 }
 
 export async function getScenarioByName(name: string) {
-  const mongo = await connect()
-  const scenario = await mongo.db(DB).collection(C_SCENARIOS).findOne({ name: name })
+  const mongo = await connectCore()
+  const scenario = await mongo.db(DB_CORE).collection(C_SCENARIOS).findOne({ name: name })
   return scenario
 }
 
 export async function getScenarioById(id: string) {
-  const mongo = await connect()
-  const scenario = await mongo.db(DB).collection(C_SCENARIOS).findOne({ _id: new ObjectId(id as string) })
+  const mongo = await connectCore()
+  const scenario = await mongo.db(DB_CORE).collection(C_SCENARIOS).findOne({ _id: new ObjectId(id as string) })
   return scenario
 }
 
 
 export async function getCharacterById(id: string) {
-  const mongo = await connect()
-  const character = await mongo.db(DB).collection(C_CHARACTERS).findOne({ _id: new ObjectId(id as string) })
+  const mongo = await connectCore()
+  const character = await mongo.db(DB_CORE).collection(C_CHARACTERS).findOne({ _id: new ObjectId(id as string) })
   return character
 }
 
 
 export async function getStoryById(threadId: string) {
-  const mongo = await connect()
-  const threadPromise = mongo.db(DB).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
-  const pagesPromise = mongo.db(DB).collection('story_pages').find({ _id: new ObjectId(threadId as string) })
+  const mongo = await connectCore()
+  const threadPromise = mongo.db(DB_CORE).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
+  const pagesPromise = mongo.db(DB_CORE).collection('story_pages').find({ _id: new ObjectId(threadId as string) })
   const [thread, pages] = await Promise.all([threadPromise, pagesPromise.toArray()])
   const res = { ...thread, pages: pages }
   return JSON.parse(JSON.stringify(res))
 }
 
 export async function getStoryThreadById(threadId: string) {
-  const mongo = await connect()
-  const repeatThread = await mongo.db(DB).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
+  const mongo = await connectCore()
+  const repeatThread = await mongo.db(DB_CORE).collection('story_threads').findOne({ _id: new ObjectId(threadId as string) })
   return repeatThread
 }
 
 
 export async function getStoryPageByIndex(threadId: string, index: number) {
-  const mongo = await connect()
-  const repeatPage = await mongo.db(DB).collection('story_pages').findOne({ threadId: new ObjectId(threadId), index: index })
+  const mongo = await connectCore()
+  const repeatPage = await mongo.db(DB_CORE).collection('story_pages').findOne({ threadId: new ObjectId(threadId), index: index })
   return repeatPage
 }
 
 
 export async function getRepeatThreadById(threadId: string) {
-  const mongo = await connect()
-  const repeatThread = await mongo.db(DB).collection(C_REPEAT_THREADS).findOne({ _id: new ObjectId(threadId as string) })
+  const mongo = await connectCore()
+  const repeatThread = await mongo.db(DB_CORE).collection(C_REPEAT_THREADS).findOne({ _id: new ObjectId(threadId as string) })
   return repeatThread
 }
 
 
 export async function getRepeatPageByIndex(threadId: string, index: number) {
-  const mongo = await connect()
-  const repeatPage = await mongo.db(DB).collection(C_REPEAT_PAGES).findOne({ threadId: threadId, index: index })
+  const mongo = await connectCore()
+  const repeatPage = await mongo.db(DB_CORE).collection(C_REPEAT_PAGES).findOne({ threadId: threadId, index: index })
   return repeatPage
 }
 
@@ -358,16 +358,16 @@ export async function getRepeatRecordByUserId(userId: string) {
 }
 
 export async function createCharacter(character: any) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('characters')
     .insertOne(character)
   return res.insertedId.toString()
 }
 
 export async function getAllCharacters() {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('characters')
     .find({ isPublic: true })
     .toArray();
@@ -376,8 +376,8 @@ export async function getAllCharacters() {
 
 //Talk about
 export async function getTalkaboutById(threadId: string) {
-  const mongo = await connect()
-  const repeatThread = await mongo.db(DB).collection("talkabouts").findOne({ _id: new ObjectId(threadId as string) })
+  const mongo = await connectCore()
+  const repeatThread = await mongo.db(DB_CORE).collection("talkabouts").findOne({ _id: new ObjectId(threadId as string) })
   return repeatThread
 }
 
@@ -432,22 +432,22 @@ export async function getTalkaboutRecordByUserId(userId: string, threadId: strin
 
 
 export async function getWordThreadById(threadId: string) {
-  const mongo = await connect()
-  const repeatThread = await mongo.db(DB).collection("word_threads").findOne({ _id: new ObjectId(threadId as string) })
+  const mongo = await connectCore()
+  const repeatThread = await mongo.db(DB_CORE).collection("word_threads").findOne({ _id: new ObjectId(threadId as string) })
   return JSON.parse(JSON.stringify(repeatThread))
 }
 
 
 export async function getWordPageByIndex(threadId: string, index: number) {
-  const mongo = await connect()
-  const repeatPage = await mongo.db(DB).collection("word_pages").findOne({ threadId: threadId, index: index })
+  const mongo = await connectCore()
+  const repeatPage = await mongo.db(DB_CORE).collection("word_pages").findOne({ threadId: threadId, index: index })
   return repeatPage
 }
 
 export async function getWordById(threadId: string) {
-  const mongo = await connect()
-  const threadPromise = mongo.db(DB).collection("word_threads").findOne({ _id: new ObjectId(threadId) })
-  const pagesPromise = mongo.db(DB).collection("word_pages").find({ threadId: threadId }).sort({ index: 1 }).toArray()
+  const mongo = await connectCore()
+  const threadPromise = mongo.db(DB_CORE).collection("word_threads").findOne({ _id: new ObjectId(threadId) })
+  const pagesPromise = mongo.db(DB_CORE).collection("word_pages").find({ threadId: threadId }).sort({ index: 1 }).toArray()
   const [thread, pages] = await Promise.all([threadPromise, pagesPromise])
   const repeatData = { ...thread, content: pages }
   return repeatData
@@ -484,9 +484,9 @@ export async function saveWordRecord(userId: string, threadId: string, score: nu
 
 
 export async function getDictationById(threadId: string) {
-  const mongo = await connect()
-  const threadPromise = mongo.db(DB).collection("dictation_threads").findOne({ _id: new ObjectId(threadId) })
-  const pagesPromise = mongo.db(DB).collection("dictation_pages").find({ threadId: threadId }).sort({ index: 1 }).toArray()
+  const mongo = await connectCore()
+  const threadPromise = mongo.db(DB_CORE).collection("dictation_threads").findOne({ _id: new ObjectId(threadId) })
+  const pagesPromise = mongo.db(DB_CORE).collection("dictation_pages").find({ threadId: threadId }).sort({ index: 1 }).toArray()
   const [thread, pages] = await Promise.all([threadPromise, pagesPromise])
   const repeatData = { ...thread, content: pages }
   return repeatData
@@ -510,32 +510,11 @@ export async function saveDictationRecord(userId: string, threadId: string, scor
 
 
 
-export async function getAllLessons() {
-  noStore()
-  const mongo = await connect()
-  const lessons = mongo.db(DB).collection('lessons').find()
-  const res = await lessons.toArray()
-  return res
-}
 
-export async function getMyLessons(userId: string) {
-  noStore()
-  const mongo = await connect()
-  const lessons = mongo.db(DB).collection('lessons').find({ userId: userId })
-  const res = await lessons.toArray()
-  return JSON.parse(JSON.stringify(res))
-}
-
-export async function getLessonListById(lessonId: string) {
-  noStore()
-  const mongo = await connect()
-  const lesson = mongo.db(DB).collection('lessons').find({ _id: new ObjectId(lessonId as string) })
-  return lesson
-}
 
 export async function getImgtalkById(id: string) {
-  const mongo = await connect()
-  const scenario = await mongo.db(DB).collection('imgtalks').findOne({ _id: new ObjectId(id as string) })
+  const mongo = await connectCore()
+  const scenario = await mongo.db(DB_CORE).collection('imgtalks').findOne({ _id: new ObjectId(id as string) })
   return scenario
 }
 
@@ -599,8 +578,8 @@ export async function getScenarioRecordByUserId(userId: string, threadId: string
 
 
 export async function createWrite(userId: string, values: any) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('writes')
     .insertOne({ creator: userId, ...values })
   await addToUserLessonList(userId, res.insertedId.toString(), values.name, 'write')
@@ -608,8 +587,8 @@ export async function createWrite(userId: string, values: any) {
 }
 
 export async function getWriteById(Id: string) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('writes')
     .findOne({ _id: new ObjectId(Id) })
   return JSON.parse(JSON.stringify(res))
@@ -657,9 +636,9 @@ export async function saveWriteRecord(userId: string, writeId: string, content: 
 
 
 export async function createRepeat(userId: string, name: string, content: string[], access: string) {
-  const mongo = await connect()
+  const mongo = await connectCore()
   const trimed_content = content.filter(item => item.trim() !== "");
-  const res = await mongo.db(DB)
+  const res = await mongo.db(DB_CORE)
     .collection('repeats')
     .insertOne({ creator: userId, name: name, content: trimed_content, access: access })
   await addToUserLessonList(userId, res.insertedId.toString(), name, 'repeat')
@@ -668,8 +647,8 @@ export async function createRepeat(userId: string, name: string, content: string
 
 
 export async function getRepeatById(threadId: string) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('repeats')
     .findOne({ _id: new ObjectId(threadId) })
   return JSON.parse(JSON.stringify(res))
@@ -703,8 +682,8 @@ export async function getReadingById(threadId: string) {
 
 
 export async function getTextbookData(id: string) {
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('textbooks')
     .findOne({
       _id: new ObjectId(id)
@@ -729,8 +708,8 @@ export async function getTextbookData(id: string) {
 
 export async function getCurrentTextbookData(userId: string) {
   const id = await getCurrentTextbook(userId) as string
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection('textbooks')
     .findOne({
       _id: new ObjectId(id)
@@ -971,6 +950,7 @@ export async function getAllRecordsByUserId(userId: string) {
 
 export async function getBriefForAssignment(threadId: string, orgId: string) {
   const mongo = await connect()
+  const mongoCore = await connectCore()
   const [assignment, userIds] = await Promise.all([getAssignmentById(threadId, orgId), getOrgStudents(orgId)])
 
   const recordPromise = mongo.db(DB).collection(assignment?.type + '_records').aggregate([
@@ -997,7 +977,7 @@ export async function getBriefForAssignment(threadId: string, orgId: string) {
   ]).toArray();
 
 
-  const infoPromise = mongo.db(DB).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
+  const infoPromise = mongoCore.db(DB_CORE).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);
   const assignmentData = { assignment, info: info, records: records }
   return JSON.parse(JSON.stringify(assignmentData))
@@ -1034,8 +1014,8 @@ export async function getAnyRecord(userId: string, threadId: string, type: strin
 
 export async function getAnyLesson(threadId: string, type: string) {
   const collectionName = Type2Collection(type)
-  const mongo = await connect()
-  const res = await mongo.db(DB)
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE)
     .collection(collectionName)
     .findOne({ _id: new ObjectId(threadId) })
   if (res) {
@@ -1045,16 +1025,5 @@ export async function getAnyLesson(threadId: string, type: string) {
   }
 }
 
-export async function getAllLessonsByLessonId(lessonId: string) {
-  const mongo = await connect()
-  const lessonList = await mongo.db(DB).collection('lessons').findOne({ _id: new ObjectId(lessonId as string) })
-  if (!lessonList) {
-    return null
-  }
-  //@ts-ignore
-  const promises = lessonList.chapters.map(items => getAnyLesson(items.id, items.type));
-  const results = await Promise.all(promises);
-  return JSON.parse(JSON.stringify(results));
-}
 
 
