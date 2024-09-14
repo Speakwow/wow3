@@ -4,8 +4,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { TableHeader, TableRow, TableHead, TableBody, Table } from "@/components/ui/table";
 import { getOrgStudents, getRecordsForAssignment } from "@/lib/action/mongoIO";
 import { reformatRecords } from "@/lib/dashboard";
-import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil } from "@/lib/tools";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil, getChineseName } from "@/lib/tools";
+import { auth, clerkClient, User } from "@clerk/nextjs/server";
 import { DollarSign, Users, CreditCard, ChevronLeft } from "lucide-react";
 import { AssignmentRecord, columns } from "./columns"
 import { DataTable } from "./date-table";
@@ -96,7 +96,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
                                 <CardContent>
                                     <div className="text-2xl font-bold">{highestScoreDoc?.score.toFixed(1)}</div>
                                     <p className="text-xs text-muted-foreground">
-                                        学生：{bestUser.fullName ?? bestUser.username ?? 'Null'}
+                                        学生：{getChineseName(bestUser as User)}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -108,7 +108,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
                                 <CardContent>
                                     <div className="text-2xl font-bold">{lowestScoreDoc?.score.toFixed(1)}</div>
                                     <p className="text-xs text-muted-foreground">
-                                        学生：{worstUser.fullName ?? worstUser.username ?? 'Null'}
+                                        学生：{getChineseName(worstUser as User)}
                                     </p>
                                 </CardContent>
                             </Card>

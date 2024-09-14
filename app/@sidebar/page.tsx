@@ -23,7 +23,7 @@ export default async function SideBar() {
     const [data, points, user] = await Promise.all([getUserData(userId), getPoint(userId), clerkClient().users.getUser(userId)])
     //@ts-ignore
     const lessonList = data.lessonList.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
-    const chineseName = `${user.lastName??user.username} ${user.firstName}`
+    const chineseName = `${user.lastName??user.username}${user.firstName??''}`
     return (
         <div className="h-full p-4 flex flex-col justify-between">
             <div className="flex flex-col gap-6 ">
