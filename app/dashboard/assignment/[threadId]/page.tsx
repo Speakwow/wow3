@@ -96,7 +96,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
                                 <CardContent>
                                     <div className="text-2xl font-bold">{highestScoreDoc?.score.toFixed(1)}</div>
                                     <p className="text-xs text-muted-foreground">
-                                        学生：{bestUser.username}
+                                        学生：{bestUser.fullName ?? bestUser.username ?? 'Null'}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -108,7 +108,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
                                 <CardContent>
                                     <div className="text-2xl font-bold">{lowestScoreDoc?.score.toFixed(1)}</div>
                                     <p className="text-xs text-muted-foreground">
-                                        学生：{worstUser.username}
+                                        学生：{worstUser.fullName ?? worstUser.username ?? 'Null'}
                                     </p>
                                 </CardContent>
                             </Card>
