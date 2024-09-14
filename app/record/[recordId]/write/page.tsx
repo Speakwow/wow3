@@ -48,7 +48,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
             try {
                 const user = await clerkClient().users.getUser(userId)
                 console.log(user)
-                stuName = user.fullName ?? user.username ?? 'Null'
+                stuName = `${user.lastName??user.username??'no name'} ${user.firstName}`
             } catch (error) {
 
             }

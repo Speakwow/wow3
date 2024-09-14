@@ -21,13 +21,14 @@ export async function reformatRecords(records: any[], studentIds: string[],type:
             const score = parseFloat(record.score);
             const status = record.finishAt ? "已完成" : "未完成";
             const rank = record.finishAt ? rankMap.get(record.userId)! : -1;
+            const chineseName = `${user.lastName??user.username??'no name'} ${user.firstName??user.username}`
 
             return {
                 recordId:record._id.toString(),
                 threadId: record.threadId,
                 type:type,
                 userId: record.userId,
-                username: user.fullName ?? user.username ?? 'no name',
+                username: chineseName,
                 status: "已完成" as "已完成" | "未完成",
                 score,
                 rank,
@@ -35,12 +36,13 @@ export async function reformatRecords(records: any[], studentIds: string[],type:
             };
         } else {
             const user = await clerkClient().users.getUser(userId);
+            const chineseName = `${user.lastName??user.username??'no name'} ${user.firstName}`
             return {
                 recordId:'',
                 threadId: "",
                 type:type,
                 userId:userId,
-                username: user.fullName ?? user.username ?? 'no name',
+                username: chineseName,
                 status: "未完成" as "已完成" | "未完成",
                 score: 0,
                 rank: -1,
