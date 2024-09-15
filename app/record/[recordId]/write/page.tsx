@@ -17,6 +17,7 @@ import { DB } from "@/lib/constant";
 import { redirect } from "next/navigation"
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { getChineseName } from "@/lib/tools";
 
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
@@ -47,8 +48,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
             const userId = record.userId as string
             try {
                 const user = await clerkClient().users.getUser(userId)
-                console.log(user)
-                stuName = user.username ?? 'Null'
+                stuName = getChineseName(user)
             } catch (error) {
 
             }
