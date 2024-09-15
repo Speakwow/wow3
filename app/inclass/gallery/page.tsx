@@ -21,7 +21,7 @@ export default async function Home() {
         redirect('/')
     }
     const mongo = await connectCore()
-    const [rawTextbooks, currentBookId] = await Promise.all([mongo.db(DB_CORE).collection('textbooks').find({ access: 'tbds-only' }).toArray(), kv.hget(userId, 'textbook')])
+    const [rawTextbooks, currentBookId] = await Promise.all([mongo.db(DB_CORE).collection('textbooks').find({ access: 'public' }).toArray(), kv.hget(userId, 'textbook')])
     const textbooks = JSON.parse(JSON.stringify(rawTextbooks))
 
 

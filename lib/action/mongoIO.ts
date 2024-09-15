@@ -682,8 +682,8 @@ export async function getReadingById(threadId: string) {
 
 
 export async function getTextbookData(id: string) {
-  const mongo = await connectCore()
-  const res = await mongo.db(DB_CORE)
+  const mongoCore = await connectCore()
+  const res = await mongoCore.db(DB_CORE)
     .collection('textbooks')
     .findOne({
       _id: new ObjectId(id)
@@ -695,7 +695,7 @@ export async function getTextbookData(id: string) {
     for (const lesson of unit.lessons) {
       const collectionName = (typeMap.find(item => item.type === lesson.type))?.collection
       try {
-        const lessonData = await mongo.db(DB).collection(collectionName as string).findOne({ _id: new ObjectId(lesson.id as string) })
+        const lessonData = await mongoCore.db(DB_CORE).collection(collectionName as string).findOne({ _id: new ObjectId(lesson.id as string) })
         lesson.data = lessonData;
       } catch (error) {
         logger.info(`Get lesson data error,${lesson.type}:${lesson.id}`)
