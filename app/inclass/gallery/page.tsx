@@ -1,6 +1,6 @@
 import { Header } from "@/components/student-nav";
-import { DB } from "@/lib/constant";
-import { connect } from "@/lib/mongo";
+import { DB, DB_CORE } from "@/lib/constant";
+import { connectCore} from "@/lib/mongo";
 import { auth } from "@clerk/nextjs/server";
 import { kv } from "@vercel/kv";
 import { redirect } from "next/navigation";
@@ -20,8 +20,8 @@ export default async function Home() {
     if (orgId) {
         redirect('/')
     }
-    const mongo = await connect()
-    const [rawTextbooks, currentBookId] = await Promise.all([mongo.db(DB).collection('textbooks').find({ access: 'tbds-only' }).toArray(), kv.hget(userId, 'textbook')])
+    const mongo = await connectCore()
+    const [rawTextbooks, currentBookId] = await Promise.all([mongo.db(DB_CORE).collection('textbooks').find({ access: 'public' }).toArray(), kv.hget(userId, 'textbook')])
     const textbooks = JSON.parse(JSON.stringify(rawTextbooks))
 
 

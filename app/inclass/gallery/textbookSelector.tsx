@@ -88,23 +88,6 @@ export default function TextbookSelector({ textbooks, userId, currentBookId }: {
                                             <Card className="w-full relative text-muted-foreground bg-muted">
                                                 <CardHeader>
                                                     <CardTitle className="text-lg">
-                                                        牛津译林版
-                                                    </CardTitle>
-                                                    <CardDescription>
-                                                    测试版：暂无权限
-                                                    </CardDescription>
-                                                </CardHeader>
-                                            </Card>
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="w-full relative">
-                                        <FormControl>
-                                            {/* <RadioGroupItem className="absolute top-2 right-2 z-10" value={'yilin'} /> */}
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            <Card className="w-full relative text-muted-foreground bg-muted">
-                                                <CardHeader>
-                                                    <CardTitle className="text-lg">
                                                         人教版
                                                     </CardTitle>
                                                     <CardDescription>

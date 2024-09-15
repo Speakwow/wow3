@@ -49,11 +49,13 @@ export function calculateTalkaboutSpeedScore(wordsPerSecond: number): number {
 }
 
 export function countWords(input: string): number {
-    // 去掉字符串前后的空白符，并按空白符（包括空格、制表符和换行符）分割字符串
-    const words = input.trim().split(/\s+/);
+    // 去除符号，只保留字母和空格
+    const cleanedText = input.replace(/[^\w\s]/g, '');
+    // 通过空格将文本分割成单词数组
+    const wordsArray = cleanedText.trim().split(/\s+/);
 
     // 过滤掉空字符串并返回单词数量
-    return words.filter(word => word.length > 0).length;
+    return wordsArray.filter(word => word.length > 0).length;
 }
 
 // 获取当前北京时间
