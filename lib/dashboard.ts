@@ -1,6 +1,7 @@
 'use server'
 import { AssignmentRecord } from "@/app/dashboard/assignment/[threadId]/columns";
 import { clerkClient } from "@clerk/nextjs/server";
+import { getChineseName } from "@/lib/tools";
 
 export async function reformatRecords(records: any[], studentIds: string[],type:string): Promise<AssignmentRecord[]> {
     // 过滤出符合 studentIds 的记录并按分数降序排序
@@ -27,7 +28,7 @@ export async function reformatRecords(records: any[], studentIds: string[],type:
                 threadId: record.threadId,
                 type:type,
                 userId: record.userId,
-                username: user.username ?? 'no name',
+                username: getChineseName(user),
                 status: "已完成" as "已完成" | "未完成",
                 score,
                 rank,
@@ -40,7 +41,7 @@ export async function reformatRecords(records: any[], studentIds: string[],type:
                 threadId: "",
                 type:type,
                 userId:userId,
-                username: user.username ?? 'no name',
+                username: getChineseName(user),
                 status: "未完成" as "已完成" | "未完成",
                 score: 0,
                 rank: -1,

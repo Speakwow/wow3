@@ -17,6 +17,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getChineseName } from "@/lib/tools";
 
 
 
@@ -43,7 +44,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
             const userId = record.userId as string
             try {
                 const user = await clerkClient().users.getUser(userId)
-                stuName = user.username ?? 'Null'
+                stuName = getChineseName(user)
             } catch (error) {
 
             }
