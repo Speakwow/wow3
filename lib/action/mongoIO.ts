@@ -680,6 +680,22 @@ export async function getReadingById(threadId: string) {
   return JSON.parse(JSON.stringify(res))
 }
 
+export async function saveReadingRecord(userId: string, threadId: string, score: number, report: any, record: any[]) { 
+  const mongo = await connect()
+  const res = await mongo.db(DB)
+    .collection('reading_records')
+    .insertOne({
+      userId: userId,
+      threadId: threadId,
+      score: +score.toFixed(0),
+      report: report,
+      record: record,
+      isFinished: true,
+      finishAt: new Date(),
+    })
+  return res.insertedId.toString()
+}
+
 
 export async function getTextbookData(id: string) {
   const mongoCore = await connectCore()

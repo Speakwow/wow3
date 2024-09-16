@@ -72,8 +72,8 @@ export default async function ReadingPage({ params }: { params: { threadId: stri
         )
     }
     return (
-        <div className='flex w-full h-full relative p-2 gap-12 bg-muted overflow-auto'>
-            <Card style={bgImage} className="relative overflow-hidden w-full h-full flex rounded-[20px]" >
+        <div className='flex w-full h-full relative p-2 gap-12 bg-muted'>
+            <Card style={bgImage} className="relative  w-full h-full flex rounded-[20px]" >
                 <div className='w-full h-full flex flex-col gap-4 items-center mt-2'>
                     <div className="relative w-full flex items-center justify-end sm:justify-center px-2">
                         <Button asChild size="icon" variant="outline" className='absolute left-2 top-0'>

@@ -1,6 +1,6 @@
 'use server'
 import { Header } from "@/components/student-nav";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { TableHeader, TableRow, TableHead, TableBody, Table } from "@/components/ui/table";
 import { getAllRecordsByUserId, getOrgStudents, getRecordsForAssignment } from "@/lib/action/mongoIO";
 import { reformatRecords } from "@/lib/dashboard";
@@ -20,6 +20,7 @@ import {
 import { connect } from "@/lib/mongo";
 import { DB } from "@/lib/constant";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 
 export default async function MyRecords() {
@@ -61,8 +62,8 @@ export default async function MyRecords() {
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb> */}
-                <ScrollArea className="w-full h-full flex flex-col gap-8">
-                    <div className="w-full h-full flex flex-col gap-8 mb-24">
+
+                    <div className="w-full h-full flex flex-col gap-8 ">
 
                         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
 
@@ -86,12 +87,15 @@ export default async function MyRecords() {
                                 <CardContent>
                                     <DataTable columns={columns} data={reformatedRecord} />
                                 </CardContent>
-
                             </Card>
 
+
                         </div>
+                        <div className="flex flex-col gap-4 py-4">
+                                    <Separator/>
+                                    <div className="text-center text-xs text-muted-foreground">我也是有底线的～</div>
+                                </div>
                     </div>
-                </ScrollArea>
 
 
             </main>

@@ -2,12 +2,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconRightArrow } from "@/components/ui/icons"
-import { synthesizeSpeech } from "@/lib/speech/tts";
-import { Mic, RefreshCwIcon, Volume1Icon } from "lucide-react";
+import { Mic,  } from "lucide-react";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Howl } from 'howler';
-import { Bravo } from "./bravo";
-import { saveRepeatRecord } from "@/lib/action/mongoIO";
 import { LessonReport } from "@/components/report";
 import { StopIcon } from "@radix-ui/react-icons";
 import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
@@ -15,17 +12,13 @@ import AzureConfig from "@/lib/speech/config";
 import _ from "lodash";
 import { useUnmount } from "usehooks-ts";
 import { useToast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from "next/navigation";
-import stringSimilarity from "string-similarity"
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { saveReadingRecord } from "@/lib/action/mongoIO";
 
 
 export default function Reading({ thread, userId, threadId }: { thread: any, userId: string, threadId: string }) {
 
     const text = thread.text
-    const intro = thread.intro
     const questions = thread.questions
 
 
@@ -34,12 +27,11 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
 
     //是否开始问题
     const [startQuestion, setStartQuestion] = useState(false)
-
+    const [report, setReport] = useState<any>()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [currentRecord, setCurrentRecord] = useState<any>()
     const [threadRecord, setThreadRecord] = useState<any[]>([])
 
-    const [report, setReport] = useState<any>()
     const [saveState, setSaveState] = useState('unsaved')
     const [currentAnswer, setCurrentAnswer] = useState(''); // 存储语音识别的文本
     const [displayText, setDisplayText] = useState('');
@@ -157,11 +149,11 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                             })
                         })
                             .then(res => res.json())
-                            .then(data => {
+                            .then((data:string) => {
                                 setCurrentRecord({
                                     question: questions[index],
                                     answer: recognizedText,
-                                    score: data
+                                    score: +data*100
                                 })
                                 setIsReviewing(false)
                             }).catch(error => {
@@ -264,8 +256,24 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
             setIsRecognizing(false);
             setIsFinish(false);
             setCurrentAnswer('')
+            const report = {
+                score: threadRecord.reduce((acc, curr) => acc + curr.score, 0) / threadRecord.length,
+                length: threadRecord.length,
+                countCorrect: threadRecord.filter(item => item.score > 60).length,
+            }
+            setReport(report)
             setCurrentRecord(null)
             setSaveState('saving')
+            saveReadingRecord(userId, threadId, report.score,report,threadRecord).then(()=>{
+                setSaveState('saved')
+            }).catch(error => {
+                setSaveState('failed')
+                toast({
+                    title: '保存失败',
+                    description: '请刷新页面重新开始',
+                    variant: 'destructive',
+                })
+            })
         }
     }
 
@@ -288,7 +296,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-between p-2 gap-4 pb-4">
-            <Card className="max-h-[500px] w-full grow flex flex-col gap-2 bg-white/75 backdrop-blur py-6">
+            <Card className="max-h-96  w-full grow flex flex-col gap-2 bg-white/75 backdrop-blur py-6">
 
                 <CardDescription className="px-6">
                     {thread.intro}
@@ -315,8 +323,8 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                     </div>
                     </div>
                     {currentAnswer && currentAnswer.length > 0 ?
-                        <div className={`text-pretty ${currentRecord && currentRecord.score > 0.6 ? 'text-primary ' : 'text-red-500'}`}>
-                            <p className="inline">{!isReviewing && currentRecord.score > 0.6 ? ' ✅ ' : ' ❌ '}</p>
+                        <div className={`text-pretty ${currentRecord && currentRecord.score > 60 ? 'text-primary ' : 'text-red-500'}`}>
+                            <p className="inline">{!isReviewing && currentRecord.score > 60 ? ' ✅ ' : ' ❌ '}</p>
                             {currentAnswer}
                         </div>
                         :
