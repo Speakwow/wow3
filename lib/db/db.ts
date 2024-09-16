@@ -79,6 +79,14 @@ export const typeMap: TypeMapEntry[] = [
     banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
     icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
   },
+  {
+    type:"reading",
+    collection:"readings",
+    tag:"阅读问答",
+    intro: '通过精选的阅读材料和相关问题，培养学生的阅读理解能力和批判性思维。AI助手提供个性化指导，帮助学生深入理解文本内容。',
+    banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
+    icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
+  },
 ]
 
 export const Type2Tag = (type:string) => {
