@@ -72,16 +72,16 @@ export default async function ReadingPage({ params }: { params: { threadId: stri
         )
     }
     return (
-        <div className='flex w-full h-full relative p-2 gap-12 bg-muted'>
+        <div className='flex w-full h-full relative p-2 gap-12 bg-muted overflow-auto'>
             <Card style={bgImage} className="relative overflow-hidden w-full h-full flex rounded-[20px]" >
                 <div className='w-full h-full flex flex-col gap-4 items-center mt-2'>
-                    <div className="relative w-full flex items-center justify-center">
+                    <div className="relative w-full flex items-center justify-end sm:justify-center px-2">
                         <Button asChild size="icon" variant="outline" className='absolute left-2 top-0'>
                             <Link href="/">
                                 <ChevronLeft />
                             </Link>
                         </Button>
-                        <Badge className='max-w-[250px] truncate overflow-hidden font-medium text-sm md:text-md h-10 bg-white/75 backdrop-blur px-4' variant="secondary"> {reading_data.name}</Badge >
+                        <Badge className='max-w-72 truncate overflow-hidden font-medium text-sm md:text-md h-10 bg-white border border-muted backdrop-blur px-4' variant="secondary"> {reading_data.name}</Badge >
                     </div>
                     <div className='w-full h-full'>
                         <Reading thread={JSON.parse(JSON.stringify(reading_data))} userId={userId as string} threadId={params.threadId} />
