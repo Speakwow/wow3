@@ -24,7 +24,6 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
     const router = useRouter()
     const { toast } = useToast()
 
-    //是否开始问
     const [report, setReport] = useState<any>()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [currentRecord, setCurrentRecord] = useState<any>()
