@@ -2,10 +2,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { IconRightArrow } from "@/components/ui/icons"
-import { Mic,  } from "lucide-react";
+import {  Mic,RefreshCwIcon, } from "lucide-react";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Howl } from 'howler';
-import { LessonReport } from "@/components/report";
 import { StopIcon } from "@radix-ui/react-icons";
 import * as speechsdk from "microsoft-cognitiveservices-speech-sdk"
 import AzureConfig from "@/lib/speech/config";
@@ -14,6 +13,7 @@ import { useUnmount } from "usehooks-ts";
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation";
 import { saveReadingRecord } from "@/lib/action/mongoIO";
+import { ReadingReport } from "./report";
 
 
 export default function Reading({ thread, userId, threadId }: { thread: any, userId: string, threadId: string }) {
@@ -21,28 +21,22 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
     const text = thread.text
     const questions = thread.questions
 
-
     const router = useRouter()
     const { toast } = useToast()
 
-    //是否开始问题
-    const [startQuestion, setStartQuestion] = useState(false)
+    //是否开始问
     const [report, setReport] = useState<any>()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [currentRecord, setCurrentRecord] = useState<any>()
     const [threadRecord, setThreadRecord] = useState<any[]>([])
 
     const [saveState, setSaveState] = useState('unsaved')
-    const [currentAnswer, setCurrentAnswer] = useState(''); // 存储语音识别的文本
-    const [displayText, setDisplayText] = useState('');
+    
 
     //是否在识别
     const [isRecognizing, setIsRecognizing] = useState(false)
-    //是否在识别
+    const [currentAnswer, setCurrentAnswer] = useState(''); 
     const [isReviewing, setIsReviewing] = useState(false)
-    //是否有结果
-    const [isFinish, setIsFinish] = useState(false)
-    const audioRef = useRef<HTMLAudioElement>(null);
     const [sound, setSound] = useState<Howl | null>(null);
 
     var asrOff = new Howl({
@@ -56,15 +50,12 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
         format: ['wav'],
         autoplay: false,
     });
+
     var correct = new Howl({
         src: ['/sound/game_correct.mp3'],
         format: ['mp3'],
         autoplay: false,
     });
-
-
-
-
 
     // Cleanup on component unmount or page unload
     useEffect(() => {
@@ -106,7 +97,6 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
 
 
     const handleStartRecording = useCallback((index: number) => {
-        setDisplayText('Repeat After Me...');
         setIsRecognizing(true);
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then((stream: MediaStream) => {
@@ -136,7 +126,6 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                     setCurrentAnswer(recognizedText)
 
                     if (recognizedText) {
-                        setDisplayText('');
                         setIsRecognizing(false);
                         setIsReviewing(true)
                         fetch('/api/reading/review', {
@@ -149,22 +138,20 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                             })
                         })
                             .then(res => res.json())
-                            .then((data:string) => {
+                            .then((data: string) => {
                                 setCurrentRecord({
                                     question: questions[index],
                                     answer: recognizedText,
-                                    score: +data*100
+                                    score: +data * 100
                                 })
                                 setIsReviewing(false)
                             }).catch(error => {
                                 setSaveState('failed')
-                                setDisplayText('review failed, try again');
                                 setIsRecognizing(false);
                                 setIsReviewing(false)
                                 console.error('Error accessing media devices.', error);
                             })
                     } else {
-                        setDisplayText('Not hearing, try again');
                         setIsRecognizing(false);
                     }
                 }
@@ -187,7 +174,6 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
             })
             .catch(error => {
                 setSaveState('failed')
-                setDisplayText('load failed, try again');
                 setIsRecognizing(false);
                 setIsReviewing(false)
                 console.error('Error accessing media devices.', error);
@@ -195,9 +181,8 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
     }, [azureSpeechConfig])
 
     useEffect(() => {
-        console.log('Get Record', currentRecord)
-
         if (currentRecord) {
+            setSound(correct)
             correct.play()
             if (!threadRecord[currentIndex]) {
                 setThreadRecord(prev => [
@@ -216,7 +201,6 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
 
     const handleStopRecording = useCallback(() => {
         setIsReviewing(true)
-        setDisplayText('Reviewing...');
         if (sttRef.current) {
             sttRef.current.stopContinuousRecognitionAsync(() => {
                 sttRef.current?.close();
@@ -232,15 +216,12 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
         }
     }, []);
 
-    // const handleRetry = useCallback(() => {
-    //     setIsRecognizing(false);
-    //     setIsFinish(false);
-    //     setIsPlaying(false);
-    //     setDisplayText('Press the button and try agian')
-    //     setRecognitionText('')
-    // }, []);
 
-
+    const handleRetry = useCallback((index: number) => {
+        setIsRecognizing(false);
+        setCurrentAnswer('')
+        handleStartRecording(index)
+    }, []);
 
 
     const nextPage = () => {
@@ -249,12 +230,9 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
             setIsRecognizing(false);
             setCurrentAnswer('')
             setCurrentRecord(null)
-            setIsFinish(false);
-            setDisplayText('')
             setCurrentIndex(currentIndex + 1)
         } else {
             setIsRecognizing(false);
-            setIsFinish(false);
             setCurrentAnswer('')
             const report = {
                 score: threadRecord.reduce((acc, curr) => acc + curr.score, 0) / threadRecord.length,
@@ -264,7 +242,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
             setReport(report)
             setCurrentRecord(null)
             setSaveState('saving')
-            saveReadingRecord(userId, threadId, report.score,report,threadRecord).then(()=>{
+            saveReadingRecord(userId, threadId, report.score, report, threadRecord).then(() => {
                 setSaveState('saved')
             }).catch(error => {
                 setSaveState('failed')
@@ -289,7 +267,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
     if (saveState == 'saved' && report.score) {
         return (
             <div className=' h-full flex flex-col justify-center items-center '>
-                <LessonReport score={report.score} detail={report.detailScore} />
+                <ReadingReport score={report.score} detail={report} />
             </div>
         )
     }
@@ -297,7 +275,6 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
     return (
         <div className="w-full h-full flex flex-col items-center justify-between p-2 gap-4 pb-4">
             <Card className="max-h-96  w-full grow flex flex-col gap-2 bg-white/75 backdrop-blur py-6">
-
                 <CardDescription className="px-6">
                     {thread.intro}
                 </CardDescription>
@@ -317,14 +294,18 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
             <Card className=" w-full flex p-4 flex-row justify-between bg-white/75 backdrop-blur">
                 <div className="flex flex-col">
                     <div className="flex flex-row gap-2 items-center">
-                <div className="text-muted-foreground text-sm font-medium">{currentIndex + 1} / {questions.length}</div>
-                    <div className="text-xl font-medium">
-                        {questions[currentIndex].question}
-                    </div>
+                        <div className="flex-1 leading-none text-muted-foreground text-xs font-medium w-fit">
+                            {currentIndex + 1} / {questions.length}
+                        </div>
+                        <div className="text-xl font-medium">
+                            {questions[currentIndex].question}
+                        </div>
                     </div>
                     {currentAnswer && currentAnswer.length > 0 ?
-                        <div className={`text-pretty ${currentRecord && currentRecord.score > 60 ? 'text-primary ' : 'text-red-500'}`}>
-                            <p className="inline">{!isReviewing && currentRecord.score > 60 ? ' ✅ ' : ' ❌ '}</p>
+                        <div className={`text-pretty ${currentRecord ? currentRecord.score > 60 ? 'text-primary ' : 'text-red-500' : ''}`}>
+                            {currentRecord &&
+                                <p className="inline">{!isReviewing && currentRecord.score > 60 ? ' ✅ ' : ' ❌ '}</p>
+                            }
                             {currentAnswer}
                         </div>
                         :
@@ -335,9 +316,12 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                 </div>
                 <div className='flex flex-row  mt-auto '>
                     {currentRecord ?
-                        <div>
-                            <Button size="icon" className='rounded-full p-3 w-fit h-fit bg-[#42C83C] border-4 border-white ' onClick={() => nextPage()}>
-                                <IconRightArrow className="w-6 h-6" />
+                        <div className="flex flex-row items-center gap-2">
+                            <Button size="icon" variant="ghost" className='rounded-full p-2 w-fit h-fit' onClick={() => handleRetry(currentIndex)}>
+                                <RefreshCwIcon color="gray" width="20" height="20" />
+                            </Button>
+                            <Button size="icon" className='rounded-full p-2 w-fit h-fit bg-[#42C83C] border-4 border-white ' onClick={() => nextPage()}>
+                                <IconRightArrow className="w-6 h-6 " />
                             </Button>
                         </div>
                         :
@@ -351,6 +335,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                             >
                                 <StopIcon width="30" height="30" />
                             </Button>
+
                             :
                             <Button
                                 type='button'
@@ -363,13 +348,6 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                             </Button>
 
                     }
-                    {/* <div className=
-                        {` text-xl md:text-2xl
-                 ${displayText == 'Repeat After Me...' ? 'animate-bounce ' : ''} 
-                w-full text-center text-white`
-                        } style={{ textShadow: '2px 2px 2px #333' }}>
-                        {displayText}
-                    </div> */}
                 </div>
             </Card>
         </div>
