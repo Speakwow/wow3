@@ -34,6 +34,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
 
     //是否在识别
     const [isRecognizing, setIsRecognizing] = useState(false)
+    const [isFinish, setIsFinish] = useState(false)
     const [currentAnswer, setCurrentAnswer] = useState(''); 
     const [isReviewing, setIsReviewing] = useState(false)
     const [sound, setSound] = useState<Howl | null>(null);
@@ -144,6 +145,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                                     score: +data * 100
                                 })
                                 setIsReviewing(false)
+                                setIsFinish(true)
                             }).catch(error => {
                                 setSaveState('failed')
                                 setIsRecognizing(false);
@@ -198,7 +200,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
         }
     }, [currentRecord])
 
-    const handleStopRecording = useCallback(() => {
+    const handleStopRecording =  useCallback(()  => {
         setIsReviewing(true)
         if (sttRef.current) {
             sttRef.current.stopContinuousRecognitionAsync(() => {
@@ -213,19 +215,21 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
         if (audioConfigRef.current) {
             sttRef.current = undefined;
         }
-    }, []);
+    },[]);
 
 
     const handleRetry = useCallback((index: number) => {
         setIsRecognizing(false);
         setCurrentAnswer('')
+        setIsFinish(false)
         handleStartRecording(index)
-    }, []);
+    },[]);
 
 
     const nextPage = () => {
         setCurrentRecord(null)
         if (currentIndex + 1 <= thread.questions.length - 1) {
+            setIsFinish(false)
             setIsRecognizing(false);
             setCurrentAnswer('')
             setCurrentRecord(null)
@@ -290,31 +294,31 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                 </div>
             </Card>
 
-            <Card className=" w-full flex p-4 flex-row justify-between bg-white/75 backdrop-blur">
-                <div className="flex flex-col">
+            <Card className=" w-full flex p-4 flex-row justify-between leading-none bg-white/75 z-10 backdrop-blur">
+                <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-row gap-2 items-center">
-                        <div className="flex-1 leading-none text-muted-foreground text-xs font-medium w-fit">
+                        <div className="grow-0 leading-none text-muted-foreground text-xs font-medium w-fit">
                             {currentIndex + 1} / {questions.length}
                         </div>
-                        <div className="text-xl font-medium">
+                        <div className="text-xl grow font-medium leading-none">
                             {questions[currentIndex].question}
                         </div>
                     </div>
                     {currentAnswer && currentAnswer.length > 0 ?
-                        <div className={`text-pretty ${currentRecord ? currentRecord.score > 60 ? 'text-primary ' : 'text-red-500' : ''}`}>
+                        <div className={`text-pretty ${isFinish&&currentRecord ? currentRecord.score > 60 ? 'text-primary ' : 'text-red-500' : ''}`}>
                             {currentRecord &&
                                 <p className="inline">{!isReviewing && currentRecord.score > 60 ? ' ✅ ' : ' ❌ '}</p>
                             }
                             {currentAnswer}
                         </div>
                         :
-                        <div className="text-muted-foreground animate-pulse text-xs">
+                        <div className="text-muted-foreground text-xs">
                             等待作答
                         </div>
                     }
                 </div>
-                <div className='flex flex-row  mt-auto '>
-                    {currentRecord ?
+                <div className='flex flex-row ml-auto'>
+                    {isFinish&&currentRecord ?
                         <div className="flex flex-row items-center gap-2">
                             <Button size="icon" variant="ghost" className='rounded-full p-2 w-fit h-fit' onClick={() => handleRetry(currentIndex)}>
                                 <RefreshCwIcon color="gray" width="20" height="20" />

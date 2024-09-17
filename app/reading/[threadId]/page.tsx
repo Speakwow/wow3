@@ -47,7 +47,7 @@ export default async function ReadingPage({ params }: { params: { threadId: stri
 
     if (!reading_data || !reading_data.name) {
         return (
-            <div className='flex w-full h-screen relative p-4 gap-12 bg-muted'>
+            <div className='flex w-full h-full p-4 gap-12 bg-muted'>
                 <div className="absolute top-2 left-2">
                     <Button asChild size="icon" variant="outline">
                         <Link href="/">
@@ -72,8 +72,8 @@ export default async function ReadingPage({ params }: { params: { threadId: stri
         )
     }
     return (
-        <div className='flex w-full h-full relative p-2 gap-12 bg-muted'>
-            <Card style={bgImage} className="relative  w-full h-full flex rounded-[20px]" >
+        <div className='flex w-full h-full p-2 gap-12 bg-muted'>
+            <Card style={bgImage} className="relative  w-full h-full flex rounded-[20px] overflow-auto" >
                 <div className='w-full h-full flex flex-col gap-4 items-center mt-2'>
                     <div className="relative w-full flex items-center justify-end sm:justify-center px-2">
                         <Button asChild size="icon" variant="outline" className='absolute left-2 top-0'>

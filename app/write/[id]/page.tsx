@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { WriteForm } from './write';
 import { connect } from '@/lib/mongo';
 import { DB } from '@/lib/constant';
+import { Separator } from '@/components/ui/separator';
 
 
 export async function generateStaticParams() {
@@ -37,8 +38,7 @@ export default async function Write({ params }: { params: { id: string } }) {
     // }
     // const recordId = '1'
     return (
-        <div className="relative w-full h-screen bg-muted p-2">
-            <ScrollArea className="h-full overflow-hidden w-full  pb-12">
+        <div className="relative w-full h-full bg-muted p-2">
                 <div className='flex flex-col md:flex-row gap-2 w-full mb-24'>
                     <div className=" ">
                         <Link href={"/"} className="z-10">
@@ -47,11 +47,11 @@ export default async function Write({ params }: { params: { id: string } }) {
                             </Button>
                         </Link>
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <Card className=" h-fit relative">
+                    <div className="flex flex-col gap-2 w-full pr-2">
+                        <Card className=" h-fit relative w-full">
                             <CardHeader className="text-2xl text-primary">
                                 <CardTitle className=''>
-                                    写作练习
+                                    {data.name}
                                 </CardTitle>
                                 <CardDescription className=''>
                                     <div>单词数：<div className='inline'>{data.word_count}</div> 词</div>
@@ -77,9 +77,13 @@ export default async function Write({ params }: { params: { id: string } }) {
                         <Card className="p-6 h-fit relative">
                             <WriteForm userId={userId as string} write={data} />
                         </Card>
+                        <div className='flex flex-col gap-4 w-full py-4 text-center'>
+                            <Separator />
+                            <div className='text-xs text-muted-foreground'>我也是有底线的～</div>
+                            
+                        </div>
                     </div>
                 </div>
-            </ScrollArea>
         </div>
 
     )

@@ -87,7 +87,7 @@ export default function RootLayout({
 
                   </div>
                 </div>
-                <div className="h-full overflow-auto">
+                <div className="h-full overflow-auto bg-muted">
                   <AI>{children}</AI>
                   
                 </div>
