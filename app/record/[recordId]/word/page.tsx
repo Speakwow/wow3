@@ -18,63 +18,43 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getChineseName } from "@/lib/tools";
+import { fetchRecordData } from "@/lib/action/mongoIO";
 
 
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
 
 
-    const mongo = await connect()
 
-    let record;
     let assignmentName: string = '';
     let overallScore: any[] = [];
     let detailScore: any[][] = [];
-    let stuName = '未命名用户'
+    
+    const result = await fetchRecordData(params.recordId, 'word');
 
-    try {
+    if (result !== null) {
+        const { record, info, stuName } = result;
+        assignmentName = info?.name || '';
+        const tScore = record?.score;
+        const tAccuracy = record.report.detailScore.accuracy;
+        const tFluency = record.report.detailScore.fluency;
+        const tCompleteness = record.report.detailScore.completeness;
+        const tProsody = record.report.detailScore.prosody;
+        overallScore = [tScore, tAccuracy, tFluency, tCompleteness, tProsody];
 
-        const database = mongo.db(DB);
-        const records = database.collection('word_records');
-        record = await records.findOne({ _id: new ObjectId(params.recordId) })
-
-        if (record !== null) {
-            const threads = database.collection('word_threads');
-            const exthreadId = record.threadId as string
-            const userId = record.userId as string
-            try {
-                const user = await clerkClient().users.getUser(userId)
-                stuName = getChineseName(user)
-            } catch (error) {
-
-            }
-
-            const thread = await threads.findOne({ _id: new ObjectId(exthreadId) });
-            if (thread !== null) {
-                assignmentName = thread.name;
-            }
-            const tScore = record.score;
-            const tAccuracy = record.report.detailScore.accuracy;
-            const tFluency = record.report.detailScore.fluency;
-            const tCompleteness = record.report.detailScore.completeness;
-            const tProsody = record.report.detailScore.prosody;
-            overallScore = [tScore, tAccuracy, tFluency, tCompleteness, tProsody];
-
-            for (let i = 0; i < record.record.length; i++) {
-                detailScore[i] = [];
-                detailScore[i][0] = record.record[i].text.text;
-                detailScore[i][1] = record.record[i].score;
-                detailScore[i][2] = record.record[i].detail_score.accuracy;
-                detailScore[i][3] = record.record[i].detail_score.fluency;
-                detailScore[i][4] = record.record[i].detail_score.completeness;
-                detailScore[i][5] = record.record[i].detail_score.prosody;
-            }
+        for (let i = 0; i < record.record.length; i++) {
+            detailScore[i] = [];
+            detailScore[i][0] = record.record[i].text.text;
+            detailScore[i][1] = record.record[i].score;
+            detailScore[i][2] = record.record[i].detail_score.accuracy;
+            detailScore[i][3] = record.record[i].detail_score.fluency;
+            detailScore[i][4] = record.record[i].detail_score.completeness;
+            detailScore[i][5] = record.record[i].detail_score.prosody;
         }
-
-    } catch (error) {
-        
-
+    }else{
+        return redirect('/404')
     }
+
 
     // const stuName = "Chen Tai Ming"
 

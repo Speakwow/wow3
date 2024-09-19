@@ -8,6 +8,7 @@ import { Assignment } from '../schema/assign';
 import { clerkClient } from '@clerk/nextjs/server';
 import { logger } from '../logger';
 import { getCurrentTextbook } from './kv';
+import { getChineseName } from '../tools';
 
 
 export async function updateScenario(name: string, content: any) {
@@ -1041,5 +1042,43 @@ export async function getAnyLesson(threadId: string, type: string) {
   }
 }
 
+
+export async function fetchRecordData(recordId: string, type: string) {
+  // 连接到MongoDB数据库
+  const client = await connect();
+  const core = await connectCore();
+
+  // 从指定集合中查找指定ID的记录
+  const record = await client
+      .db(DB)
+      .collection(`${type}_records`)
+      .findOne({ _id: new ObjectId(recordId) });
+
+  // 如果记录不存在，返回null
+  if (record === null) return null;
+
+  // 查找对应的typeMap条目
+  const typeMapEntry = typeMap.find(entry => entry.type === type);
+  if (!typeMapEntry) throw new Error(`Type ${type} not found in typeMap`);
+  console.log(typeMapEntry)
+
+  // 并行获取练习线程和用户信息
+  const [info, user] = await Promise.all([
+      // 从对应集合中查找练习线程
+      core
+          .db(DB_CORE)
+          .collection(typeMapEntry.collection)
+          .findOne({ _id: new ObjectId(record.threadId as string) }),
+      // 获取用户信息
+      clerkClient()
+          .users
+          .getUser(record.userId) ?? null
+  ]);
+
+  // 获取学生中文名，如果不存在则使用默认名称
+  const stuName = getChineseName(user) ?? '未命名用户';
+
+  return { record, info, stuName };
+}
 
 

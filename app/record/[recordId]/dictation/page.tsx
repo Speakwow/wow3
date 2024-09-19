@@ -10,8 +10,8 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { connect } from "@/lib/mongo";
-import { DB } from "@/lib/constant";
+import { connect, connectCore } from "@/lib/mongo";
+import { DB, DB_CORE } from "@/lib/constant";
 import { redirect } from "next/navigation"
 import { clerkClient } from "@clerk/nextjs/server";
 import { ChevronLeft } from "lucide-react";
@@ -23,47 +23,34 @@ import { getChineseName } from "@/lib/tools";
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
 
+    // 连接到MongoDB数据库
+    const client = await connect()
+    const core = await connectCore()
 
-    const mongo = await connect()
-
-    let record;
-    let thread;
-    let assignmentName: string = '';
-    let overallScore: any[] = [];
-    let detailScore: any[][] = [];
-    let stuName = '未命名用户'
-
-    try {
-
-        const database = mongo.db(DB);
-        const records = database.collection('dictation_records');
-        record = await records.findOne({ _id: new ObjectId(params.recordId) })
-
-        if (record !== null) {
-            const threads = database.collection('dictation_threads');
-            const exthreadId = record.threadId as string
-            const userId = record.userId as string
-            try {
-                const user = await clerkClient().users.getUser(userId)
-                stuName = getChineseName(user)
-            } catch (error) {
-
-            }
-
-            thread = await threads.findOne({ _id: new ObjectId(exthreadId) });
-            if (thread !== null) {
-                assignmentName = thread.name;
-            }
-
-
+    // 从dictation_records集合中查找指定ID的记录
+    const record = await client
+        .db(DB)
+        .collection('dictation_records')
+        .findOne({ _id: new ObjectId(params.recordId) })
     
-        }
+    // 如果记录不存在，重定向到404页面
+    if (record === null) return redirect('/404')
 
-    } catch (error) {
-        
-    }
-
-    // const stuName = "Chen Tai Ming"
+    // 并行获取听写练习线程和用户信息
+    const [thread, user] = await Promise.all([
+        // 从dictation_threads集合中查找对应的听写练习线程
+        core
+            .db(DB_CORE)
+            .collection('dictation_threads')
+            .findOne({ _id: new ObjectId(record.threadId as string) }),
+        // 获取用户信息
+        clerkClient()
+            .users
+            .getUser(record.userId)
+    ])
+    console.log(user.username)
+    // 获取学生中文名，如果不存在则使用默认名称
+    const stuName = getChineseName(user) ?? '未命名用户'
 
 
     return (
@@ -103,7 +90,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             </CardHeader>
                             <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
                                 <div className="flex items-baseline gap-1 text-xl font-bold tabular-nums leading-none text-primary">
-                                    {assignmentName}
+                                    {thread?.name ?? '未命名課程'}
                                 </div>
                             </CardContent>
                         </Card>
@@ -126,7 +113,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                     <div className="pt-6 h-screen w-full">
                         <Card className="h-fit w-full">
                             <CardHeader className="p-4 pb-6">
-                                <CardTitle className="text-lg font-bold">{stuName}</CardTitle> {/* 學生名稱 */}
+                                <CardTitle className="text-lg font-bold">{stuName}</CardTitle> 
                                 <CardDescription className="text-xs">
                                     听写练习 - 詳細分析
                                 </CardDescription>
@@ -141,12 +128,11 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {record?.record.map((item:any, index:any) => (
+                                    {record?.record.map((item: any, index: any) => (
                                         <TableRow key={index}>
                                             <TableCell className="text-md max-w-64 ">{item.text}</TableCell>
                                             <TableCell className="text-md max-w-64 text-muted-foreground">{item.input}</TableCell>
-                                            <TableCell className={`text-lg font-bold text-primary ${item.isCorrect?"text-green-500":"text-red-500"}`}>{item.isCorrect?"正確":"錯誤"}</TableCell>
-
+                                            <TableCell className={`text-lg font-bold text-primary ${item.isCorrect ? "text-green-500" : "text-red-500"}`}>{item.isCorrect ? "正確" : "錯誤"}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
