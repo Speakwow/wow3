@@ -48,7 +48,6 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
             .users
             .getUser(record.userId)
     ])
-    console.log(user.username)
     // 获取学生中文名，如果不存在则使用默认名称
     const stuName = getChineseName(user) ?? '未命名用户'
 
