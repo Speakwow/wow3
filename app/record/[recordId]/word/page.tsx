@@ -138,8 +138,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                     {detailScore.map((row, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="text-md max-w-64 text-muted-foreground">{row[0]}</TableCell>
-                                            <TableCell className="text-lg font-bold text-primary">{row[1]}</TableCell>
-
+                                            <TableCell className={`text-lg font-bold ${row[1]>75?'text-primary':'text-red-500'}`}>{row[1]}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
