@@ -33,7 +33,6 @@ export default async function MyRecords() {
         )
     }
     const records = await getAllRecordsByUserId(userId)
-    console.log(records)
     const reformatedRecord = records.map((item: any )=>{
         return{
             name:item.info.name,

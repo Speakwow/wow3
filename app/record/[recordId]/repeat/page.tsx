@@ -18,40 +18,28 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { getChineseName } from "@/lib/tools";
+import { fetchRecordData } from "@/lib/action/mongoIO";
 
 
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
 
 
-    const mongo = await connect()
-
-    let record;
+    const result = await fetchRecordData(params.recordId, 'repeat');
+    if (!result) {
+        return redirect('/404')
+    }
+    const { record, info, userData } = result;
     let assignmentName: string = '';
     let overallScore: any[] = [];
     let detailScore: any[][] = [];
-    let stuName = '未命名用户'
+    let stuName = userData.chineseName ?? "未命名用户"
 
     try {
 
-        const database = mongo.db(DB);
-        const records = database.collection('repeat_records');
-        record = await records.findOne({ _id: new ObjectId(params.recordId) })
-
         if (record !== null) {
-            const threads = database.collection('repeats');
-            const exthreadId = record.threadId as string
-            const userId = record.userId as string
-            try {
-                const user = await clerkClient().users.getUser(userId)
-                stuName = getChineseName(user)
-            } catch (error) {
-
-            }
-
-            const thread = await threads.findOne({ _id: new ObjectId(exthreadId) });
-            if (thread !== null) {
-                assignmentName = thread.name;
+            if (info !== null) {
+                assignmentName = info.name;
             }
             const tScore = record.score;
             const tAccuracy = record.report.detailScore.accuracy;

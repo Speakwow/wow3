@@ -1104,8 +1104,8 @@ export async function fetchRecordData(recordId: string, type: string) {
       .db(DB)
       .collection(`${type}_records`)
       .findOne({ _id: new ObjectId(recordId) });
-
-  // 如果记录不存在，返回null
+  console.log(record)
+  // 如果记录不存在，返回nu ll
   if (record === null) return null;
 
   // 查找对应的typeMap条目
@@ -1127,7 +1127,7 @@ export async function fetchRecordData(recordId: string, type: string) {
 
   // 获取学生中文名等信息，如果不存在则使用默认名称
   const userData = {
-    username:user?.username,
+    userName:user?.username,
     chineseName:getChineseName(user) ?? '未命名用户'
   }
 

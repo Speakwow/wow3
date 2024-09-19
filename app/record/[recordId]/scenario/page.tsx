@@ -18,46 +18,36 @@ import { redirect } from "next/navigation"
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { getChineseName } from "@/lib/tools";
+import { fetchRecordData } from "@/lib/action/mongoIO";
 
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
 
 
-    const client = await connect()
+    const result = await fetchRecordData(params.recordId, 'scenario');
+    if (!result) {
+        console.log(result)
+        return redirect('/404')
+    }
+    const { record, info, userData } = result;
 
-    let record;
     let assignmentName: string = '';
     let topic: string = '';
     let minutes: number;
     let seconds: number;
-    let stuName = "未命名用户"
+    let stuName = userData.chineseName ?? "未命名用户"
     let level: string = '';
     let len: string = '';
     let overallScore: any[] = [];
     let detailScore: any[][] = [];
 
     try {
-
-        const database = client.db(DB);
-        const records = database.collection('scenario_records');
-        record = await records.findOne({ _id: new ObjectId(params.recordId) })
-
         if (record !== null) {
-            const threads = database.collection('scenarios');
-            const exthreadId = record.threadId;
-            const userId = record.userId as string
-            try {
-                const user = await clerkClient().users.getUser(userId)
-                stuName =  getChineseName(user)
-            } catch (error) {
-
-            }
-            const thread = await threads.findOne({ _id: new ObjectId(exthreadId) });
-            if (thread !== null) {
-                assignmentName = thread.name;
-                topic = thread.topic;
-                len = thread.length;
-                level = thread.level;
+            if (info !== null) {
+                assignmentName = info.name;
+                topic = info.topic;
+                len = info.length;
+                level = info.level;
             }
             const tScore = record.score;
             const tAccuracy = record.report.accuracy;

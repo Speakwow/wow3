@@ -18,72 +18,38 @@ import { redirect } from "next/navigation"
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { getChineseName } from "@/lib/tools";
+import { fetchRecordData } from "@/lib/action/mongoIO";
 
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
 
+    const result = await fetchRecordData(params.recordId, 'write');
+    if (!result) return redirect('/404');
 
-    const client = await connect()
+    const { record, info, userData } = result;
+    const stuName = userData.chineseName ?? "未命名用户";
 
-    let record;
-    let assignmentName: string = '';
-    let topic: string = '';
-    let comment: string = '';
-    let stuEssay: string = '';
-    let polished: string = '';
-    let stuName = "未命名用户"
-    let level: string = '';
-    let wordCount: string = '';
-    let overallScore: any[] = [];
-    let detailScore: any[][] = [];
+    // 初始化变量并提取信息
+    const {
+        name: assignmentName = '',
+        topic = '',
+        word_count: wordCount = '',
+        level = ''
+    } = info as any;
+    const { score, content_score, communicativeachievement_score, organisation_score, language_score, w_feedback: comment, polished: polished } = record.report;
+    const content = record.content;
 
-    try {
-        const database = client.db(DB);
-        const records = database.collection('write_records');
-        record = await records.findOne({ _id: new ObjectId(params.recordId) })
+    const overallScore = [
+        score,
+        content_score,
+        communicativeachievement_score,
+        organisation_score,
+        language_score,
+        content,
+        polished,
+        comment
+    ];
 
-        if (record !== null) {
-            const threads = database.collection('writes');
-            const exthreadId = record.threadId;
-            const userId = record.userId as string
-            try {
-                const user = await clerkClient().users.getUser(userId)
-                stuName = getChineseName(user)
-            } catch (error) {
-
-            }
-            const thread = await threads.findOne({ _id: new ObjectId(exthreadId) });
-            if (thread !== null) {
-                assignmentName = thread.name;
-                topic = thread.topic;
-                wordCount = thread.word_count;
-                level = thread.level;
-            }
-            const tScore = record.report.score;
-            const tContent = record.report.content_score;
-            const tCommun = record.report.communicativeachievement_score;
-            const tOrgan = record.report.organisation_score;
-            const tLang = record.report.language_score;
-            comment = record.report.w_feedback;
-            stuEssay = record.content;
-            polished = record.report.polished;
-            overallScore = [tScore, tContent, tCommun, tOrgan, tLang, stuEssay, polished, comment];
-
-            // for (let i=0; i<record.record.length; i++){
-            //         detailScore[i] = [];
-            //         detailScore[i][0] = record.record[i].text;
-            //         detailScore[i][1] = record.record[i].score;
-            //         detailScore[i][2] = record.record[i].detail_score.accuracy;
-            //         detailScore[i][3] = record.record[i].detail_score.fluency;
-            //         detailScore[i][4] = record.record[i].detail_score.completeness;
-            //         detailScore[i][5] = record.record[i].detail_score.prosody;
-            // }
-        }
-
-    } finally {
-        // Ensures that the client will close when you finish/error
-
-    }
 
 
     return (

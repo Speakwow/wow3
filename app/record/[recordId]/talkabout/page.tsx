@@ -19,78 +19,39 @@ import { redirect } from "next/navigation"
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { getChineseName } from "@/lib/tools";
+import { fetchRecordData } from "@/lib/action/mongoIO";
 
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
-    const core = await connectCore()
-    const client = await connect()
-    let record;
-    let assignmentName: string = '';
-    let topic: string = '';
-    let comment: string = '';
-    let stuAns: string = '';
-    let stuName = "未命名用户"
-    let level: string = '';
-    let prepTime: string = '';
-    let ansTime: string = '';
-    let tSpeed = 0
-    let overallScore: any[] = [];
-    let detailScore: any[][] = [];
-
-    try {
-
-        const database = client.db(DB);
-        const coreDB = core.db(DB_CORE);
-        const records = database.collection('talkabout_records');
-        record = await records.findOne({ _id: new ObjectId(params.recordId) })
-
-        if (record !== null) {
-            const threads = coreDB.collection('talkabouts');
-            const exthreadId = record.threadId;
-            const userId = record.userId as string
-            try {
-                const user = await clerkClient().users.getUser(userId)
-                stuName = getChineseName(user)
-            } catch (error) {
-
-            }
-            const thread = await threads.findOne({ _id: new ObjectId(exthreadId) });
-            if (thread !== null) {
-                assignmentName = thread.name;
-                topic = thread.rule;
-                prepTime = thread.prepare_time;
-                ansTime = thread.answer_time;
-                level = thread.level;
-            }
-            const tScore = record.score;
-            const tAccuracy = record.report.accuracy;
-            const tFluency = record.report.fluency;
-            const tGram = record.report.grammarScore;
-            const tContent = record.report.overallContentScore;
-            const tPron = record.report.overallPronScore;
-            const tTheme = record.report.themeScore;
-            const tVocab = record.report.vocabScore;
-            tSpeed = record.report.speedScore;
-
-            comment = record.report.feedback;
-            stuAns = record.report.user_answer;
-            overallScore = [tScore, tAccuracy, tFluency, tGram, tContent, tPron, tTheme, tVocab, stuAns, comment];
-
-            // for (let i=0; i<record.record.length; i++){
-            //         detailScore[i] = [];
-            //         detailScore[i][0] = record.record[i].text;
-            //         detailScore[i][1] = record.record[i].score;
-            //         detailScore[i][2] = record.record[i].detail_score.accuracy;
-            //         detailScore[i][3] = record.record[i].detail_score.fluency;
-            //         detailScore[i][4] = record.record[i].detail_score.completeness;
-            //         detailScore[i][5] = record.record[i].detail_score.prosody;
-            // }
-        }
-
-    } finally {
-        // Ensures that the client will close when you finish/error
-
+    const result = await fetchRecordData(params.recordId, 'talkabout');
+    if (!result) {
+        console.log(result)
+        return redirect('/404')
     }
+    const { record, info, userData } = result;
+    const stuName = userData.chineseName ?? "未命名用户";
+
+    const assignmentName = info?.name ?? '';
+    const topic = info?.rule ?? '';
+    const prepTime = info?.prepare_time ?? '';
+    const ansTime = info?.answer_time ?? '';
+    const level = info?.level ?? '';
+
+    const tSpeed = record?.report.speedScore ?? 0;
+    const comment = record?.report.feedback ?? '';
+    const stuAns = record?.report.user_answer ?? '';
+    const overallScore = record ? [
+        record.score,
+        record.report.accuracy,
+        record.report.fluency,
+        record.report.grammarScore,
+        record.report.overallContentScore,
+        record.report.overallPronScore,
+        record.report.themeScore,
+        record.report.vocabScore,
+        stuAns,
+        comment
+    ] : [];
 
 
     return (
@@ -236,32 +197,6 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             </div>
                         </CardFooter>
                     </Card>
-                    {/* <Card className="w-full pb-2">
-                        <CardHeader className="p-4 pb-0">
-                            <CardTitle className="text-md">貼題</CardTitle>
-                            <CardDescription className="text-xs">
-                                Theme
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
-                            <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                                {Math.round(overallScore[6])}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="w-full pb-2">
-                        <CardHeader className="p-4 pb-0">
-                            <CardTitle className="text-md">詞匯</CardTitle>
-                            <CardDescription className="text-xs">
-                                Vocabulary
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
-                            <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
-                                {Math.round(overallScore[7])}
-                            </div>
-                        </CardContent>
-                    </Card> */}
                 </div>
                 <div className=" grid grid-cols-1 sm:grid-cols-2 gap-4  mb-24">
                     <Card className=" w-full mt-4">
