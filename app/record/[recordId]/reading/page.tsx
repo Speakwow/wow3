@@ -10,8 +10,8 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { connect } from "@/lib/mongo";
-import { DB } from "@/lib/constant";
+import { connect, connectCore } from "@/lib/mongo";
+import { DB, DB_CORE } from "@/lib/constant";
 import { redirect } from "next/navigation"
 import { clerkClient } from "@clerk/nextjs/server";
 import { ChevronLeft } from "lucide-react";
@@ -25,22 +25,21 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
 
 
     const mongo = await connect()
-
+    const mongoCore = await connectCore()
     let record;
     let thread;
     let assignmentName: string = '';
-    let overallScore: any[] = [];
-    let detailScore: any[][] = [];
     let stuName = '未命名用户'
-
+    let info;
     try {
 
         const database = mongo.db(DB);
-        const records = database.collection('dictation_records');
+        const coreDB = mongoCore.db(DB_CORE);
+        const records = database.collection('reading_records');
         record = await records.findOne({ _id: new ObjectId(params.recordId) })
 
         if (record !== null) {
-            const threads = database.collection('dictation_threads');
+            const threads = coreDB.collection('readings');
             const exthreadId = record.threadId as string
             const userId = record.userId as string
             try {
@@ -54,13 +53,14 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
             if (thread !== null) {
                 assignmentName = thread.name;
             }
+            info = thread
 
 
-    
+
         }
 
     } catch (error) {
-        
+
     }
 
     // const stuName = "Chen Tai Ming"
@@ -98,7 +98,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             <CardHeader className="p-4 pb-0">
                                 <CardTitle className="text-md ">課程名稱</CardTitle>
                                 <CardDescription className="text-xs">
-                                    听写练习
+                                阅读理解
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
@@ -120,6 +120,17 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                 </div>
                             </CardContent>
                         </Card>
+                        <Card className="w-full col-span-full  h-fit pb-2">
+                            <CardHeader className="p-4 pb-0">
+                                <CardTitle className="text-md ">阅读材料</CardTitle>
+                                <CardDescription className="text-xs">
+                                    {info?.intro}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex flex-row items-baseline gap-4 p-4 text-sm text-muted-foreground pt-0 mt-2">
+                                {info?.text}
+                            </CardContent>
+                        </Card>
 
 
                     </div>
@@ -134,18 +145,21 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>單詞</TableHead>
+                                        <TableHead>题目</TableHead>
                                         <TableHead>學生回答</TableHead>
                                         <TableHead>是否正確</TableHead>
+                                        <TableHead>标准答案</TableHead>
 
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {record?.record.map((item:any, index:any) => (
+                                    {record?.record.map((item: any, index: any) => (
                                         <TableRow key={index}>
-                                            <TableCell className="text-md max-w-64 ">{item.text}</TableCell>
-                                            <TableCell className="text-md max-w-64 text-muted-foreground">{item.input}</TableCell>
-                                            <TableCell className={`text-lg font-bold text-primary ${item.isCorrect?"text-green-500":"text-red-500"}`}>{item.isCorrect?"正確":"錯誤"}</TableCell>
+                                            <TableCell className="text-md max-w-64 ">{item.question.question}</TableCell>
+                                            <TableCell className="text-md max-w-64 text-muted-foreground">{item.answer}</TableCell>
+                                            <TableCell className={`text-lg font-bold text-primary ${item.score > 0 ? "text-green-500" : "text-red-500"}`}>{item.score > 0 ? "正確" : "錯誤"}</TableCell>
+                                            <TableCell className="text-md max-w-64 text-muted-foreground">{item.question.suggested_answer}</TableCell>
+
 
                                         </TableRow>
                                     ))}

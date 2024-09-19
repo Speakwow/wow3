@@ -48,7 +48,6 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
             const userId = record.userId as string
             try {
                 const user = await clerkClient().users.getUser(userId)
-                console.log(user)
                 stuName =  getChineseName(user)
             } catch (error) {
 

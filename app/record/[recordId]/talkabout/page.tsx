@@ -13,8 +13,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
-import { connect } from "@/lib/mongo";
-import { DB } from "@/lib/constant";
+import { connect, connectCore } from "@/lib/mongo";
+import { DB, DB_CORE } from "@/lib/constant";
 import { redirect } from "next/navigation"
 import { clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
@@ -22,7 +22,7 @@ import { getChineseName } from "@/lib/tools";
 
 
 export default async function RecordInfo({ params }: { params: { recordId: string } }) {
-
+    const core = await connectCore()
     const client = await connect()
     let record;
     let assignmentName: string = '';
@@ -40,11 +40,12 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
     try {
 
         const database = client.db(DB);
+        const coreDB = core.db(DB_CORE);
         const records = database.collection('talkabout_records');
         record = await records.findOne({ _id: new ObjectId(params.recordId) })
 
         if (record !== null) {
-            const threads = database.collection('talkabouts');
+            const threads = coreDB.collection('talkabouts');
             const exthreadId = record.threadId;
             const userId = record.userId as string
             try {
