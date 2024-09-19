@@ -912,8 +912,59 @@ export async function getRecordsForAssignment(threadId: string, orgId: string, s
   return JSON.parse(JSON.stringify(assignmentData))
 }
 
+// export async function getAllRecordsByUserId(userId: string) {
+//   const mongo = await connect();
+//   const promises = typeMap.map(typeEntry => {
+//     const pipeline = [
+//       {
+//         $match: {
+//           userId: userId,
+//           isFinished: true
+//         }
+//       },
+//       {
+//         $sort: {
+//           finishAt: -1  // 按finishAt字段倒序排序
+//         }
+//       },
+//       {
+//         $limit: 10  // 限制查询结果最多为10条
+//       },
+//       {
+//         $addFields: {
+//           type: typeEntry.type,
+//           tag: typeEntry.tag,
+//           convertedThreadId: { $toObjectId: "$threadId" } 
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: Type2Collection(typeEntry.type),  // 关联详细信息集合
+//           localField: 'convertedThreadId',  // 本集合的关联字段
+//           foreignField: '_id',  // 目标集合的关联字段
+//           as: 'info'  // 将结果存储到字段 "info"
+//         }
+//       },
+//       {
+//         $unwind: {
+//           path: "$info",
+//           preserveNullAndEmptyArrays: true  // 如果没有匹配到，也保持结果
+//         }
+//       }
+//     ];
+//     return mongo.db(DB).collection(typeEntry.type + '_records').aggregate(pipeline).toArray();
+//   });
+
+//   const records = await Promise.all(promises);
+//   const mergedRecords = records.flat();
+
+
+//   mergedRecords.sort((a, b) => new Date(b.finishAt).getTime() - new Date(a.finishAt).getTime());
+//   return JSON.parse(JSON.stringify(mergedRecords));
+// }
 export async function getAllRecordsByUserId(userId: string) {
   const mongo = await connect();
+  const core = await connectCore();
   const promises = typeMap.map(typeEntry => {
     const pipeline = [
       {
@@ -933,22 +984,7 @@ export async function getAllRecordsByUserId(userId: string) {
       {
         $addFields: {
           type: typeEntry.type,
-          tag: typeEntry.tag,
-          convertedThreadId: { $toObjectId: "$threadId" } 
-        }
-      },
-      {
-        $lookup: {
-          from: Type2Collection(typeEntry.type),  // 关联详细信息集合
-          localField: 'convertedThreadId',  // 本集合的关联字段
-          foreignField: '_id',  // 目标集合的关联字段
-          as: 'info'  // 将结果存储到字段 "info"
-        }
-      },
-      {
-        $unwind: {
-          path: "$info",
-          preserveNullAndEmptyArrays: true  // 如果没有匹配到，也保持结果
+          tag: typeEntry.tag
         }
       }
     ];
@@ -958,11 +994,26 @@ export async function getAllRecordsByUserId(userId: string) {
   const records = await Promise.all(promises);
   const mergedRecords = records.flat();
 
+  // 获取每个record对应的thread信息
+  const threadPromises = mergedRecords.map(async record => {
+    const thread = await core.db(DB_CORE)
+      .collection(Type2Collection(record.type))
+      .findOne({ _id: new ObjectId(record.threadId as string) });
+    if (thread) {
+      return { ...record, info: thread };
+    } else {
+      logger.info(`找不到匹配的thread，${record.type}:${record.threadId}`)
+      // 如果找不到匹配的thread，返回null
+      return null;
+    }
+  });
 
-  mergedRecords.sort((a, b) => new Date(b.finishAt).getTime() - new Date(a.finishAt).getTime());
-  return JSON.parse(JSON.stringify(mergedRecords));
+  // 过滤掉返回null的记录
+  const recordsWithInfo = (await Promise.all(threadPromises)).filter(record => record !== null);
+
+  recordsWithInfo.sort((a:any, b:any) => new Date(b.finishAt).getTime() - new Date(a.finishAt).getTime());
+  return JSON.parse(JSON.stringify(recordsWithInfo));
 }
-
 
 
 export async function getBriefForAssignment(threadId: string, orgId: string) {
@@ -1060,7 +1111,6 @@ export async function fetchRecordData(recordId: string, type: string) {
   // 查找对应的typeMap条目
   const typeMapEntry = typeMap.find(entry => entry.type === type);
   if (!typeMapEntry) throw new Error(`Type ${type} not found in typeMap`);
-  console.log(typeMapEntry)
 
   // 并行获取练习线程和用户信息
   const [info, user] = await Promise.all([
@@ -1075,10 +1125,13 @@ export async function fetchRecordData(recordId: string, type: string) {
           .getUser(record.userId) ?? null
   ]);
 
-  // 获取学生中文名，如果不存在则使用默认名称
-  const stuName = getChineseName(user) ?? '未命名用户';
+  // 获取学生中文名等信息，如果不存在则使用默认名称
+  const userData = {
+    username:user?.username,
+    chineseName:getChineseName(user) ?? '未命名用户'
+  }
 
-  return { record, info, stuName };
+  return { record, info, userData };
 }
 
 

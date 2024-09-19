@@ -29,11 +29,13 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
     let assignmentName: string = '';
     let overallScore: any[] = [];
     let detailScore: any[][] = [];
-    
+    let stuName:string = '未命名用户';
     const result = await fetchRecordData(params.recordId, 'word');
-
     if (result !== null) {
-        const { record, info, stuName } = result;
+        const { record, info, userData } = result;
+        if(userData.chineseName){
+            stuName = userData.chineseName
+        }
         assignmentName = info?.name || '';
         const tScore = record?.score;
         const tAccuracy = record.report.detailScore.accuracy;
