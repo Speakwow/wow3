@@ -6,8 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { openai } from '@ai-sdk/openai';
 import {  generateObject, streamObject } from 'ai';
 import { talkaboutReportSchema } from "@/lib/schema/talkabout";
-import {connect} from "@/lib/mongo"
-import { DB } from "@/lib/constant";
+import {connect, connectCore} from "@/lib/mongo"
+import { DB, DB_CORE } from "@/lib/constant";
 import { ObjectId } from "mongodb";
 import { calculateTalkaboutSpeedScore, countWords } from "@/lib/tools";
 
@@ -86,8 +86,8 @@ export async function POST(req: NextRequest) {
   const {user_answer,threadId} = await req.json()
   console.log(user_answer)
   const systemTemplate = PromptTemplate.fromTemplate(template)
-  const mongo = await connect()
-  const talkabout = await mongo.db(DB).collection('talkabouts').findOne({_id:new ObjectId(threadId as string)})
+  const mongo = await connectCore()
+  const talkabout = await mongo.db(DB_CORE).collection('talkabouts').findOne({_id:new ObjectId(threadId as string)})
   if(!talkabout){
     return NextResponse.json({error:`Cannot find talkabout ${threadId}`})
   }
