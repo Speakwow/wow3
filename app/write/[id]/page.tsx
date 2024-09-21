@@ -11,7 +11,7 @@ import { WriteForm } from './write';
 import { connect } from '@/lib/mongo';
 import { DB } from '@/lib/constant';
 import { Separator } from '@/components/ui/separator';
-
+import Image from 'next/image';
 
 export async function generateStaticParams() {
     const mongo = await connect()
@@ -64,6 +64,17 @@ export default async function Write({ params }: { params: { id: string } }) {
                                 <div className='text-pretty whitespace-pre-line text-sm'>
                                     {data.topic}
                                 </div>
+                                {
+                                    data.image_url&&
+                                    <div>
+                                        <Image 
+                                        src={data.image_url} 
+                                        alt=''
+                                        width={450}
+                                        height={300}
+                                        objectFit='cover' />
+                                    </div>
+                                }
                             </CardContent>
                             {/* <div className='flex flex-col gap-2 text-left px-6'>
                             <CardDescription>
