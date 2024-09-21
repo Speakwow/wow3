@@ -154,6 +154,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                             })
                     } else {
                         setIsRecognizing(false);
+                        setIsReviewing(false)
                     }
                 }
 
@@ -306,7 +307,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                     </div>
                     {currentAnswer && currentAnswer.length > 0 ?
                         <div className={`text-pretty ${isFinish&&currentRecord ? currentRecord.score > 60 ? 'text-primary ' : 'text-red-500' : ''}`}>
-                            {currentRecord &&
+                            {isFinish&&currentRecord &&
                                 <p className="inline">{!isReviewing && currentRecord.score > 60 ? ' ✅ ' : ' ❌ '}</p>
                             }
                             {currentAnswer}
