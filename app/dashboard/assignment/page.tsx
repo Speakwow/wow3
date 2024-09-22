@@ -21,6 +21,9 @@ import { Suspense } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { redirect } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { kv } from "@vercel/kv"
 
 
 export default async function Plan() {
@@ -32,7 +35,10 @@ export default async function Plan() {
     if (!has({ role: "org:admin" })) {
         redirect('/404/unauthoried')
     }
-    const textbookId = "66b0937bfdcc2483666628a5"
+    const textbookId = await kv.hget('org:'+orgId,"textbook") as string
+    if(!textbookId){
+        redirect('/dashboard/textbook')
+    }
     const [data, studentIds] = await Promise.all([getTextbookData(textbookId), getOrgStudents(orgId as string)])
 
     return (
@@ -53,17 +59,19 @@ export default async function Plan() {
                         <Card className="col-span-4 h-full">
                             <CardHeader className="flex flex-row items-center">
                                 <div className="grid gap-2">
-                                    <CardTitle>{data?.name ?? '无课程'}</CardTitle>
+                                    <CardTitle>
+                                        {data?.name ?? '无课程'}
+                                        </CardTitle>
                                     <CardDescription>
                                         课程导览
                                     </CardDescription>
                                 </div>
                                 <div className="ml-auto flex flex-row gap-2">
-                                    {/* <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
-                                    <Link href="#">
-                                        查看全部
+                                    <Button asChild size="sm" className="ml-auto gap-1" variant="outline">
+                                    <Link href="/dashboard/textbook">
+                                        更改教材
                                     </Link>
-                                </Button> */}
+                                </Button>
                                 </div>
                             </CardHeader>
                             <CardContent>
