@@ -877,6 +877,7 @@ export async function getOrgAssignments(orgId: string) {
 
 export async function getRecordsForAssignment(threadId: string, orgId: string, studentIds: string[]) {
   const mongo = await connect()
+  const core = await connectCore()
   const userIds = studentIds
   const [assignment] = await Promise.all([getAssignmentById(threadId, orgId)])
   if (!assignment) {
@@ -906,7 +907,7 @@ export async function getRecordsForAssignment(threadId: string, orgId: string, s
     }
   ]).toArray();
 
-  const infoPromise = mongo.db(DB).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
+  const infoPromise = core.db(DB_CORE).collection(Type2Collection(assignment?.type)).findOne({ _id: new ObjectId(threadId) })
   const [info, records] = await Promise.all([infoPromise, recordPromise]);
   const assignmentData = { ...assignment, info: info, records: records }
   return JSON.parse(JSON.stringify(assignmentData))

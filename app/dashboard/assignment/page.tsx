@@ -40,7 +40,6 @@ export default async function Plan() {
         redirect('/dashboard/textbook')
     }
     const [data, studentIds] = await Promise.all([getTextbookData(textbookId), getOrgStudents(orgId as string)])
-    console.log(data)
 
     return (
         <div className="flex h-screen w-full flex-col bg-muted">
@@ -104,11 +103,8 @@ export default async function Plan() {
                                                 return unit.lessons.map(
                                                     lesson => {
                                                         if (lesson.data) {
-                                                            if(!lesson.data.name){
-                                                                console.log(lesson)
-                                                            }
                                                             return (
-                                                                <Suspense key={lesson.id} fallback={
+                                                                <Suspense key={lesson.type+lesson.id} fallback={
                                                                     <AssignmentRowLoading
                                                                         unit={unit.unit}
                                                                         name={lesson.data.name}
@@ -119,7 +115,7 @@ export default async function Plan() {
                                                                         textbookId={textbookId}
                                                                         userId={userId as string}
                                                                     />}>
-                                                                    {/* @ts-ignore */}
+
                                                                     <AssignmentRow
                                                                         unit={unit.unit}
                                                                         name={lesson.data.name}
