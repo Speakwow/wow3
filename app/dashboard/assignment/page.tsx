@@ -40,6 +40,7 @@ export default async function Plan() {
         redirect('/dashboard/textbook')
     }
     const [data, studentIds] = await Promise.all([getTextbookData(textbookId), getOrgStudents(orgId as string)])
+    console.log(data)
 
     return (
         <div className="flex h-screen w-full flex-col bg-muted">
