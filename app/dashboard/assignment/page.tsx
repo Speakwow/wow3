@@ -104,6 +104,9 @@ export default async function Plan() {
                                                 return unit.lessons.map(
                                                     lesson => {
                                                         if (lesson.data) {
+                                                            if(!lesson.data.name){
+                                                                console.log(lesson)
+                                                            }
                                                             return (
                                                                 <Suspense key={lesson.id} fallback={
                                                                     <AssignmentRowLoading
