@@ -833,6 +833,7 @@ export async function getAssignmentsByCreator(creatorId: string, orgId: string) 
 
 export async function getMyAssignments(orgId: string, userId: string) {
   const mongo = await connect()
+  const core = await connectCore()
   const allAssignments = await mongo.db(DB)
     .collection('assignments')
     .find({
@@ -843,7 +844,7 @@ export async function getMyAssignments(orgId: string, userId: string) {
   const assignmentsWithDetails = await Promise.all(
     allAssignments.map(async (assignment) => {
       const collectionName = Type2Collection(assignment.type)
-      const lesson_promise = mongo.db(DB).collection(collectionName).findOne({ _id: new ObjectId(assignment.threadId as string) })
+      const lesson_promise = core.db(DB_CORE).collection(collectionName).findOne({ _id: new ObjectId(assignment.threadId as string) })
       const record_promise = mongo.db(DB).collection(assignment.type + '_records').findOne(
         {
           threadId: assignment.threadId,
