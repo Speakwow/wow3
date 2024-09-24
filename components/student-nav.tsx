@@ -40,7 +40,7 @@ export function Header({activePage}:{activePage:string}) {
                     href="/myrecords"
                     className={`truncate transition-colors hover:text-foreground ${activePage == 'myrecords' ? 'text-foreground underline ':' text-muted-foreground '}`}
                 >
-                    成绩详情
+                    练习记录
                 </Link>
                 </Button>
             </nav>
