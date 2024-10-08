@@ -325,7 +325,7 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                         :
                         <div className='relative w-full flex flex-col gap-2 items-center'>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="w-[250px] space-y-6">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="w-[300px] space-y-6">
                                 <div className='flex flex-row gap-4 justify-between max-w-md'>
                                     <div className='relative w-full flex flex-row gap-2 items-center'>
                                         <FormField
@@ -333,11 +333,12 @@ export default function RepeatText({ thread, userId, threadId }: { thread: any[]
                                             name="input"
                                             render={({ field }) => (
                                                 <Input
-                                                    className="flex-1 w-full h-12 text-2xl text-center"
+                                                    className="flex-1 w-full text-xl text-center"
+                                                    autoComplete="off"
                                                     {...field}
                                                 />)}
                                         />
-                                        <div className='absolute right-1'>
+                                        <div className=''>
                                             <Button size='icon' type="submit"><SendIcon /></Button>
                                         </div>
                                     </div>
