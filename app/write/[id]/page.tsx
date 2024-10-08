@@ -70,8 +70,8 @@ export default async function Write({ params }: { params: { id: string } }) {
                                         <Image 
                                         src={data.image_url} 
                                         alt=''
-                                        width={450}
-                                        height={300}
+                                        width={600}
+                                        height={400}
                                         objectFit='cover' />
                                     </div>
                                 }
