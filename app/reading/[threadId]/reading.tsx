@@ -284,7 +284,7 @@ export default function Reading({ thread, userId, threadId }: { thread: any, use
                 </CardDescription>
                 <div className="flex grow overflow-auto py-0 px-6">
                     <div className="flex flex-col h-full gap-4">
-                        <p className="w-full h-fit text-pretty text-ellipsis whitespace-pre-line">
+                        <p className="w-full h-fit text-pretty text-ellipsis whitespace-pre-wrap">
                             {text}
                         </p>
                         <p className="text-center text-xs p-4 text-muted-foreground">
