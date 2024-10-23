@@ -91,7 +91,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full col-span-2  h-fit pb-2 border-primary">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md ">課程名稱</CardTitle>
+                                <CardTitle className="text-md ">课程名称</CardTitle>
                                 <CardDescription className="text-xs">
                                     詞彙練習
                                 </CardDescription>
@@ -104,7 +104,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full h-fit pb-2 border-primary">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md ">總分</CardTitle>
+                                <CardTitle className="text-md ">总分</CardTitle>
                                 <CardDescription className="text-xs">
                                     Overall
                                 </CardDescription>
@@ -123,13 +123,13 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             <CardHeader className="p-4 pb-6">
                                 <CardTitle className="text-lg font-bold">{stuName}</CardTitle> {/* 學生名稱 */}
                                 <CardDescription className="text-xs">
-                                    詞彙練習 - 詳細分析
+                                    词汇练习 - 详细分析
                                 </CardDescription>
                             </CardHeader>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>單詞</TableHead>
+                                        <TableHead>单词</TableHead>
                                         <TableHead>得分</TableHead>
 
                                     </TableRow>

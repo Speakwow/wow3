@@ -196,7 +196,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className=" w-full pb-2 mt-4">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-xl">AI 評語</CardTitle>
+                                <CardTitle className="text-xl">AI 评语</CardTitle>
                             </CardHeader>
                             <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
                                 <div className="flex items-baseline gap-1 text-md tabular-nums leading-none">

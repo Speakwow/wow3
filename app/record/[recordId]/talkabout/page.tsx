@@ -110,7 +110,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                     </Card>
                     <Card className="w-full pb-2 col-span-2 border-primary">
                         <CardHeader className="p-4 pb-0">
-                            <CardTitle className="text-md text-primary">總分</CardTitle>
+                            <CardTitle className="text-md text-primary">总分</CardTitle>
                             <CardDescription className="text-xs">
                                 Overall
                             </CardDescription>
@@ -124,7 +124,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
 
                     <Card className="w-full pb-2 col-span-2">
                         <CardHeader className="p-4 pb-0">
-                            <CardTitle className="text-md">内容總分</CardTitle>
+                            <CardTitle className="text-md">内容总分</CardTitle>
                             <CardDescription className="text-xs">
                                 Language
                             </CardDescription>
@@ -137,21 +137,21 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         <CardFooter className="flex flex-row border-t p-4">
                             <div className="flex w-full items-center gap-2">
                                 <div className="grid flex-1 auto-rows-min gap-0.5">
-                                    <div className="text-xs text-muted-foreground">Theme 切題</div>
+                                    <div className="text-xs text-muted-foreground">Theme 切题</div>
                                     <div className="flex items-baseline gap-1 text-xl  tabular-nums leading-none">
                                         {Math.round(overallScore[6])}
                                     </div>
                                 </div>
                                 <Separator orientation="vertical" className="mx-2 h-10 w-px" />
                                 <div className="grid flex-1 auto-rows-min gap-0.5">
-                                    <div className="text-xs text-muted-foreground">Grammar 語法</div>
+                                    <div className="text-xs text-muted-foreground">Grammar 语法</div>
                                     <div className="flex items-baseline gap-1 text-xl tabular-nums leading-none">
                                         {Math.round(overallScore[3])}
                                     </div>
                                 </div>
                                 <Separator orientation="vertical" className="mx-2 h-10 w-px" />
                                 <div className="grid flex-1 auto-rows-min gap-0.5">
-                                    <div className="text-xs text-muted-foreground">Vocabulary 詞彙</div>
+                                    <div className="text-xs text-muted-foreground">Vocabulary 词汇</div>
                                     <div className="flex items-baseline gap-1 text-xl  tabular-nums leading-none">
                                         {Math.round(overallScore[7])}
                                     </div>
@@ -162,7 +162,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                     </Card>
                     <Card className="w-full pb-2 col-span-2">
                         <CardHeader className="p-4 pb-0">
-                            <CardTitle className="text-md">發音總分</CardTitle>
+                            <CardTitle className="text-md">发音总分</CardTitle>
                             <CardDescription className="text-xs">
                                 Language
                             </CardDescription>
@@ -175,21 +175,21 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         <CardFooter className="flex flex-row border-t p-4">
                             <div className="flex w-full items-center gap-2">
                                 <div className="grid flex-1 auto-rows-min gap-0.5">
-                                    <div className="text-xs text-muted-foreground">Accuracy 準確度</div>
+                                    <div className="text-xs text-muted-foreground">Accuracy 准确度</div>
                                     <div className="flex items-baseline gap-1 text-xl  tabular-nums leading-none">
                                         {Math.round(overallScore[1])}
                                     </div>
                                 </div>
                                 <Separator orientation="vertical" className="mx-2 h-10 w-px" />
                                 <div className="grid flex-1 auto-rows-min gap-0.5">
-                                    <div className="text-xs text-muted-foreground">Fluency 流暢度</div>
+                                    <div className="text-xs text-muted-foreground">Fluency 流畅度</div>
                                     <div className="flex items-baseline gap-1 text-xl  tabular-nums leading-none">
                                         {Math.round(overallScore[2])}
                                     </div>
                                 </div>
                                 <Separator orientation="vertical" className="mx-2 h-10 w-px" />
                                 <div className="grid flex-1 auto-rows-min gap-0.5">
-                                    <div className="text-xs text-muted-foreground">Speed 語速</div>
+                                    <div className="text-xs text-muted-foreground">Speed 语速</div>
                                     <div className="flex items-baseline gap-1 text-xl  tabular-nums leading-none">
                                         {Math.round(tSpeed)}
                                     </div>
@@ -201,7 +201,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                 <div className=" grid grid-cols-1 sm:grid-cols-2 gap-4  mb-24">
                     <Card className=" w-full mt-4">
                         <CardHeader className="p-4 pb-0">
-                            <CardTitle className="text-xl">學生回答</CardTitle>
+                            <CardTitle className="text-xl">学生回答</CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
                             <div className="flex items-baseline gap-1 text-md tabular-nums leading-none">
@@ -211,7 +211,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                     </Card>
                     <Card className=" w-full pb-2 mt-4">
                         <CardHeader className="p-4 pb-0">
-                            <CardTitle className="text-xl">AI 評語</CardTitle>
+                            <CardTitle className="text-xl">AI 评语</CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
                             <div className="flex items-baseline gap-1 text-md tabular-nums leading-none">

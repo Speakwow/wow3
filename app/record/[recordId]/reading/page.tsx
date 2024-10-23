@@ -96,7 +96,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full col-span-2  h-fit pb-2 border-primary">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md ">課程名稱</CardTitle>
+                                <CardTitle className="text-md ">课程名称</CardTitle>
                                 <CardDescription className="text-xs">
                                 阅读理解
                                 </CardDescription>
@@ -109,7 +109,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full h-fit pb-2 border-primary">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md ">總分</CardTitle>
+                                <CardTitle className="text-md ">总分</CardTitle>
                                 <CardDescription className="text-xs">
                                     Overall
                                 </CardDescription>
@@ -139,15 +139,15 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             <CardHeader className="p-4 pb-6">
                                 <CardTitle className="text-lg font-bold">{stuName}</CardTitle> {/* 學生名稱 */}
                                 <CardDescription className="text-xs">
-                                    听写练习 - 詳細分析
+                                    听写练习 - 详细分析
                                 </CardDescription>
                             </CardHeader>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>题目</TableHead>
-                                        <TableHead>學生回答</TableHead>
-                                        <TableHead>是否正確</TableHead>
+                                        <TableHead>学生回答</TableHead>
+                                        <TableHead>是否正确</TableHead>
                                         <TableHead>标准答案</TableHead>
 
                                     </TableRow>
@@ -157,7 +157,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                         <TableRow key={index}>
                                             <TableCell className="text-md max-w-64 ">{item.question.question}</TableCell>
                                             <TableCell className="text-md max-w-64 text-muted-foreground">{item.answer}</TableCell>
-                                            <TableCell className={`text-lg font-bold text-primary ${item.score > 0 ? "text-green-500" : "text-red-500"}`}>{item.score > 0 ? "正確" : "錯誤"}</TableCell>
+                                            <TableCell className={`text-lg font-bold text-primary ${item.score > 0 ? "text-green-500" : "text-red-500"}`}>{item.score > 0 ? "正确" : "错误"}</TableCell>
                                             <TableCell className="text-md max-w-64 text-muted-foreground">{item.question.suggested_answer}</TableCell>
 
 

@@ -109,7 +109,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full h-fit pb-2 border-primary">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md ">總分</CardTitle>
+                                <CardTitle className="text-md ">总分</CardTitle>
                                 <CardDescription className="text-xs">
                                     Overall
                                 </CardDescription>
@@ -122,7 +122,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full h-fit pb-2">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">準確度</CardTitle>
+                                <CardTitle className="text-md">准确度</CardTitle>
                                 <CardDescription className="text-xs">
                                     Accuracy
                                 </CardDescription>
@@ -135,7 +135,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full h-fit pb-2">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">流暢度</CardTitle>
+                                <CardTitle className="text-md">流畅度</CardTitle>
                                 <CardDescription className="text-xs">
                                     Fluency
                                 </CardDescription>
@@ -161,7 +161,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className="w-full h-fit pb-2">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">韻律</CardTitle>
+                                <CardTitle className="text-md">韵律</CardTitle>
                                 <CardDescription className="text-xs">
                                     Prosody
                                 </CardDescription>
@@ -178,18 +178,18 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                             <CardHeader className="p-4 pb-6">
                                 <CardTitle className="text-lg font-bold">{stuName}</CardTitle> {/* 學生名稱 */}
                                 <CardDescription className="text-xs">
-                                    課文跟讀 - 每段分析
+                                    课文跟读 - 每段分析
                                 </CardDescription>
                             </CardHeader>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>跟讀章節</TableHead>
+                                        <TableHead>跟读章节</TableHead>
                                         <TableHead>得分</TableHead>
-                                        <TableHead>準確度</TableHead>
-                                        <TableHead>流暢度</TableHead>
+                                        <TableHead>准确度</TableHead>
+                                        <TableHead>流畅度</TableHead>
                                         <TableHead>完整度</TableHead>
-                                        <TableHead>韻律</TableHead>
+                                        <TableHead>韵律</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
