@@ -66,7 +66,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                 <div className="flex flex-col p-4">
 
                     <div className=" grid auto-rows-max grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-10">
-                        <Card className=" col-span-2 md:col-span-3 row-span-2 w-full pb-2">
+                        <Card className=" col-span-2 md:col-span-3 row-span-3 w-full pb-2">
                             <CardHeader className="p-4 pb-0">
                                 <CardTitle className="text-2xl text-primary">{assignmentName}</CardTitle>
                                 <CardDescription className="text-lg">
@@ -107,9 +107,9 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
 
                         </CardContent> */}
                         </Card>
-                        <Card className="w-full pb-2 border-primary">
+                        <Card className="col-span-2 row-span-1 w-full pb-2 border-primary">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md text-primary">總分</CardTitle>
+                                <CardTitle className="text-md text-primary">总分</CardTitle>
                                 <CardDescription className="text-xs">
                                     Overall
                                 </CardDescription>
@@ -120,9 +120,9 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="w-full pb-2">
+                        <Card className="col-span-1 row-span-1 w-full pb-2">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">內容切題</CardTitle>
+                                <CardTitle className="text-md">內容切题</CardTitle>
                                 <CardDescription className="text-xs">
                                     Content
                                 </CardDescription>
@@ -133,9 +133,9 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="w-full pb-2">
+                        <Card className="col-span-1 row-span-1 w-full pb-2">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">表達得當</CardTitle>
+                                <CardTitle className="text-md">表达得当</CardTitle>
                                 <CardDescription className="text-xs">
                                     Communicative Achievement
                                 </CardDescription>
@@ -146,9 +146,9 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="w-full pb-2">
+                        <Card className="col-span-1 row-span-1 w-full pb-2">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">語言結構</CardTitle>
+                                <CardTitle className="text-md">语言结构</CardTitle>
                                 <CardDescription className="text-xs">
                                     Organisation
                                 </CardDescription>
@@ -159,9 +159,9 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="w-full pb-2">
+                        <Card className="col-span-1 row-span-1 w-full pb-2">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-md">詞彙及語法</CardTitle>
+                                <CardTitle className="text-md">词汇及语法</CardTitle>
                                 <CardDescription className="text-xs">
                                     Language
                                 </CardDescription>
@@ -176,7 +176,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                     <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 mb-10">
                         <Card className=" w-full pb-2 mt-4">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-xl">學生原文</CardTitle>
+                                <CardTitle className="text-xl">学生原文</CardTitle>
                             </CardHeader>
                             <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
                                 <div className="flex items-baseline gap-1 text-md tabular-nums leading-none">
@@ -186,7 +186,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
                         </Card>
                         <Card className=" w-full pb-2 mt-4">
                             <CardHeader className="p-4 pb-0">
-                                <CardTitle className="text-xl">AI 升級文章</CardTitle>
+                                <CardTitle className="text-xl">AI 升级文章</CardTitle>
                             </CardHeader>
                             <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0 mt-2">
                                 <div className="flex items-baseline gap-1 text-md tabular-nums leading-none">
