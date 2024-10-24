@@ -58,7 +58,7 @@ export function WriteForm({ userId, write }: { userId: string, write: any }) {
         setPolished(improvedResult as string)
         saveWriteRecord(userId, write._id, values.content, {...feedback,polished:improvedResult}).then(res => setSaveState('saved'))
         console.log('submit success')
-        // router.push('/scenario/' + id)
+
     }
 
     const [isGenerating, setIsGenerating] = useState(false)
