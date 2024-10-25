@@ -79,6 +79,14 @@ export const typeMap: TypeMapEntry[] = [
     banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
     icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
   },
+  {
+    type:"reading",
+    collection:"readings",
+    tag:"阅读理解",
+    intro: '通过阅读理解练习，提高学生的阅读理解能力和词汇量。AI会评估学生的阅读理解结果并提供反馈。',
+    banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
+    icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
+  },
 ]
 
 export const Type2Tag = (type:string) => {

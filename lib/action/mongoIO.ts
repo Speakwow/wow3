@@ -714,6 +714,7 @@ export async function getCurrentTextbookData(userId: string) {
     .findOne({
       _id: new ObjectId(id)
     })
+
   if (!res) {
     return null
   }
@@ -721,10 +722,10 @@ export async function getCurrentTextbookData(userId: string) {
     for (const lesson of unit.lessons) {
       const collectionName = (typeMap.find(item => item.type === lesson.type))?.collection
       try {
-        const lessonData = await mongo.db(DB).collection(collectionName as string).findOne({ _id: new ObjectId(lesson.id as string) })
+        const lessonData = await mongo.db(DB_CORE).collection(collectionName as string).findOne({ _id: new ObjectId(lesson.id as string) })
         lesson.data = lessonData;
       } catch (error) {
-        logger.info(`Get lesson data error,${lesson.type}:${lesson.id}`)
+        logger.info(`Get lesson data error,${lesson.type}:${lesson.id},:${res._id}`)
         throw (error)
       }
     }
