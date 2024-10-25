@@ -33,6 +33,14 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
   {
     accessorKey: "score",
     header: "得分",
+    cell: ({ row }) =>{
+      const record = row.original
+      if (record.score){ 
+        return (
+          <div>{record.score.toFixed(1)}</div>
+        )
+      }
+    },
   },
   {
     accessorKey: "rank",
