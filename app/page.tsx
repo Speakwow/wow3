@@ -77,11 +77,11 @@ export default async function Home() {
                                             userId={userId as string}
                                             orgId={orgId as string}
                                             userData={userData}
-                                            name={assginment.info.name}
+                                            name={assginment.info?.name ?? ''}
                                             type={assginment.type}
                                             tag={Type2Tag(assginment.type) as string}
                                             threadId={assginment.threadId}
-                                            intro={assginment.info.intro}
+                                            intro={assginment.info?.intro ?? ''}
                                             key={assginment.threadId}
                                             cover=''
                                         />

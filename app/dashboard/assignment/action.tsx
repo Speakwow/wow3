@@ -331,7 +331,7 @@ export function ReviewAssignmentButton(
 
                       <div className="flex flex-col gap-2">
                         <CardTitle className="text-lg">
-                          {info.name ?? ''}
+                          {(info && info.name) ?? ''}
                         </CardTitle>
                         <CardDescription>
                           {Type2Tag(assignment.type)}
