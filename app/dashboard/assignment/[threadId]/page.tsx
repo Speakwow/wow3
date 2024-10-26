@@ -64,7 +64,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                            <BreadcrumbPage>{assignmentData.info.name}</BreadcrumbPage>
+                            <BreadcrumbPage>{assignmentData.info?.name ?? ''}</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -121,7 +121,7 @@ export default async function AssginmentInfo({ params }: { params: { threadId: s
                             <Card className="col-span-4 h-full">
                                 <CardHeader className="flex flex-row items-center">
                                     <div className="grid gap-2">
-                                        <CardTitle>{assignmentData.info.name}</CardTitle>
+                                        <CardTitle>{assignmentData.info?.name ?? ''}</CardTitle>
                                         <CardDescription>
                                             成绩详情
                                         </CardDescription>

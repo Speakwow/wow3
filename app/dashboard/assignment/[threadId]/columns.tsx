@@ -35,9 +35,14 @@ export const columns: ColumnDef<AssignmentRecord>[] = [
     header: "得分",
     cell: ({ row }) =>{
       const record = row.original
-      if (record.score){ 
+      if (record.score && !Number.isInteger(record.score)){ 
         return (
           <div>{record.score.toFixed(1)}</div>
+        )
+      }
+      else if(record.score && Number.isInteger(record.score)){
+        return(
+          <div>{record.score}</div>
         )
       }
     },
