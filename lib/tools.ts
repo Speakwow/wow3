@@ -103,3 +103,11 @@ export function hoursUntil(endAt: Date): number {
     const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
     return differenceInHours;
 }
+
+export function getFullName(user:any){
+    if(user.lastName && user.firstName){
+        return user.lastName+user.firstName
+    }else{
+        return user.username
+    }
+}

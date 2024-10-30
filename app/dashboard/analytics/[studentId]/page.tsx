@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { TableHeader, TableRow, TableHead, TableBody, Table } from "@/components/ui/table";
 import { getAllRecordsByUserId, getLatestRecordsByUserId, getOrgAssignments, getOrgStudents, getRecordsByOrgId, getRecordsForAssignment } from "@/lib/action/mongoIO";
 import { reformatRecords } from "@/lib/dashboard";
-import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil, Score2Grade } from "@/lib/tools";
+import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil, Score2Grade, getFullName } from "@/lib/tools";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { DollarSign, Users, CreditCard, ChevronLeft } from "lucide-react";
 import {  columns } from "./columns"
@@ -73,8 +73,8 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
     const calGrammarScore = (reformatedRecord:any[])=>{
         const writeRecords = reformatedRecord.filter((item:any)=>item.type==='write')
         const talkaboutRecords = reformatedRecord.filter((item:any)=>item.type==='talkabout')
-        const writeScore = writeRecords.reduce((acc:number, item:any)=>{if(item.report?.language_score) return acc+item.report.language_score ;else return acc+60},0)/writeRecords.length
-        const talkaboutScore = talkaboutRecords.reduce((acc:number, item:any)=>{if(item.report?.grammarScore) return acc+item.report.grammarScore ;else return acc+60},0)/talkaboutRecords.length
+        const writeScore = writeRecords.reduce((acc:number, item:any)=>{if(item.report?.language_score) return acc+item.report.language_score ;else return acc+75},0)/writeRecords.length
+        const talkaboutScore = talkaboutRecords.reduce((acc:number, item:any)=>{if(item.report?.grammarScore) return acc+item.report.grammarScore ;else return acc+75},0)/talkaboutRecords.length
         
         return (writeScore+talkaboutScore)/2
     }
@@ -119,7 +119,7 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                            <BreadcrumbPage>{user.username}</BreadcrumbPage>
+                            <BreadcrumbPage>{ getFullName(user)}</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>

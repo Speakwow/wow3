@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { TableHeader, TableRow, TableHead, TableBody, Table } from "@/components/ui/table";
 import { getOrgStudents, getRecordsForAssignment } from "@/lib/action/mongoIO";
 import { reformatRecords } from "@/lib/dashboard";
-import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil } from "@/lib/tools";
+import { calculateAverageScore, findLowestScoreDoc, findHighestScoreDoc, hoursUntil, getFullName } from "@/lib/tools";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { DollarSign, Users, CreditCard, ChevronLeft } from "lucide-react";
 import { AssignmentRecord, columns } from "./columns"
@@ -34,7 +34,7 @@ export default async function AssginmentInfo() {
     const studentIds = await getOrgStudents(orgId)
     const students = await Promise.all(studentIds.map(async id => {
         const user = await clerkClient().users.getUser(id)
-        return { userId: id, username: user.username ?? '-' }
+        return { userId: id, username:  getFullName(user) ?? '-' }
     }))
 
 
