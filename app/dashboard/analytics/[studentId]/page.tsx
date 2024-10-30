@@ -22,6 +22,7 @@ import { DB } from "@/lib/constant";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReportRadar from "./radar-chart";
 import { genReportAdvice } from "@/lib/action/gen";
+import { Type2Tag, typeMap } from "@/lib/db/db";
 
 
 export default async function MyRecords({params}:{params:{studentId:string}}) {
@@ -39,14 +40,25 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
         getOrgAssignments(orgId),
         getRecordsByOrgId(orgId)
     ])
-    const userRecords = orgRecords.filter((record: any) => record.userId === params.studentId);
-    const userScore = userRecords.reduce((acc: number, record: any) => acc + record.score, 0);
+    // const calculateUserRank = (records: any[], userId: string) => {
+    //     // 按用戶ID分組並計算每個用戶的總分
+    //     const userScores = records.reduce((acc: {[key: string]: number}, record: any) => {
+    //         const id = record.userId;
+    //         acc[id] = (acc[id] || 0) + record.score;
+    //         return acc;
+    //     }, {});
     
-    const totalScores = orgRecords.map((record: any) => record.score);
-    totalScores.push(userScore); // 将当前用户的分数添加到总分数中
+    //     // 將所有用戶的總分轉換為數組並排序
+    //     const sortedScores = Object.values(userScores).sort((a, b) => b - a);
+        
+    //     // 獲取目標用戶的總分
+    //     const targetUserScore = userScores[userId];
+        
+    //     // 返回排名（從1開始）
+    //     return sortedScores.indexOf(targetUserScore) + 1;
+    // }
 
-    const sortedScores = totalScores.sort((a:number, b:number) => b - a); // 按分数降序排序
-    const userRank = sortedScores.indexOf(userScore) + 1; // 获取用户排名（从1开始）
+    // const userRank = calculateUserRank(orgRecords, params.studentId);
 
 
     const reformatedRecord = records.map((item: any )=>{
@@ -93,6 +105,27 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
         pronunciation:calculateAverageScore(reformatedRecord.filter((item:any)=>item.type==='scenario'||item.type==='repeat'||item.type==='word')),
         thinking:calThinkingScore(reformatedRecord),
     }
+    const lowestScoreType = reformatedRecord.reduce((acc:any, item:any) => {
+        if (!acc[item.type]) {
+            acc[item.type] = { totalScore: 0, count: 0 };
+        }
+        acc[item.type].totalScore += item.score;
+        acc[item.type].count += 1;
+        return acc;
+    }, {});
+    //@ts-ignore
+    const averageScores = Object.entries(lowestScoreType).map(([type, { totalScore, count }]) => ({
+        type,
+        average: totalScore / count,
+    }));
+
+    const minScoreType = averageScores.reduce((min, current) => {
+        return current.average < min.average ? current : min;
+    });
+
+    console.log('平均分最低的类型:', minScoreType.type, '平均分:', minScoreType.average);
+    const lowestTypeTag = Type2Tag(minScoreType.type)
+
     const totalDuration = reformatedRecord.reduce((acc:number, item:any)=>{
         return acc + durationMap[item.type as keyof typeof durationMap] 
     },0)
@@ -147,8 +180,8 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
                             </Card>
                             <Card className=" h-full">
                                 <CardHeader>
-                                    <CardTitle>{userRank}/ {orgRecords.length}</CardTitle>
-                                    <CardDescription>班级排名</CardDescription>
+                                    <CardTitle>{lowestTypeTag ?? '-'} </CardTitle>
+                                    <CardDescription>薄弱項</CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="h-full col-span-2">
