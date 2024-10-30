@@ -387,6 +387,63 @@ The Earth is a beautiful place. It is our only home. We should take good care of
     }
 }
 
+export async function genReportAdvice(
+    speaking:number,
+    writing: number,
+    pronunciation: number,
+    grammar: number,
+    thinking: number
+
+) {
+    
+    const template = `
+#Role
+你是一个富有经验的初中英语老师，你擅长通过学生的成绩数据分析学生的学习情况。您能从数字、数字与数字的关系，见微知著地分析学生的语言学习。你对语言学习有自己的一套学习方法，你知道不同语言能力之间的关系，比如词汇、听力、写作、语法、口说等各个能力之间该如何培养。
+#Task
+你将为你的学生撰写一段约*150字简体中文*的语言能力分析来评估他的英语能力。
+你需要根据以下的学生数据和指标，分析出学生的优势和弱项，你需要具体的分析学生在语言应用表达（比如写作、情景对话、看图说话）各个方面的表现。
+首先，你需要关注学生的成绩与班级平均成绩的差异，用简短的语言给出三个能力的综合分析，指出学生在这几个能力的表现情况，以及和班级的对比。
+其次，你需要给出该学生需要重点关注的语言能力（包含明显落后的具体指标），你需要指出哪项能力较弱，其中应该如何加强。
+*以下是学生的成绩情况和班级的总体成绩，供你参考：
+这位学生的口说成绩为${speaking}，
+这位学生的写作成绩为${writing}，
+这位学生的发音成绩为${pronunciation}，
+这位学生的语法成绩为${grammar}，
+这位学生的思维成绩为${thinking}，
+#Rules：
+1. 根据学生的具体成绩数据做分析，不要产生幻觉
+2. 你的目标是给出客观的分析、帮助学生进步，但是请使用温和的语气描述。不要批评学生，使用鼓励式的语言。
+#Examplar：
+这位学生在口语和写作方面都表现出色，成绩稳定且高于班级平均水平。特别是在口语流畅度和写作中的切题度、词汇运用方面展现了非常扎实的能力。口语方面，学生的流畅度得分较高，表明他在表达自己的想法时非常自如，并且语法和词汇的掌握度也很强。然而，发音得分稍低于班级平均值，这意味着在某些音节或发音细节上还有进步的空间。写作方面，他的切题度和词汇应用得分高，展示了对写作任务的良好理解和词汇掌握能力。但在语言结构上得分较低，提示他需要在文章的组织和段落连贯性上多加注意。总体来说，学生的语言基础扎实，具备较好的表达和理解能力。未来可以通过更多的发音练习和写作结构方面的训练，进一步提高整体的表现。
+##注意：Examplar仅供参考，请根据每个学生的具体情况做调整。
+#Format：
+仅输出结果，不要说额外的话。
+  `
+    const parser = new StringOutputParser()
+    const chain = RunnableSequence.from([
+        PromptTemplate.fromTemplate(
+            template
+        ),
+        new ChatOpenAI({ model: 'gpt-4o-mini' }),
+        parser
+    ]);
+    const maxRetries = 5
+    let attempts = 0;
+    while (attempts < maxRetries) {
+        try {
+            const res = await chain.invoke({})
+            return res
+        }
+        catch (error) {
+            attempts++;
+            console.error(`Attempt ${attempts} failed:`, error);
+
+            if (attempts >= maxRetries) {
+                throw new Error('Maximum retries reached');
+            }
+        }
+    }
+}
 
 
 export async function genTalkaboutFeedback(

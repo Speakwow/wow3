@@ -947,6 +947,164 @@ export async function getAllRecordsByUserId(userId: string) {
   return JSON.parse(JSON.stringify(mergedRecords));
 }
 
+export async function getLatestRecordsByUserId(userId: string) {
+  const mongo = await connect();
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  
+  const promises = typeMap.map(typeEntry => {
+    const pipeline = [
+      {
+        $match: {
+          userId: userId,
+          isFinished: true,
+          finishAt: { 
+            $gte: threeMonthsAgo, // 只查询3个月内的记录
+            $lte: new Date() 
+          }
+        }
+      },
+      {
+        $sort: { 
+          score: -1  // 首先按分数降序排序
+        }
+      },
+      {
+        $group: {
+          _id: "$threadId", // 按 threadId 分组
+          record: { $first: "$$ROOT" } // 保留每组中的第一条记录(分数最高的)
+        }
+      },
+      {
+        $replaceRoot: { 
+          newRoot: "$record" // 将分组结果展开
+        }
+      },
+      {
+        $sort: {
+          finishAt: -1 // 最后按完成时间降序排序
+        }
+      },
+      {
+        $addFields: {
+          type: typeEntry.type,
+          tag: typeEntry.tag,
+          convertedThreadId: { $toObjectId: "$threadId" } 
+        }
+      },
+      {
+        $lookup: {
+          from: Type2Collection(typeEntry.type),  // 关联详细信息集合
+          localField: 'convertedThreadId',  // 本集合的关联字段
+          foreignField: '_id',  // 目标集合的关联字段
+          as: 'info'  // 将结果存储到字段 "info"
+        }
+      },
+      {
+        $unwind: {
+          path: "$info",
+          preserveNullAndEmptyArrays: true  // 如果没有匹配到，也保持结果
+        }
+      }
+    ];
+    return mongo.db(DB).collection(typeEntry.type + '_records').aggregate(pipeline).toArray();
+  });
+
+  const records = await Promise.all(promises);
+  const mergedRecords = records.flat();
+
+
+  mergedRecords.sort((a, b) => new Date(b.finishAt).getTime() - new Date(a.finishAt).getTime());
+  return JSON.parse(JSON.stringify(mergedRecords));
+}
+
+
+export async function getRecordsByOrgId(orgId: string) {
+  const mongo = await connect();
+  const userIds = await getOrgStudents(orgId)
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  
+  const promises = typeMap.map(typeEntry => {
+    const pipeline = [
+      {
+        $match: {
+          userId: { $in: userIds },
+          isFinished: true,
+          finishAt: { 
+            $gte: threeMonthsAgo, // 只查询3个月内的记录
+            $lte: new Date() 
+          }
+        }
+      },
+      {
+        $sort: { 
+          score: -1  // 首先按分数降序排序
+        }
+      },
+      {
+        $group: {
+          _id: "$threadId", // 按 threadId 分组
+          record: { $first: "$$ROOT" } // 保留每组中的第一条记录(分数最高的)
+        }
+      },
+      {
+        $replaceRoot: { 
+          newRoot: "$record" // 将分组结果展开
+        }
+      },
+      {
+        $sort: {
+          finishAt: -1 // 最后按完成时间降序排序
+        }
+      },
+      {
+        $addFields: {
+          type: typeEntry.type,
+          tag: typeEntry.tag,
+          convertedThreadId: { $toObjectId: "$threadId" } 
+        }
+      },
+      {
+        $lookup: {
+          from: Type2Collection(typeEntry.type),  // 关联详细信息集合
+          localField: 'convertedThreadId',  // 本集合的关联字段
+          foreignField: '_id',  // 目标集合的关联字段
+          as: 'info'  // 将结果存储到字段 "info"
+        }
+      },
+      {
+        $unwind: {
+          path: "$info",
+          preserveNullAndEmptyArrays: true  // 如果没有匹配到，也保持结果
+        }
+      },
+    ];
+    return mongo.db(DB).collection(typeEntry.type + '_records').aggregate(pipeline).toArray();
+  });
+  
+  const records = await Promise.all(promises);
+  const mergedRecords = records.flat();
+  const userScores = mergedRecords.reduce((acc, record) => {
+    const { userId, score } = record;
+    if (!acc[userId]) {
+      acc[userId] = { userId, totalScore: 0, count: 0, records: [] };
+    }
+    acc[userId].totalScore += score;
+    acc[userId].count += 1;
+    acc[userId].records.push(record);
+    return acc;
+  }, {});
+
+  const averageScores = Object.values(userScores).map(({ userId, totalScore, count, records }) => ({
+    userId,
+    score: totalScore / count,
+    records
+  }));
+
+  return JSON.parse(JSON.stringify(averageScores));
+}
+
 
 
 export async function getBriefForAssignment(threadId: string, orgId: string) {
