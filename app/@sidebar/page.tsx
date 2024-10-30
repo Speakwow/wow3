@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { getPoint } from "@/lib/action/kv";
 import { Badge } from "@/components/ui/badge";
 import { redirect } from "next/dist/server/api-utils";
+import { getFullName } from "@/lib/tools";
 
 export default async function SideBar() {
     const { userId, orgId, has, redirectToSignIn } = auth();
@@ -19,6 +20,7 @@ export default async function SideBar() {
         redirectToSignIn()
         return null
     }
+    
 
     const [data, points, user] = await Promise.all([getUserData(userId), getPoint(userId), clerkClient().users.getUser(userId)])
     //@ts-ignore
@@ -67,7 +69,7 @@ export default async function SideBar() {
                                 }} />
                             </SignedIn>
                             <div className="text-lg text-muted-foreground font-medium">
-                                {user.lastName}{user.firstName}
+                                {getFullName(user)}
                             </div>
                         </div>
                         <div>
