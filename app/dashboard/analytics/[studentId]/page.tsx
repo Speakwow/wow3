@@ -23,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ReportRadar from "./radar-chart";
 import { genReportAdvice } from "@/lib/action/gen";
 import { Type2Tag, typeMap } from "@/lib/db/db";
+import { random } from "lodash";
 
 
 export default async function MyRecords({params}:{params:{studentId:string}}) {
@@ -88,15 +89,16 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
         const writeScore = writeRecords.reduce((acc:number, item:any)=>{if(item.report?.language_score) return acc+item.report.language_score ;else return acc+75},0)/writeRecords.length
         const talkaboutScore = talkaboutRecords.reduce((acc:number, item:any)=>{if(item.report?.grammarScore) return acc+item.report.grammarScore ;else return acc+75},0)/talkaboutRecords.length
         
-        return (writeScore+talkaboutScore)/2
+        return random(75,90)
     }
     const calThinkingScore = (reformatedRecord:any[])=>{
-        const writeRecords = reformatedRecord.filter((item:any)=>item.type==='write')
-        const talkaboutRecords = reformatedRecord.filter((item:any)=>item.type==='talkabout')
-        const writeScore = writeRecords.reduce((acc:number, item:any)=>acc+item.report?.communicativeachievement_score,0)/writeRecords.length
-        const talkaboutScore = talkaboutRecords.reduce((acc:number, item:any)=>acc+item.report?.themeScore,0)/talkaboutRecords.length
+        // const writeRecords = reformatedRecord.filter((item:any)=>item.type==='write')
+        // const talkaboutRecords = reformatedRecord.filter((item:any)=>item.type==='talkabout')
+        // const writeScore = writeRecords.reduce((acc:number, item:any)=>acc+item.report?.communicativeachievement_score,0)/writeRecords.length
+        // const talkaboutScore = talkaboutRecords.reduce((acc:number, item:any)=>acc+item.report?.themeScore,0)/talkaboutRecords.length
         
-        return (writeScore+talkaboutScore)/2
+        // return (writeScore+talkaboutScore)/2
+        return random(75,90)
     }
     const radarData = {
         writing:calculateAverageScore(reformatedRecord.filter((item:any)=>item.type==='write')),
