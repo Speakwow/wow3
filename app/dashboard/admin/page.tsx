@@ -131,55 +131,23 @@ export default async function AdminPage() {
                 </Breadcrumb>
                 <ScrollArea className="w-full h-full flex flex-col gap-8">
                     <div className="w-full h-full flex flex-col gap-8 mb-24">
-
-                        <div className="grid gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-                            <Card className=" h-full">
-                                <CardHeader>
-                                    <CardTitle>{'s'}</CardTitle>
-                                    <CardDescription>作业完成数</CardDescription>
-                                </CardHeader>
-                            </Card>
-                            <Card className=" h-full">
-                                <CardHeader>
-                                    <CardTitle>{'minutes'} min</CardTitle>
-                                    <CardDescription>总练习时长</CardDescription>
-                                </CardHeader>
-                            </Card>
-                            <Card className=" h-full">
-                                <CardHeader>
-                                    <CardTitle>{''} </CardTitle>
-                                    <CardDescription>平均分</CardDescription>
-                                </CardHeader>
-                            </Card>
-                            <Card className=" h-full">
-                                <CardHeader>
-                                    <CardTitle>{'-'} </CardTitle>
-                                    <CardDescription>薄弱項</CardDescription>
+                        <div className="grid gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4">               
+                            <Card className="h-full col-span-2">
+                                <CardContent>
+                                    <MyChart data={orgData} dataKey="RecordCount" />
+                                </CardContent>
+                                <CardHeader className="w-full text-center">
+                                    <CardDescription className="text-center w-full">完成数对比</CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="h-full col-span-2">
-                                <CardHeader className="w-full text-center">
-                                    <CardDescription className="text-center w-full">五維能力模型</CardDescription>
-                                </CardHeader>
                                 <CardContent>
                                     <MyChart data={orgData} dataKey="AverageScore" />
                                 </CardContent>
-
-                            </Card>
-                            <Card className="h-full col-span-2">
                                 <CardHeader className="w-full text-center">
-                                    <CardDescription className="text-center w-full">智能建議</CardDescription>
+                                    <CardDescription className="text-center w-full">平均分对比</CardDescription>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="text-sm">
-                                        {'智能建議'}
-                                    </div>
-                                </CardContent>
-
                             </Card>
-
-
-
                         </div>
                     </div>
                 </ScrollArea>
