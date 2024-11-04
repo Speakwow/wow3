@@ -89,7 +89,7 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
         const writeScore = writeRecords.reduce((acc:number, item:any)=>{if(item.report?.language_score) return acc+item.report.language_score ;else return acc+75},0)/writeRecords.length
         const talkaboutScore = talkaboutRecords.reduce((acc:number, item:any)=>{if(item.report?.grammarScore) return acc+item.report.grammarScore ;else return acc+75},0)/talkaboutRecords.length
         
-        return random(75,90)
+        return 80
     }
     const calThinkingScore = (reformatedRecord:any[])=>{
         // const writeRecords = reformatedRecord.filter((item:any)=>item.type==='write')
@@ -98,7 +98,7 @@ export default async function MyRecords({params}:{params:{studentId:string}}) {
         // const talkaboutScore = talkaboutRecords.reduce((acc:number, item:any)=>acc+item.report?.themeScore,0)/talkaboutRecords.length
         
         // return (writeScore+talkaboutScore)/2
-        return random(75,90)
+        return 75
     }
     const radarData = {
         writing:calculateAverageScore(reformatedRecord.filter((item:any)=>item.type==='write')),
