@@ -148,7 +148,7 @@ export default async function AdminPage() {
                                     <CardDescription className="text-center w-full">平均分对比</CardDescription>
                                 </CardHeader>
                             </Card>
-                            <Card className="h-full col-span-2 grid grid-cols-3">
+                            {/* <Card className="h-full col-span-2 grid grid-cols-3">
                                 {orgData.map(org =>
                                     <Card key={org.orgId}>
                                         <CardHeader>
@@ -164,7 +164,7 @@ export default async function AdminPage() {
 
                                 )}
 
-                            </Card>
+                            </Card> */}
                         </div>
                     </div>
                 </ScrollArea>

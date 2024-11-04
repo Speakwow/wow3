@@ -13,7 +13,7 @@ export function MyChart({data,dataKey}:{data:any[],dataKey:string}) {
       tickLine={false}
       tickMargin={10}
       axisLine={false}
-      tickFormatter={(value) => value.slice(0, 3)}
+      tickFormatter={(value) => value.slice(0, 6)}
     />
         <ChartTooltip content={<ChartTooltipContent />} />
       </BarChart>
