@@ -150,7 +150,7 @@ export default async function AdminPage() {
                             </Card>
                             <Card className="h-full col-span-2 grid grid-cols-3">
                                 {orgData.map(org =>
-                                    <Card>
+                                    <Card key={org.orgId}>
                                         <CardHeader>
                                             <CardTitle>
                                                 {org.WeakestType}
