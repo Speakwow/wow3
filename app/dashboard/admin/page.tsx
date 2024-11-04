@@ -162,7 +162,7 @@ export default async function AdminPage() {
                                     <CardDescription className="text-center w-full">五維能力模型</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <MyChart data={orgData} />
+                                    <MyChart data={orgData} dataKey="AverageScore" />
                                 </CardContent>
 
                             </Card>

@@ -3,11 +3,11 @@ import { Bar, BarChart } from "recharts"
  
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
  
-export function MyChart({data}:{data:any[]}) {
+export function MyChart({data,dataKey}:{data:any[],dataKey:string}) {
   return (
     <ChartContainer config={{}}>
       <BarChart data={data}>
-        <Bar dataKey="value" />
+        <Bar dataKey={dataKey} />
         <ChartTooltip content={<ChartTooltipContent />} />
       </BarChart>
     </ChartContainer>
