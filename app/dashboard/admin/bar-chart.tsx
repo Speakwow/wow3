@@ -9,7 +9,7 @@ export function MyChart({data,dataKey}:{data:any[],dataKey:string}) {
       <BarChart data={data}>
         <Bar dataKey={dataKey} />
         <XAxis
-      dataKey="name"
+      dataKey="orgName"
       tickLine={false}
       tickMargin={10}
       axisLine={false}

@@ -131,7 +131,7 @@ export default async function AdminPage() {
                 </Breadcrumb>
                 <ScrollArea className="w-full h-full flex flex-col gap-8">
                     <div className="w-full h-full flex flex-col gap-8 mb-24">
-                        <div className="grid gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4">               
+                        <div className="grid gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
                             <Card className="h-full col-span-2">
                                 <CardContent>
                                     <MyChart data={orgData} dataKey="RecordCount" />
@@ -147,6 +147,23 @@ export default async function AdminPage() {
                                 <CardHeader className="w-full text-center">
                                     <CardDescription className="text-center w-full">平均分对比</CardDescription>
                                 </CardHeader>
+                            </Card>
+                            <Card className="h-full col-span-2 grid grid-cols-3">
+                                {orgData.map(org =>
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>
+                                                {org.WeakestType}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {org.orgName}
+                                            </CardDescription>
+                                        </CardHeader>
+                                    </Card>
+
+
+                                )}
+
                             </Card>
                         </div>
                     </div>
