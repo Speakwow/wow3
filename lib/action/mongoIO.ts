@@ -1044,9 +1044,10 @@ export async function getRecordsByOrgId(orgId: string) {
       },
       {
         $group: {
-          _id: "$threadId", // 按 threadId 分组
-          record: { $first: "$$ROOT" } // 保留每组中的第一条记录(分数最高的)
-        }
+            userId: "$userId",    // 按userId和threadId组合分组
+            threadId: "$threadId"
+        },
+        record: { $first: "$$ROOT" }
       },
       {
         $replaceRoot: { 
@@ -1076,7 +1077,7 @@ export async function getRecordsByOrgId(orgId: string) {
       {
         $unwind: {
           path: "$info",
-          preserveNullAndEmptyArrays: true  // 如果没有匹配到，也保持结果
+          preserveNullAndEmptyArrays: false  // 如果没有匹配到，也保持结果
         }
       },
     ];

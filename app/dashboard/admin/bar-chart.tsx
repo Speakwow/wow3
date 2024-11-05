@@ -27,7 +27,7 @@ export function MyChart({data,dataKey}:{data:any[],dataKey:string}) {
       tickFormatter={(value) => value.slice(0, 6)}
     />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Bar fill="var(--color-desktop)" radius={8}  dataKey={dataKey} >
+        <Bar fill="primary" radius={8}  dataKey={dataKey} >
         <LabelList
                 position="top"
                 offset={12}
