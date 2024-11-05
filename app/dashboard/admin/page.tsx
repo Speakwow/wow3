@@ -97,7 +97,7 @@ export default async function AdminPage() {
                 orgId: org.id,
                 orgName: org.name,
                 RecordCount,
-                AverageScore,
+                AverageScore: parseFloat(AverageScore.toFixed(2)),
                 WeakestType,
                 TotalDuration,
             }

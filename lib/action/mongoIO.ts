@@ -1032,31 +1032,32 @@ export async function getRecordsByOrgId(orgId: string) {
           userId: { $in: userIds },
           isFinished: true,
           finishAt: { 
-            $gte: threeMonthsAgo, // 只查询3个月内的记录
+            $gte: threeMonthsAgo,
             $lte: new Date() 
+          },
+          score: {
+            $gte: 0,
+            $lte: 100
           }
         }
       },
       {
         $sort: { 
-          score: -1  // 首先按分数降序排序
+          score: -1  
         }
       },
       {
         $group: {
-            userId: "$userId",    // 按userId和threadId组合分组
+          _id: {
+            userId: "$userId",    
             threadId: "$threadId"
-        },
-        record: { $first: "$$ROOT" }
-      },
-      {
-        $replaceRoot: { 
-          newRoot: "$record" // 将分组结果展开
+          },
+          record: { $first: "$$ROOT" }
         }
       },
       {
-        $sort: {
-          finishAt: -1 // 最后按完成时间降序排序
+        $replaceRoot: { 
+          newRoot: "$record"
         }
       },
       {
@@ -1068,18 +1069,15 @@ export async function getRecordsByOrgId(orgId: string) {
       },
       {
         $lookup: {
-          from: Type2Collection(typeEntry.type),  // 关联详细信息集合
-          localField: 'convertedThreadId',  // 本集合的关联字段
-          foreignField: '_id',  // 目标集合的关联字段
-          as: 'info'  // 将结果存储到字段 "info"
+          from: Type2Collection(typeEntry.type),
+          localField: "convertedThreadId",
+          foreignField: "_id",
+          as: "info"
         }
       },
       {
-        $unwind: {
-          path: "$info",
-          preserveNullAndEmptyArrays: false  // 如果没有匹配到，也保持结果
-        }
-      },
+        $unwind: "$info"
+      }
     ];
     return mongo.db(DB).collection(typeEntry.type + '_records').aggregate(pipeline).toArray();
   });
