@@ -918,7 +918,7 @@ export async function getAllRecordsByUserId(userId: string) {
         $addFields: {
           type: typeEntry.type,
           tag: typeEntry.tag,
-          convertedThreadId: { $toObjectId: "$threadId" } 
+          convertedThreadId: { $toObjectId: "$threadId" }
         }
       },
       {
@@ -951,21 +951,21 @@ export async function getLatestRecordsByUserId(userId: string) {
   const mongo = await connect();
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  
+
   const promises = typeMap.map(typeEntry => {
     const pipeline = [
       {
         $match: {
           userId: userId,
           isFinished: true,
-          finishAt: { 
+          finishAt: {
             $gte: threeMonthsAgo, // 只查询3个月内的记录
-            $lte: new Date() 
+            $lte: new Date()
           }
         }
       },
       {
-        $sort: { 
+        $sort: {
           score: -1  // 首先按分数降序排序
         }
       },
@@ -976,7 +976,7 @@ export async function getLatestRecordsByUserId(userId: string) {
         }
       },
       {
-        $replaceRoot: { 
+        $replaceRoot: {
           newRoot: "$record" // 将分组结果展开
         }
       },
@@ -989,7 +989,7 @@ export async function getLatestRecordsByUserId(userId: string) {
         $addFields: {
           type: typeEntry.type,
           tag: typeEntry.tag,
-          convertedThreadId: { $toObjectId: "$threadId" } 
+          convertedThreadId: { $toObjectId: "$threadId" }
         }
       },
       {
@@ -1024,16 +1024,16 @@ export async function getRecordsByOrgId(orgId: string) {
   const userIds = await getOrgStudents(orgId)
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  
+
   const promises = typeMap.map(typeEntry => {
     const pipeline = [
       {
         $match: {
           userId: { $in: userIds },
           isFinished: true,
-          finishAt: { 
+          finishAt: {
             $gte: threeMonthsAgo,
-            $lte: new Date() 
+            $lte: new Date()
           },
           score: {
             $gte: 0,
@@ -1042,21 +1042,21 @@ export async function getRecordsByOrgId(orgId: string) {
         }
       },
       {
-        $sort: { 
-          score: -1  
+        $sort: {
+          score: -1
         }
       },
       {
         $group: {
           _id: {
-            userId: "$userId",    
+            userId: "$userId",
             threadId: "$threadId"
           },
           record: { $first: "$$ROOT" }
         }
       },
       {
-        $replaceRoot: { 
+        $replaceRoot: {
           newRoot: "$record"
         }
       },
@@ -1064,7 +1064,7 @@ export async function getRecordsByOrgId(orgId: string) {
         $addFields: {
           type: typeEntry.type,
           tag: typeEntry.tag,
-          convertedThreadId: { $toObjectId: "$threadId" } 
+          convertedThreadId: { $toObjectId: "$threadId" }
         }
       },
       {
@@ -1081,25 +1081,60 @@ export async function getRecordsByOrgId(orgId: string) {
     ];
     return mongo.db(DB).collection(typeEntry.type + '_records').aggregate(pipeline).toArray();
   });
-  
+
   const records = await Promise.all(promises);
   const mergedRecords = records.flat();
   const userScores = mergedRecords.reduce((acc, record) => {
-    const { userId, score } = record;
+    const { userId, score, type } = record;
     if (!acc[userId]) {
-      acc[userId] = { userId, totalScore: 0, count: 0, records: [] };
+      acc[userId] = {
+        userId,
+        totalScore: 0,
+        count: 0,
+        typeScores: {}, // 存储每种类型的分数信息
+        records: []
+      };
     }
+
+    // 更新总分和总数
     acc[userId].totalScore += score;
     acc[userId].count += 1;
+
+    // 更新类型分数
+    if (!acc[userId].typeScores[type]) {
+      acc[userId].typeScores[type] = {
+        total: 0,
+        count: 0
+      };
+    }
+    acc[userId].typeScores[type].total += score;
+    acc[userId].typeScores[type].count += 1;
+
     acc[userId].records.push(record);
     return acc;
   }, {});
+  interface TypeScore {
+    total: number;
+    count: number;
+  }
+  const averageScores = Object.values(userScores)
+    .filter(({ count }) => count > 0)
+    .map(({ userId, totalScore, count, typeScores, records }) => {
+      // 计算每种类型的平均分
+      const typeAverages: { [key: string]: number } = {};
+      Object.entries(typeScores as { [key: string]: TypeScore }).forEach(([type, scores]) => {
+        typeAverages[type] = +(scores.total / scores.count).toFixed(1);
+      });
 
-  const averageScores = Object.values(userScores).map(({ userId, totalScore, count, records }) => ({
-    userId,
-    score: totalScore / count,
-    records
-  }));
+      return {
+        userId,
+        score: +(totalScore / count).toFixed(1), // 总平均分
+        typeScores: typeAverages, // 每种类型的平均分
+        records: records.sort((a: any, b: any) =>
+          new Date(b.finishAt).getTime() - new Date(a.finishAt).getTime()
+        )
+      };
+    });
 
   return JSON.parse(JSON.stringify(averageScores));
 }
@@ -1158,7 +1193,7 @@ export async function getAnyRecord(userId: string, threadId: string, type: strin
   const collectionName = Type2Collection(type)
   const mongo = await connect()
   const res = await mongo.db(DB)
-    .collection(type+'_records')
+    .collection(type + '_records')
     .find({ userId: userId, threadId: threadId })
     .sort({ score: -1 }) // 按 createAt 字段降序排序
     .limit(1) // 只获取一条记录

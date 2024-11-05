@@ -24,7 +24,7 @@ import ReportRadar from "./radar-chart";
 import { genReportAdvice } from "@/lib/action/gen";
 import { Type2Tag, typeMap } from "@/lib/db/db";
 import { random } from "lodash";
-import { MyChart } from "./bar-chart";
+import { MultipleBarChart, MyChart } from "./bar-chart";
 
 
 interface OrgData {
@@ -64,15 +64,20 @@ export default async function AdminPage() {
             // 计算平均分
             const AverageScore = calculateAverageScore(orgRecords)
 
-            // 计算最弱类型
-            const typeScores = orgRecords.reduce((acc: any, record: any) => {
-                if (!acc[record.type]) {
-                    acc[record.type] = { total: 0, count: 0 }
-                }
-                acc[record.type].total += record.score
-                acc[record.type].count += 1
-                return acc
-            }, {})
+            const typeScores = orgRecords.reduce((acc: any, userRecord: any) => {
+                Object.entries(userRecord.typeScores).forEach(([type, score]) => {
+                    if (!acc[type]) {
+                        acc[type] = [];
+                    }
+                    acc[type].push(score);
+                });
+                return acc;
+            }, {});
+            
+            const typeAverages = Object.entries(typeScores).reduce((acc: any, [type, scores]: [string, number[]]) => {
+                acc[type] = +(scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1);
+                return acc;
+            }, {});
 
             const WeakestType = Object.entries(typeScores).reduce((min: any, [type, data]: any) => {
                 const average = data.total / data.count
@@ -96,6 +101,7 @@ export default async function AdminPage() {
             return {
                 orgId: org.id,
                 orgName: org.name,
+                ...typeAverages,
                 RecordCount,
                 AverageScore: parseFloat(AverageScore.toFixed(2)),
                 WeakestType,
@@ -143,6 +149,14 @@ export default async function AdminPage() {
                             <Card className="h-full col-span-2">
                                 <CardContent>
                                     <MyChart data={orgData} dataKey="AverageScore" />
+                                </CardContent>
+                                <CardHeader className="w-full text-center">
+                                    <CardDescription className="text-center w-full">平均分对比</CardDescription>
+                                </CardHeader>
+                            </Card>
+                            <Card className="h-full col-span-4">
+                                <CardContent>
+                                    <MultipleBarChart data={orgData} />
                                 </CardContent>
                                 <CardHeader className="w-full text-center">
                                     <CardDescription className="text-center w-full">平均分对比</CardDescription>
