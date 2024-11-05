@@ -74,7 +74,7 @@ export function MultipleBarChart({data}:{data:any}) {
           <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="name"
+              dataKey="orgName"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
