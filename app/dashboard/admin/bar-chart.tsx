@@ -1,5 +1,5 @@
 'use client'
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
  
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
  
@@ -26,6 +26,7 @@ export function MyChart({data,dataKey}:{data:any[],dataKey:string}) {
       axisLine={false}
       tickFormatter={(value) => value.slice(0, 6)}
     />
+     <YAxis domain={[60, 100]} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar fill="primary" radius={8}  dataKey={dataKey} >
         <LabelList
@@ -79,6 +80,8 @@ export function MultipleBarChart({data}:{data:any}) {
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 6)}
             />
+            <YAxis domain={[60, 100]} />
+
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
