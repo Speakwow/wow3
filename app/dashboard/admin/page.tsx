@@ -139,15 +139,15 @@ export default async function AdminPage() {
                 <ScrollArea className="w-full h-full flex flex-col gap-8">
                     <div className="w-full h-full flex flex-col gap-8 mb-24">
                         <div className="grid gap-2 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-                            <Card className="h-full col-span-2">
+                            <Card className="h-full col-span-2 pt-4">
                                 <CardContent>
                                     <MyChart data={orgData} dataKey="RecordCount" />
                                 </CardContent>
                                 <CardHeader className="w-full text-center">
-                                    <CardDescription className="text-center w-full">完成数对比</CardDescription>
+                                    <CardDescription className="text-center w-full">完成作业数对比</CardDescription>
                                 </CardHeader>
                             </Card>
-                            <Card className="h-full col-span-2">
+                            <Card className="h-full col-span-2 pt-4">
                                 <CardContent>
                                     <MyChart data={orgData} dataKey="AverageScore" />
                                 </CardContent>
@@ -155,12 +155,12 @@ export default async function AdminPage() {
                                     <CardDescription className="text-center w-full">平均分对比</CardDescription>
                                 </CardHeader>
                             </Card>
-                            <Card className="h-full col-span-4">
+                            <Card className="h-full col-span-4 pt-4">
                                 <CardContent>
                                     <MultipleBarChart data={orgData} />
                                 </CardContent>
                                 <CardHeader className="w-full text-center">
-                                    <CardDescription className="text-center w-full">平均分对比</CardDescription>
+                                    <CardDescription className="text-center w-full">分类型均分对比</CardDescription>
                                 </CardHeader>
                             </Card>
                             {/* <Card className="h-full col-span-2 grid grid-cols-3">
