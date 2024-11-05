@@ -86,11 +86,41 @@ export function MultipleBarChart({data}:{data:any}) {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="write" fill="hsl(var(--chart-1))" radius={4} label='写作' />
-            <Bar dataKey="word" fill="hsl(var(--chart-2))" radius={4} label='单词' />
-            <Bar dataKey="repeat" fill="hsl(var(--chart-3))" radius={4} label='跟读'/>
-            <Bar dataKey="scenario" fill="hsl(var(--chart-4))" radius={4} label='情景对话'/>
-            <Bar dataKey="talkabout" fill="hsl(var(--chart-5))" radius={4} label='看图说话'/>
+            <Bar dataKey="write" fill="hsl(var(--chart-1))" radius={4} label='写作' >
+            <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              /></Bar>
+            <Bar dataKey="word" fill="hsl(var(--chart-2))" radius={4} label='单词' >
+            <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              /></Bar>
+            <Bar dataKey="repeat" fill="hsl(var(--chart-3))" radius={4} label='跟读'>
+            <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              /></Bar>
+            <Bar dataKey="scenario" fill="hsl(var(--chart-4))" radius={4} label='情景对话'>
+            <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              /></Bar>
+            <Bar dataKey="talkabout" fill="hsl(var(--chart-5))" radius={4} label='看图说话'>
+            <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              /></Bar>
           </BarChart>
         </ChartContainer>
 
