@@ -74,7 +74,8 @@ export default async function AdminPage() {
                 return acc;
             }, {});
             
-            const typeAverages = Object.entries(typeScores).reduce((acc: any, [type, scores]: [string, number[]]) => {
+            const typeAverages = Object.entries(typeScores).reduce<Record<string, number>>((acc, [type, scores]) => {
+                //@ts-ignore
                 acc[type] = +(scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1);
                 return acc;
             }, {});
