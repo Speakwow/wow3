@@ -1137,3 +1137,32 @@ export async function fetchRecordData(recordId: string, type: string) {
 }
 
 
+
+// Translation
+export async function getTranslationById(id: string) {
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE).collection('translations').findOne({ _id: new ObjectId(id) })
+  return JSON.parse(JSON.stringify(res))
+}
+
+export async function saveTranslationRecord(userId: string, threadId: string, content: string, feedback: any) {
+  const mongo = await connect()
+  const res = await mongo.db(DB).collection('translation_records').insertOne(
+    { userId: userId, 
+      threadId: threadId, 
+      score:feedback.score,
+      stu_answer: content, 
+      report: feedback }
+  )
+  return res.insertedId.toString()
+}
+
+
+
+//Prompt
+export async function getPrompt(id: string) {
+  console.log('Fetching Prompt')
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE).collection('prompts').findOne({ _id: new ObjectId(id) })
+  return JSON.parse(JSON.stringify(res))
+}

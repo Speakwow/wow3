@@ -1,25 +1,3 @@
-
-export function collection2type(collection: string) {
-  switch (collection) {
-    case 'scenarios':
-      return 'scenario';
-    case 'talkabouts':
-      return 'talkabout';
-    case 'repeat_threads':
-      return 'repeat';
-    case 'word_threads':
-      return 'word';
-    case 'story_threads':
-      return 'story';
-    case 'writes':
-      return 'write';
-      case 'repeats':
-        return 'repeat';
-    default:
-      return 'undefined';
-  }
-}
-
 interface TypeMapEntry {
   type: string;
   collection: string;
@@ -87,6 +65,14 @@ export const typeMap: TypeMapEntry[] = [
     banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
     icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
   },
+  {
+    type:"translation",
+    collection:"translations",
+    tag:"翻译练习",
+    intro: '通过翻译练习，提高学生的语言转换能力和语言表达能力。AI会评估学生的翻译结果并提供反馈。',
+    banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
+    icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
+  }
 ]
 
 export const Type2Tag = (type:string) => {
@@ -97,4 +83,9 @@ export const Type2Tag = (type:string) => {
 export const Type2Collection= (type:string) => {
   const entry = typeMap.find(item => item.type === type);
   return entry ? entry.collection : '';
+}
+
+export function collection2type(collection: string) {
+  const entry = typeMap.find(item => item.collection === collection);
+  return entry ? entry.type : 'undefined';
 }

@@ -4,12 +4,14 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 import { generateObject, streamObject } from 'ai';
 import { z } from 'zod';
-import { openai } from '@ai-sdk/openai';
+import { openai,createOpenAI} from '@ai-sdk/openai';
 import { ChatOpenAI } from "@langchain/openai";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { StructuredOutputParser, CustomListOutputParser } from "langchain/output_parsers";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { createStreamableValue } from "ai/rsc";
+import { getPrompt } from "./mongoIO";
+import { url } from "inspector";
 
 
 export async function genScenarioTarget(
@@ -491,7 +493,7 @@ export async function getTalkaboutFeedback(input: string) {
     const stream = createStreamableValue();
     (async () => {
         const { partialObjectStream } = await streamObject({
-            model: openai('gpt-4-turbo'),
+            model: openai('gpt-4o'),
             system: 'You generate three notifications for a messages app.',
             prompt: input,
             schema: z.object({
@@ -511,4 +513,54 @@ export async function getTalkaboutFeedback(input: string) {
     })();
 
     return { object: stream.value };
+}
+
+
+
+export async function genTranslationFeedback(
+    content: string,
+    topic: string,
+) {
+    const template_data = await getPrompt('6742e90ed368e87f1077525b')
+    const template = template_data?.content as string
+    // 定义需要替换的字段映射
+    const templateFields = {
+        content,
+        topic, 
+    }
+    // 使用正则表达式替换所有 {xxx} 占位符
+    const formattedPrompt = template.replace(
+        /\{(\w+)\}/g,
+        (match, key) => templateFields[key as keyof typeof templateFields] || match
+    )
+    const self_openai = createOpenAI({
+        baseURL: 'https://cn831pib23.execute-api.us-east-1.amazonaws.com',
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    const output_schema =  z.object({
+        correction: z.string(),
+        standard_answer: z.string(),
+        score: z.number()
+    })
+   
+    const maxRetries = 5
+    let attempts = 0;
+    while (attempts < maxRetries) {
+        try {
+            const { object } = await generateObject({
+                model: self_openai('gpt-4o'),
+                schema: output_schema,
+                prompt: formattedPrompt,
+              });
+            return object
+        }
+        catch (error) {
+            attempts++;
+            console.error(`Attempt ${attempts} failed:`, error);
+
+            if (attempts >= maxRetries) {
+                throw new Error('Maximum retries reached');
+            }
+        }
+    }
 }
