@@ -1157,6 +1157,27 @@ export async function saveTranslationRecord(userId: string, threadId: string, co
   return res.insertedId.toString()
 }
 
+//Listening
+export async function getListeningById(id: string) {
+  const mongo = await connectCore()
+  const res = await mongo.db(DB_CORE).collection('listenings').findOne({ _id: new ObjectId(id) })
+  return JSON.parse(JSON.stringify(res))
+}
+
+export async function saveListeningRecord(userId: string, threadId: string, score: number, stu_answers: string[], result: any) {
+  const mongo = await connect()
+  const res = await mongo
+  .db(DB)
+  .collection('listening_records')
+  .insertOne(
+    { userId: userId, 
+      threadId: threadId, 
+      score:score, 
+      stu_answers: stu_answers, 
+      report: result
+    })
+  return res.insertedId.toString()
+}
 
 
 //Prompt

@@ -104,11 +104,10 @@ export function LessonCard({ userId, userData, name, type, id, intro, cover, tag
                 <Card className={`relative flex flex-row bg-white rounded-[10px] border hover:ring focus:outline-none focus:ring focus:ring-[#42C83C] p-2 gap-3 hover:ring-[#42C83C]`}>
 
                     <div className="h-full w-[100px]">
-                        <Image
+                        <img
                             alt='SC'
                             width={200}
                             height={50}
-                            objectFit="cover"
                             className="rounded-[10px]"
                             src={coverImg} />
                     </div>

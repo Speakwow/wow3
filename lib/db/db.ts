@@ -72,6 +72,14 @@ export const typeMap: TypeMapEntry[] = [
     intro: '通过翻译练习，提高学生的语言转换能力和语言表达能力。AI会评估学生的翻译结果并提供反馈。',
     banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
     icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
+  },
+  {
+    type:"listening",
+    collection:"listenings",
+    tag:"听力练习",
+    intro: '通过听力练习，提高学生的听力理解和语言表达能力。AI会评估学生的听力结果并提供反馈。',
+    banner: 'https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar',
+    icon:"https://imagedelivery.net/yeOpFSfmW-7M72sPdtpMKw/1d0c20b7-ac42-4961-b476-b1f769d5cd00/avatar"
   }
 ]
 
