@@ -109,3 +109,11 @@ export function hoursUntil(endAt: Date): number {
 export function getChineseName(user: User): string {
     return `${user.lastName??user.username}${user.firstName??''}`
 }
+
+export function getFullName(user:any){
+    if(user.lastName && user.firstName){
+        return user.lastName+user.firstName
+    }else{
+        return user.username
+    }
+}
