@@ -30,7 +30,7 @@ export default async function RecordInfo({ params }: { params: { recordId: strin
     let thread;
     let assignmentName: string = '';
     let stuName = '未命名用户'
-    let info;
+    let info:any;
     try {
 
         const database = mongo.db(DB);
