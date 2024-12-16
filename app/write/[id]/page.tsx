@@ -15,17 +15,17 @@ import Image from 'next/image';
 
 export async function generateStaticParams() {
     const mongo = await connect()
-    const [writes, ] = await Promise.all([
-      mongo.db(DB).collection('writes').find().toArray(),
-  
+    const [writes,] = await Promise.all([
+        mongo.db(DB).collection('writes').find().toArray(),
+
     ])
     return writes.map((write) => (
         {
-          id: write._id.toString(),
+            id: write._id.toString(),
         }
-      ))
-  }
-  
+    ))
+}
+
 
 
 export default async function Write({ params }: { params: { id: string } }) {
@@ -39,44 +39,44 @@ export default async function Write({ params }: { params: { id: string } }) {
     // const recordId = '1'
     return (
         <div className="relative w-full h-full bg-muted p-2">
-                <div className='flex flex-col md:flex-row gap-2 w-full mb-24'>
-                    <div className=" ">
-                        <Link href={"/"} className="z-10">
-                            <Button size="icon" variant="outline">
-                                <ArrowLeftIcon />
-                            </Button>
-                        </Link>
-                    </div>
-                    <div className="flex flex-col gap-2 w-full pr-2">
-                        <Card className=" h-fit relative w-full">
-                            <CardHeader className="text-2xl text-primary">
-                                <CardTitle className=''>
-                                    {data.name}
-                                </CardTitle>
-                                <CardDescription className=''>
-                                    <div>单词数：<div className='inline'>{data.word_count}</div> 词</div>
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className='flex flex-col gap-2'>
-                                <CardDescription>
-                                    题目
-                                </CardDescription>
-                                <div className='text-pretty whitespace-pre-line text-sm'>
-                                    {data.topic}
-                                </div>
-                                {
-                                    data.image_url&&
-                                    <div>
-                                        <Image 
-                                        src={data.image_url} 
+            <div className='flex flex-col md:flex-row gap-2 w-full mb-24'>
+                <div className=" ">
+                    <Link href={"/"} className="z-10">
+                        <Button size="icon" variant="outline">
+                            <ArrowLeftIcon />
+                        </Button>
+                    </Link>
+                </div>
+                <div className="flex flex-col gap-2 w-full pr-2">
+                    <Card className=" h-fit relative w-full">
+                        <CardHeader className="text-2xl text-primary">
+                            <CardTitle className=''>
+                                {data.name}
+                            </CardTitle>
+                            <CardDescription className=''>
+                                <div>单词数：<div className='inline'>{data.word_count}</div> 词</div>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className='flex flex-col gap-2'>
+                            <CardDescription>
+                                题目
+                            </CardDescription>
+                            <div className='text-pretty whitespace-pre-line text-sm'>
+                                {data.topic}
+                            </div>
+                            {
+                                data.image_url &&
+                                <div>
+                                    <Image
+                                        src={data.image_url}
                                         alt=''
                                         width={600}
                                         height={400}
                                         objectFit='cover' />
-                                    </div>
-                                }
-                            </CardContent>
-                            {/* <div className='flex flex-col gap-2 text-left px-6'>
+                                </div>
+                            }
+                        </CardContent>
+                        {/* <div className='flex flex-col gap-2 text-left px-6'>
                             <CardDescription>
                                 注意事项
                             </CardDescription>
@@ -84,17 +84,17 @@ export default async function Write({ params }: { params: { id: string } }) {
                                 {data.rule}
                             </div>
                         </div> */}
-                        </Card>
-                        <Card className="p-6 h-fit relative">
-                            <WriteForm userId={userId as string} write={data} />
-                        </Card>
-                        <div className='flex flex-col gap-4 w-full py-4 text-center'>
-                            <Separator />
-                            <div className='text-xs text-muted-foreground'>我也是有底线的～</div>
-                            
-                        </div>
+                    </Card>
+                    <Card className="p-6 h-fit relative">
+                        <WriteForm userId={userId as string} write={data} />
+                    </Card>
+                    <div className='flex flex-col gap-4 w-full py-4 text-center'>
+                        <Separator />
+                        <div className='text-xs text-muted-foreground'>我也是有底线的～</div>
+
                     </div>
                 </div>
+            </div>
         </div>
 
     )

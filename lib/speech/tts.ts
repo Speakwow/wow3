@@ -6,7 +6,7 @@ export function createSSML(text: string, name: string, style: string, degree: st
         `
     <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
       <voice name="${name}">
-        <prosody rate="-15.00%">
+        <prosody rate="0.00%">
           <mstts:express-as style="${style}" styledegree="${degree}">
               ${text}
           </mstts:express-as>
@@ -23,7 +23,7 @@ export function synthesizeSpeech(text: string,onComplete:AudioDataCallback) {
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(
-        createSSML(text, "en-US-TonyNeural", "cheerful", "0.7"),
+        createSSML(text, "en-US-TonyNeural", "cheerful", "1.0"),
         result => {
             if (result) {
                 speechSynthesizer.close();
@@ -44,7 +44,7 @@ export function synthesizeSpeechWithVoice(text: string,voice:string,onComplete:A
     // @ts-ignore
     const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig,null);
     speechSynthesizer.speakSsmlAsync(
-        createSSML(text,voice, "cheerful", "0.7"),
+        createSSML(text,voice, "cheerful", "1.0"),
         result => {
             if (result) {
                 speechSynthesizer.close();
